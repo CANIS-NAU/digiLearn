@@ -10,4 +10,4 @@ Kristine Hermosado,
 Sebastian Kastrul 
 
 ## Website Link:
-/Under Construction/
+https://ceias.nau.edu/capstone/projects/CS/2021/DigiLearn-F20/
