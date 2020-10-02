@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+.column_image {
+  float: left;
+  width: 33.33%;
+  padding: 5px;
+}
+
+/* Clearfix (clear floats) */
+.row_image::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.logo-image{
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-top: -6px;
+}
+
+</style>
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>digiLearn: Techonology</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="pages_vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <div class="logo-image">
+     <img src="digiLearnLogo.jpg" class="img-fluid">
+        </div>
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item ">
+            <a class="nav-link" href="index.html">Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="projectPage.html">Project</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="schedulePage.html">Schedule</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="technologyPage.html">Technology</a>
+            <span class="sr-only">(current)</span>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="requirements_SolutionPage.html">Requirements/Solution</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Content -->
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h1 class="mt-5">The Technologies</h1>
+        <p class="lead">This page will continue to be updated as we work on our project. </p>
+         <ul class="list-unstyled">
+          <li>Languages: For languages we are planning on using Java and Python to develop the software as those
+            are the languages the group is skilled in. We are also planning on using Kotlin for the mobile application
+            that can easily be used for creating content for android and ios.</li>
+
+            <div class="row_image">
+              <div class="column_image">
+                <img src="Java_Logo.jpg" alt="" style="width:100%">
+              </div>
+              <div class="column_image">
+                <img src="Python_Logo.jpg" alt="" style="width:100%">
+              </div>
+              <div class="column_image">
+                <img src="Kotlin_Logo.jpg" alt="" style="width:100% ">
+              </div>
+            </div>
+
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="pages_vendor/jquery/jquery.slim.min.js"></script>
+  <script src="pages_vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
