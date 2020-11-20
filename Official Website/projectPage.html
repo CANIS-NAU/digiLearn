@@ -69,17 +69,63 @@
       <div class="col-lg-12 text-center">
         <h1 class="mt-5">DigiPack</h1>
         <p class="lead"> Codebase Link: <a href="https://github.com/Krstne/digiLearn">digiLearn</a> </p>
-        <p> Together our team is creating the Digital Backpack, a mobile app designed to help student with online
-                learning. Schools rely on the use of the internet and wifi more and more as technology advances, especially
-                with the current pandemic. More students are doing online school now, as well as the students who
-                already do school online due to sick relatives, financial issues, and more. The problem our team
-                is solving by creating the Digital Backpack is to help the students who are having issues with data
-                and wifi. We want students to be able to make seach queries, and be able to pull documents and
-                assignments while offline. </p>
+        <p> The COVID-19 pandemic has led to a sudden shift to remote learning. 
+            Unfortunately, many students across America don't have access to a 
+            reliable Internet connection. The phenomenon known as “the homework gap”
+            affects nearly 12 million students that are unable to fully participate
+            in their coursework due to a lack of sufficient Internet access. Such
+            a situation disproportionately affects disenfranchised communities. 
+            These students must rely on public hotspots to complete their assignments.
+            </p>
+        
+        <p>
+            Dr. Vigil-Hayes runs the Community aware Networks & Information Systems 
+            Laboratory (CANIS) in the School of Informatics, Computing, and Cyber 
+            Systems at Northern Arizona University. CANIS Lab focuses on network
+            analysis and community-centered design. Team DigiLearn is working with 
+            Dr. Vigil Hayes and CANIS labs to bring to life The Digital Backpack. 
+            The Digital Backpack or DigiPack is an app that will allow a fluid transition 
+            between online and offline learning. When a user comes into range of
+            a wifi connection, the DigiPack will automatically download the requested
+            content for offline use later. The app will also automatically upload 
+            completed assignments for the user. These upload and download requests 
+            can be queued offline to be performed when a network connection is available.
+            The app will interface with popular Learning Management Systems such as Google Classroom. </p>
 
         <p> The initial concept for this project was provided by our sponsor,
             in <a href="Vigil-Hayes_DigiPack.pdf">DigiPack</a> pdf. </p>
 
+        <p>At the heart of the Digital Backpack system is the idea of Opportunistic
+        Content Delivery Networks, or oCDN, that enable the aforementioned, seamless
+        transitions between online and offline learning. The proxy server is the element
+        that makes such an oCDN possible. Consider the following high-level system
+        diagram: </p>
+        
+        <br>
+        <img src="DigiPackSystemDiagram.png" class="img-fluid">
+        <br>
+        
+        <p>Note the various services that the digiPack server performs on the behalf
+        of the user while the user is offline. The proxy server interfaces with third-party
+        services such as Google Classroom in order to retrieve assignments and other important
+        documents while also submitting assignments and other requests posted by the user. In this way, 
+        the proxy server is able to maximally use even the briefest of connections with
+        the DigiPack app.</p>
+        
+        <p>The DigiPack app is the user-facing portion of the Digital Backpack system.
+        Here, the user is able to view media sent by the proxy server and complete their
+        assignments. The user can also queue up actions for the app to take once they
+        have a network connection. For exmaple, a user may queue assignments for submission,
+        request certain documents to be retrieved, or even prepare Google searches for the
+        proxy server to resolve.</p>
+        
+        <p>The proxy server and the DigiPack app working in tandem creates an 
+        asynchronous environment where the proxy server is performing networked 
+        operations on the behalf of the user while the user is working separately
+        offline. In this way, even very brief network connections can be opportunistically
+        used to maximize the user's access to the wider internet.</p>
+        
+        <br><br><br><br>
       </div>
     </div>
   </div>
