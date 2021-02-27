@@ -1,0 +1,3 @@
+google drive api notes
+
+resumable uploads are possible
