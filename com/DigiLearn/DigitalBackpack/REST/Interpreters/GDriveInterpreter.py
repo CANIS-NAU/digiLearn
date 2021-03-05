@@ -1,103 +1,94 @@
-import json
-from DigiLearn.DigitalBackpack.REST.JSONBuilders import DigiJsonBuilder
-from DigiLearn.DigitalBackpack.REST import GDriveInterface
-
+# local dependencies
+from com.DigiLearn.DigitalBackpack.REST.JSONBuilders import DigiJsonBuilder
+from com.DigiLearn.DigitalBackpack.REST.Interfaces.GDriveInterface import create_service
+from com.DigiLearn.DigitalBackpack.Auth.AuthenticationManager import get_gdrive_auth
+from com.DigiLearn.DigitalBackpack.src.DataManagers.DataManager import store_file
+# python dependencies
+import io
+# google dependencies
+from googleapiclient.http import MediaIoBaseDownload
 
 _API_NAME = 'drive'
 _API_VERSION = 'v3'
-_GOOGLE_URI = 'https://www.googleapis.com/'
-_SCOPES = 'https://www.googleapis.com/auth/drive'
+_SCOPES = ['https://www.googleapis.com/auth/drive']
 # this might need more eventually but for now this is all i need
 _FILE_FIELDS = 'name, id, parents, mimeType, description, trashed, size, contentRestrictions'
-_GDRIVE_INTERFACE = None
 
 
 # this needs some work with the user_auth stuff but other than that (and some error checking stuff)
 # its done
-def getfilemetadata(user_auth: dict, fileid: str):
-    # make sure we have everything we need to fulfil the request
-    _beforeanything(user_auth)
-
-    #   get keys from user auth for GET building
-    api_key = user_auth["installed"]["something else idk need to figure this out"]  # see: client_secret.json somewhere
-    access_token = user_auth["installed"]["see above"]  # **********************
-
-    # build request  # i believe the Accept: application/json only gets the metadata here
-    request = "GET %s/%s/%s/files/%s?fields=%s&key=%s HTTP/1.1\r\n\r\nAuthorization: %s\nAccept: application/json" \
-              % (_GOOGLE_URI, _API_NAME, _API_VERSION, fileid, _FILE_FIELDS, api_key, access_token)
-    #               scopes here is the wrong liink
-    # send the metadata request
-    # get file from drive
-    response = GDriveInterface.getrequest(request)
-
-    # socket.recv() returns a bytes object
-    # bytes.decode() converts to str, defaults to ASCII
-    http_response = response.decode()
-    http_response_len = len(http_response)
-
-    # if the response went through and we got what we wanted
-    #       this is now handled by the GDriveInterface
-
-    # parse http_response for the metadata we want
-    i = 0
-    # while the next three characters arent {\r\n (start of json) and we haven't reached the end of the file
-    while i+2 < http_response_len and http_response[i:i+2] != "{\r\n":
-        i += 1  # iterate
-    # hit the first instance of {\n and so now we load the rest of the response to a dict/json
-    drive_response = json.loads(http_response[i:])
-
-    if drive_response["trashed"] != "true":
-        # well have whatever is calling this ask for the actual file in a separate call, this just gets metadata
-        local_file_path = None
-        # take the metadata about the file and create digijson
-        name = drive_response["name"]
-        driveid = drive_response["id"]
-        classid = None
-        drivepath = drive_response["parents"]
-        classpath = None
-        size = drive_response["size"]
-        fileobj = DigiJsonBuilder.createfile(name, driveid, classid, local_file_path, drivepath, classpath, size)
-        # the things added below are not a part of the official "digilearn" json structure but could be useful
-        fileobj.update(drive_response["mimeType"])
-        fileobj.update(drive_response["description"])
-        fileobj.update(drive_response["contentRestrictions"])
-        return fileobj
+def get_file_metadata(user_auth: dict, file_id: str):
+    # initialize "service"
+    #   do some auth, probably need to mess w/ this in GDriveInterface
+    gdrive_auth = get_gdrive_auth(user_auth['user_id'])
+    service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES)
+    # make request for file metadata
+    request = service.files().get(fileId=file_id, fields=_FILE_FIELDS)
+    # if the file hasn't been moved to trash by the user
+    if not request['trashed']:
+        # build the file object with no local_file_path, can be added with a second call to get_file
+        filemeta = DigiJsonBuilder.create_file(name=request['name'], drive_id=request['id'], class_id=None,
+                                               local_file_path=None, drive_path=request['parents'], classpath=None,
+                                               size=request['size'])
+        # add the other stuff we get from gdrive to the object, don't necessarily need it but might be useful eventually
+        filemeta.update({'mimeType': request['mimeType'], 'description': request['description'],
+                         'contentRestrictions': request['contentRestrictions']})
+        # return metadata
+        return filemeta
     else:
-        # throw an error here about the file being deleted by the user and return none
+        # throw an error here
         return None
 
 
-def getfile(user_auth, filedict):
-    _beforeanything(user_auth)
-    # then for the actual file? i think?
-    #   the API says you can GET files content buuut im gonna have to test that
-    #   cause currently i cant figure that out w/ just the documentation (through a GET request, their api does it tho)
-    #   but assume we have to send a separate request for the actual file
-    #       for now (unless caitlin and i can figure this out) i think we might have to use the Google libraries
-    #       to do this
+# gets a singular file from google drive, for multiple files call in a loop.
+def get_file(user_auth, file_dict):
+    # do auth and create service
+    gdrive_auth = get_gdrive_auth(user_auth['user_id'])
+    service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES)
+    # get the file itself
+    request = service.files().get_media(fileID=file_dict['drive_id'])
+    fh = io.BytesIO()
+    downloader = MediaIoBaseDownload(fd=fh, request=request)
+
+    done = False
+
+    while not done:
+        status, done = downloader.next_chunk()
+        # log the progress somewhere
+        print('download progress {0}'.format(status.progress() * 100))
+
+    fh.seek(0)
     # store it on the server somewhere
     #   this will be done by the datamanager
     #   pass the recieved string of bits to the datamanager with location,
     #   driveid(just gonna use these for naming ease), and ya well figure that out when we get there
-    return None
+    file_path = store_file(user_auth, file_dict, fh, "need to make up a storage medium key somehwere or chage the DM")
+    file_dict['localpath'] = file_path
+    return file_dict
 
 
-def getdrivelist(userauth):
-    drivelist = None
+# because of the way that the gdrive API works, this only returns the shared drives for a user
+#   my guess is that this is because every user is assumed to (and required to) have their own drive at drive#my-drive
+#   //might be drive#mydrive idrk
+def get_drive_list(user_auth):
+    # do auth and create service
+    gdrive_auth = get_gdrive_auth(user_auth['user_id'])
+    service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES)
     # get list of drive objects (this is like, mydrive, shared drives, etc. no files)
-    #   ?fields=files(_FILE_FIELDS)
+    gdrive_list = service.drives().list()
+
     # convert to digijson
     return drivelist
 
 
-def getfilelist(userauth, driveid):
+def get_file_list(userauth, driveid):
     filelist = None
     # get list of files in the specified drive
     # convert to digijson
     return filelist
 
 
-def getfilecomments(userauth, fileid):
+def get_file_comments(userauth, fileid):
     comments = None
     # get comments on the file
     # just create a (python)json object
@@ -108,7 +99,7 @@ def getfilecomments(userauth, fileid):
     return comm
 
 
-def uploadfile(userauth, fileobj, drivepath):
+def upload_file(userauth, fileobj, drivepath):
     uploadjson = None
     # get the (local) file and needed data to upload to drive
     # create drive json
@@ -121,7 +112,7 @@ def uploadfile(userauth, fileobj, drivepath):
     return uploadsuccess
 
 
-def _getdrivepermissions(drive, userauth):
+def _get_drive_permissions(drive, userauth):
     permissions = None
     # get the permissions that the user has for the drive
     drive.update(permissions)  # works like append
@@ -131,12 +122,7 @@ def _getdrivepermissions(drive, userauth):
 def _beforeanything(user_auth):
     interpretername = "Google Drive Interpreter"
 
-    # i need to figure out how the  imma do this
-
-    if type(_DATA_MANAGER) != type():  # fill this out when data manager is built
-        errstr = "No Data Manager set for Google Drive Interpreter"
-        # throw an error about this
-        return False
+    # i need to figure out more testing to do here and how to properly handle errors
     if type(user_auth) != dict:
         errstr = "Incorrect Data Type for Google Drive Interpreter User Authentication variable"
         # throw an error about this

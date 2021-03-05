@@ -3,12 +3,12 @@ import json
 _none = type(None)
 
 
-def createfile(name, driveid, classid, localfilepath, drivepath, classpath, size):
+def create_file(name, drive_id, class_id, local_file_path, drive_path, classpath, size):
     nametype = type(name)
-    didtype = type(driveid)
-    clidtype = type(classid)
-    lfptype = type(localfilepath)
-    drpathtype = type(drivepath)
+    didtype = type(drive_id)
+    clidtype = type(class_id)
+    lfptype = type(local_file_path)
+    drpathtype = type(drive_path)
     clpathtype = type(classpath)
     stype = type(size)
 
@@ -21,10 +21,10 @@ def createfile(name, driveid, classid, localfilepath, drivepath, classpath, size
             stype == int):
         file = {
                 "name": name,
-                "driveID": driveid,
-                "classID": classid,
-                "localpath": localfilepath,
-                "drivepath": drivepath,
+                "driveID": drive_id,
+                "classID": class_id,
+                "localpath": local_file_path,
+                "drivepath": drive_path,
                 "classroompath": classpath,
                 "filesize": size
         }
@@ -34,7 +34,7 @@ def createfile(name, driveid, classid, localfilepath, drivepath, classpath, size
         return "File JSON Err: invalid or missing parameter value(s)"
 
 
-def createdrive(driveid, filelist, permissions):
+def create_drive(driveid, filelist, permissions):
     didtype = type(driveid)
     fltype = type(filelist)
     ptype = type(permissions)
@@ -50,7 +50,7 @@ def createdrive(driveid, filelist, permissions):
         return "Drive JSON Err: invalid or missing parameter value(s)"
 
 
-def createsearchresult(title, link, displaylink, snippet, mime, fileformat):
+def create_search_result(title, link, displaylink, snippet, mime, fileformat):
     titletype = type(title)
     linktype = type(link)
     dlinktype = type(displaylink)
@@ -77,7 +77,7 @@ def createsearchresult(title, link, displaylink, snippet, mime, fileformat):
         return "Search Result JSON Err: invalid or missing parameter value(s)"
 
 
-def createimageresult(context, height, width, byte, thumblink, thumbheight, thumbwidth, filepath):
+def create_image_result(context, height, width, byte, thumblink, thumbheight, thumbwidth, filepath):
     contype = type(context)
     htype = type(height)
     wtype = type(width)
@@ -104,7 +104,7 @@ def createimageresult(context, height, width, byte, thumblink, thumbheight, thum
         return "Image Result JSON Err: invalid or missing parameter value(s)"
 
 
-def createresults(query, image, numresults, results):
+def create_results(query, image, numresults, results):
     qtype = type(query)
     itype = type(image)
     nrtype = type(numresults)
@@ -122,7 +122,7 @@ def createresults(query, image, numresults, results):
         return "Results JSON Err: invalid ormissing parameter value(s)"
 
 
-def createassignment(workfolder, local):
+def create_assignment(workfolder, local):
     wftype = type(workfolder)
     ltype = type(local)
 
@@ -138,7 +138,7 @@ def createassignment(workfolder, local):
         return "Assignment JSON Err: invalid or missing parameter value(s)"
 
 
-def createmultchoice(choices, local):
+def create_multchoice(choices, local):
     ctype = type(choices)
     ltype = type(local)
 
@@ -154,7 +154,7 @@ def createmultchoice(choices, local):
         return "Multchoice JSON Err: invalid or missing parameter value(s)"
 
 
-def createannouncement(annouid, text, materials, creationtime, mode, students):
+def create_announcement(annouid, text, materials, creationtime, mode, students):
     anidtype = type(annouid)
     ttype = type(text)
     mtype = type(materials)
@@ -177,7 +177,7 @@ def createannouncement(annouid, text, materials, creationtime, mode, students):
         return "Annoucement JSON Err: invalid or missing parameter value(s)"
 
 
-def creatematerial(drivefiles, ytlinks, links, forms, local):
+def create_material(drivefiles, ytlinks, links, forms, local):
     dftype = type(drivefiles)
     yttype = type(ytlinks)
     ltype = type(links)
@@ -197,7 +197,7 @@ def creatematerial(drivefiles, ytlinks, links, forms, local):
         return "Material JSON Err: invalid or missing parameter value(s)"
 
 
-def createcoursework(coursewkid, title, description, materials, creationtime, duedate, duetime, worktype, mode,
+def create_coursework(coursewkid, title, description, materials, creationtime, duedate, duetime, worktype, mode,
                      students, details):
     if (type(coursewkid) == str and type(title) == str and type(description) == str and type(materials) == list and
             type(creationtime) == str and type(duedate) == str and type(duetime) == str and type(worktype) == str and
@@ -219,7 +219,7 @@ def createcoursework(coursewkid, title, description, materials, creationtime, du
         return "Course Work JSON Err: invalid or missing parameter value(s)"
 
 
-def createcourse(name, courseid, students, announcements, coursework):
+def create_course(name, courseid, students, announcements, coursework):
     if(type(name) == str and type(courseid) == str and type(students) == list and type(announcements) == list
             and type(coursework) == list):
         return {
@@ -233,7 +233,7 @@ def createcourse(name, courseid, students, announcements, coursework):
         return "Course Creation JSON Err: invalid or missing parameter value(s)"
 
 
-def createuser( auth, courselist, searchlist, searchparams, sessions, drivelist):
+def create_user( auth, courselist, searchlist, searchparams, sessions, drivelist):
     if(type(auth) == list and type(courselist) == list and type(searchlist) == list and type(searchparams) == list
             and type(sessions) == list and type(drivelist) == list):
         return {
@@ -248,7 +248,7 @@ def createuser( auth, courselist, searchlist, searchparams, sessions, drivelist)
         return "User Creation JSON Err: invalid or missing parameter value(s)"
 
 
-def createsession( sessionid, sessionsignal, sessionstart, newrequests, newsincelast):
+def create_session( sessionid, sessionsignal, sessionstart, newrequests, newsincelast):
     if(type(sessionid) == str and type(sessionsignal) == bool and type(sessionstart) == str
             and type(newrequests) == list and type(newsincelast) == list):
         return {
