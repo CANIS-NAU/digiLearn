@@ -7,12 +7,14 @@ from com.DigiLearn.DigitalBackpack.src.DataManagers.DataManager import store_fil
 import io
 # google dependencies
 from googleapiclient.http import MediaIoBaseDownload
+from googleapiclient.http import MediaFileUpload
 
 _API_NAME = 'drive'
 _API_VERSION = 'v3'
 _SCOPES = ['https://www.googleapis.com/auth/drive']
 # this might need more eventually but for now this is all i need
 _FILE_FIELDS = 'name, id, parents, mimeType, description, trashed, size, contentRestrictions'
+_DRIVE_FIELDS = ''
 
 
 # this needs some work with the user_auth stuff but other than that (and some error checking stuff)
@@ -20,7 +22,7 @@ _FILE_FIELDS = 'name, id, parents, mimeType, description, trashed, size, content
 def get_file_metadata(user_auth: dict, file_id: str):
     # initialize "service"
     #   do some auth, probably need to mess w/ this in GDriveInterface
-    gdrive_auth = get_gdrive_auth(user_auth['user_id'])
+    gdrive_auth = user_auth  # get_gdrive_auth(user_auth['user_id'])
     service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES)
     # make request for file metadata
     request = service.files().get(fileId=file_id, fields=_FILE_FIELDS)
@@ -75,46 +77,71 @@ def get_drive_list(user_auth):
     gdrive_auth = get_gdrive_auth(user_auth['user_id'])
     service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES)
     # get list of drive objects (this is like, mydrive, shared drives, etc. no files)
+    # with all list getters, there is a list_next(prev_req, prev_resp) that can be used, gonna need a while loop
+    # for those in the future but for now well just do one page of results
     gdrive_list = service.drives().list()
-
+    drivelist = []
+    for drive in gdrive_list['drives']:
+        driveobj = DigiJsonBuilder.create_drive(drive['id'], get_file_list(user_auth, drive['id']),
+                                                drive['capabilities'])
+        driveobj = _get_drive_permissions(driveobj, drive)
+        drivelist.append(driveobj)
     # convert to digijson
     return drivelist
 
 
-def get_file_list(userauth, driveid):
-    filelist = None
+def get_file_list(user_auth, driveid):
+    filelist = []
     # get list of files in the specified drive
+    gdrive_auth = get_gdrive_auth(user_auth['user_id'])
+    service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES)
+    # see get_drive_list
+    gdrive_list = service.files().list(fields='files(%s)' % _FILE_FIELDS, id=driveid)
+
+    for file in gdrive_list['files']:
+        if not file['trashed']:
+            filemeta = DigiJsonBuilder.create_file(name=file['name'], drive_id=file['id'], class_id=None,
+                                                   local_file_path=None, drive_path=file['parents'], classpath=None,
+                                                   size=file['size'])
+            filemeta.update({'mimeType': file['mimeType'], 'description': file['description'],
+                             'contentRestrictions': file['contentRestrictions']})
+            filelist.append(filemeta)
     # convert to digijson
     return filelist
 
 
-def get_file_comments(userauth, fileid):
-    comments = None
+def get_file_comments(user_auth, fileid):
+    comments = []
+    # do auth and create service
+    gdrive_auth = get_gdrive_auth(user_auth['user_id'])
+    service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES)
     # get comments on the file
+    file_comm_list = service.comments.list(fileId=fileid)
     # just create a (python)json object
     # because json i can just slap that shit in there and not care about it lol
     comm = {
-        "comments": comments
+        "comments": file_comm_list['comments']
     }
     return comm
 
 
-def upload_file(userauth, fileobj, drivepath):
+def upload_file(user_auth, file_dict, fileobj, drivepath):
     uploadjson = None
+    gdrive_auth = get_gdrive_auth(user_auth['user_id'])
+    service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES)
     # get the (local) file and needed data to upload to drive
     # create drive json
-    # create POST request
-    # slap it all together
-    # send it out the socket
-    # probably gonna need a from Google import something up at the top
     # make sure file got uploaded correctly/completely
-    uploadsuccess = None
+    uploadsuccess = service.files().create(body='json object', media_body='filepath')
     return uploadsuccess
 
 
-def _get_drive_permissions(drive, userauth):
-    permissions = None
+def _get_drive_permissions(drive, gdrive):
     # get the permissions that the user has for the drive
+    permissions = {
+        "restrictions": gdrive['restrictions'],
+        "capabilities": gdrive['capabilities']
+    }
     drive.update(permissions)  # works like append
     return drive
 

@@ -22,7 +22,9 @@ def store_file(user_obj: dict, fileobj: dict, file: bytes, storage_medium_key: s
     # file obj has all the parameters needed to store this
     #       mostly name, size, type
     # store on the server
-
+    # *****this (or possibly whatever is sending the request to store something)
+    # also needs to check if the file json associated has a drive id, and if not get one from google so we can upload
+    # if necessary
     filepath = _STORAGE_MEDIUMS[storage_medium_key] + '/' + user_obj["auth"]["digilearn"]["userid"]
 
     try:
