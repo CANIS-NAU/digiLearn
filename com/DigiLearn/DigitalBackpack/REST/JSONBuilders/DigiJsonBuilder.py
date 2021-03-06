@@ -12,26 +12,38 @@ def create_file(name, drive_id, class_id, local_file_path, drive_path, classpath
     clpathtype = type(classpath)
     stype = type(size)
 
-    if (nametype == str and
-            (didtype == str or didtype == _none) and
-            (clidtype == str or clidtype == _none) and
-            lfptype == str and
-            (drpathtype == str or drpathtype == _none) and
-            (clpathtype == str or clpathtype == _none) and
-            stype == int):
-        file = {
-                "name": name,
-                "driveID": drive_id,
-                "classID": class_id,
-                "localpath": local_file_path,
-                "drivepath": drive_path,
-                "classroompath": classpath,
-                "filesize": size
-        }
-        return file
+    print(drpathtype)
+    if nametype == str:
+        if didtype == str or didtype == _none:
+            if clidtype == str or clidtype == _none:
+                if lfptype == str or lfptype == _none:
+                    if drpathtype == list or drpathtype == _none:
+                        if clpathtype == str or clpathtype == _none:
+                            if stype == str or stype == _none:
+                                file = {
+                                    "name": name,
+                                    "driveID": drive_id,
+                                    "classID": class_id,
+                                    "localpath": local_file_path,
+                                    "drivepath": drive_path,
+                                    "classroompath": classpath,
+                                    "filesize": size
+                                }
+                                return file
+                            else:
+                                return "Size type invalid"
+                        else:
+                            return "class path type invalid"
+                    else:
+                        return "drive path type invalid"
+                else:
+                    return "local file path type invalid"
+            else:
+                return "class id type invalid"
+        else:
+            return "drive id type invalid"
     else:
-        # probably need to throw an error here but for now
-        return "File JSON Err: invalid or missing parameter value(s)"
+        return "name type invalid"
 
 
 def create_drive(driveid, filelist, permissions):

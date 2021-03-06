@@ -13,7 +13,7 @@ _API_NAME = 'drive'
 _API_VERSION = 'v3'
 _SCOPES = ['https://www.googleapis.com/auth/drive']
 # this might need more eventually but for now this is all i need
-_FILE_FIELDS = 'name, id, parents, mimeType, description, trashed, size, contentRestrictions'
+_FILE_FIELDS = 'name, id, parents, mimeType, description, trashed, size, capabilities'
 _DRIVE_FIELDS = ''
 
 
@@ -25,16 +25,23 @@ def get_file_metadata(user_auth: dict, file_id: str):
     gdrive_auth = user_auth  # get_gdrive_auth(user_auth['user_id'])
     service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES)
     # make request for file metadata
-    request = service.files().get(fileId=file_id, fields=_FILE_FIELDS)
+    request = service.files().get(fileId=file_id, fields='*').execute()
     # if the file hasn't been moved to trash by the user
+    print(request)
     if not request['trashed']:
         # build the file object with no local_file_path, can be added with a second call to get_file
-        filemeta = DigiJsonBuilder.create_file(name=request['name'], drive_id=request['id'], class_id=None,
-                                               local_file_path=None, drive_path=request['parents'], classpath=None,
-                                               size=request['size'])
+        try:
+            filemeta = DigiJsonBuilder.create_file(name=request['name'], drive_id=request['id'], class_id=None,
+                                                   local_file_path=None, drive_path=request['parents'], classpath=None,
+                                                   size=request['size'])
+        except KeyError as k:
+            if k == 'size':
+                filemeta = DigiJsonBuilder.create_file(name=request['name'], drive_id=request['id'], class_id=None,
+                                                       local_file_path=None, drive_path=request['parents'],
+                                                       classpath=None,
+                                                       size=None)
         # add the other stuff we get from gdrive to the object, don't necessarily need it but might be useful eventually
-        filemeta.update({'mimeType': request['mimeType'], 'description': request['description'],
-                         'contentRestrictions': request['contentRestrictions']})
+        filemeta.update({'mimeType': request['mimeType'], 'capabilities': request['capabilities']})
         # return metadata
         return filemeta
     else:
@@ -64,7 +71,7 @@ def get_file(user_auth, file_dict):
     #   this will be done by the datamanager
     #   pass the recieved string of bits to the datamanager with location,
     #   driveid(just gonna use these for naming ease), and ya well figure that out when we get there
-    file_path = store_file(user_auth, file_dict, fh, "need to make up a storage medium key somehwere or chage the DM")
+    file_path = store_file(user_auth, file_dict, fh, "drive_storage")
     file_dict['localpath'] = file_path
     return file_dict
 

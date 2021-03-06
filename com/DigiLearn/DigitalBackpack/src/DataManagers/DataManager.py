@@ -1,6 +1,6 @@
 import os
 
-_STORAGE_MEDIUMS = None
+_STORAGE_MEDIUMS = {'drive_storage': 'DriveStorage'}
 _DATABASES = None
 _STORAGE_MANAGER = None
 _DATABASE_MANAGER = None
@@ -25,7 +25,8 @@ def store_file(user_obj: dict, fileobj: dict, file: bytes, storage_medium_key: s
     # *****this (or possibly whatever is sending the request to store something)
     # also needs to check if the file json associated has a drive id, and if not get one from google so we can upload
     # if necessary
-    filepath = _STORAGE_MEDIUMS[storage_medium_key] + '/' + user_obj["auth"]["digilearn"]["userid"]
+    # so its currently saving stuff to
+    filepath = './' + _STORAGE_MEDIUMS[storage_medium_key] + '/' + user_obj["auth"]["digilearn"]["userid"]
 
     try:
         with open(os.path.join(filepath, fileobj["name"]), 'wb') as f:
