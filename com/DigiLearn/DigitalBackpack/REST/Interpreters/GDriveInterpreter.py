@@ -3,6 +3,7 @@ from com.DigiLearn.DigitalBackpack.REST.JSONBuilders import DigiJsonBuilder
 from com.DigiLearn.DigitalBackpack.REST.Interfaces.GDriveInterface import create_service
 from com.DigiLearn.DigitalBackpack.Auth.AuthenticationManager import get_gdrive_auth
 from com.DigiLearn.DigitalBackpack.src.DataManagers.DataManager import store_file
+from com.DigiLearn.DigitalBackpack.err import DigiExceptions
 # python dependencies
 import io
 # google dependencies
@@ -25,9 +26,8 @@ def get_file_metadata(user_auth: dict, file_id: str):
     gdrive_auth = user_auth  # get_gdrive_auth(user_auth['user_id'])
     service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES)
     # make request for file metadata
-    request = service.files().get(fileId=file_id, fields='*').execute()
+    request = service.files().get(fileId=file_id, fields=_FILE_FIELDS).execute()
     # if the file hasn't been moved to trash by the user
-    print(request)
     if not request['trashed']:
         # build the file object with no local_file_path, can be added with a second call to get_file
         try:
@@ -46,7 +46,8 @@ def get_file_metadata(user_auth: dict, file_id: str):
         return filemeta
     else:
         # throw an error here
-        return None
+        raise DigiExceptions.TrashedFileError(file_id, '%s file has been moved to trash by user and cannot be accessed'
+                                              % file_id)
 
 
 # gets a singular file from google drive, for multiple files call in a loop.
@@ -87,7 +88,8 @@ def get_drive_list(user_auth):
     # with all list getters, there is a list_next(prev_req, prev_resp) that can be used, gonna need a while loop
     # for those in the future but for now well just do one page of results
     gdrive_list = service.drives().list()
-    drivelist = []
+    mydrive = get_file_list(user_auth, 'my-drive')
+    drivelist = [mydrive]
     for drive in gdrive_list['drives']:
         driveobj = DigiJsonBuilder.create_drive(drive['id'], get_file_list(user_auth, drive['id']),
                                                 drive['capabilities'])
@@ -100,18 +102,43 @@ def get_drive_list(user_auth):
 def get_file_list(user_auth, driveid):
     filelist = []
     # get list of files in the specified drive
-    gdrive_auth = get_gdrive_auth(user_auth['user_id'])
+    gdrive_auth = user_auth  # get_gdrive_auth(user_auth['user_id'])
     service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES)
     # see get_drive_list
-    gdrive_list = service.files().list(fields='files(%s)' % _FILE_FIELDS, id=driveid)
+    if driveid == 'my-drive':
+        gdrive_list = service.files().list(fields="files(" + _FILE_FIELDS + ")").execute()
+    else:
+        gdrive_list = service.files().list(fields="files(" + _FILE_FIELDS + ")", driveId=driveid,
+                                           supportsAllDrives=True, includeItemsFromAllDrives=True, corpora='drive'
+                                           ).execute()
 
     for file in gdrive_list['files']:
         if not file['trashed']:
-            filemeta = DigiJsonBuilder.create_file(name=file['name'], drive_id=file['id'], class_id=None,
-                                                   local_file_path=None, drive_path=file['parents'], classpath=None,
-                                                   size=file['size'])
-            filemeta.update({'mimeType': file['mimeType'], 'description': file['description'],
-                             'contentRestrictions': file['contentRestrictions']})
+            try:
+                filemeta = DigiJsonBuilder.create_file(name=file['name'], drive_id=file['id'], class_id=None,
+                                                       local_file_path=None, drive_path=file['parents'], classpath=None,
+                                                       size=file['size'])
+            except KeyError as k:
+                if k == 'size':
+                    filemeta = DigiJsonBuilder.create_file(name=file['name'], drive_id=file['id'], class_id=None,
+                                                           local_file_path=None, drive_path=file['parents'],
+                                                           classpath=None, size=None)
+                else:
+                    # throw an error
+                    return k
+            try:
+                filemeta.update({'mimeType': file['mimeType']})
+                filemeta.update({'capabilities': file['capabilities']})
+            except KeyError as k:
+                if k == 'mimeType':
+                    try:
+                        filemeta.update({'capabilities': file['capabilities']})
+                    except KeyError as k1:
+                        # throw an error? or just log?
+                        return None
+                if k == 'capabilities':
+                    filemeta.update({'capabilities': None})
+                    # should probably do some logging here...
             filelist.append(filemeta)
     # convert to digijson
     return filelist

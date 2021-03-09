@@ -12,7 +12,6 @@ def create_file(name, drive_id, class_id, local_file_path, drive_path, classpath
     clpathtype = type(classpath)
     stype = type(size)
 
-    print(drpathtype)
     if nametype == str:
         if didtype == str or didtype == _none:
             if clidtype == str or clidtype == _none:
