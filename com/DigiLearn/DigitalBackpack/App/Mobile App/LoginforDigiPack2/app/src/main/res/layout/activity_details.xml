@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_centerInParent="true"
+    android:background="@color/nau_blue"
+    android:gravity="center"
+    tools:context=".DetailsActivity">
+
+  <ScrollView
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:clipToPadding="false"
+      android:paddingTop="15dp"
+      android:paddingBottom="15dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
+        android:gravity="center"
+        android:orientation="vertical">
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="2dp"
+          android:layout_marginTop="5dp"
+          android:layout_marginBottom="5dp"
+          android:background="@android:color/white" />
+
+      <TextView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_horizontal"
+          android:text="ID"
+          android:textAlignment="center"
+          android:textColor="@android:color/black"
+          android:textSize="22sp"
+          android:textStyle="bold" />
+
+      <TextView
+          android:id="@+id/google_id_textview"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_horizontal"
+          android:text="Space 1"
+          android:textAlignment="center"
+          android:textColor="@android:color/white"
+          android:textSize="22sp"
+          android:textStyle="bold" />
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="2dp"
+          android:layout_marginTop="5dp"
+          android:layout_marginBottom="5dp"
+          android:background="@android:color/white" />
+
+      <TextView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_horizontal"
+          android:text="First Name"
+          android:textAlignment="center"
+          android:textColor="@android:color/black"
+          android:textSize="22sp"
+          android:textStyle="bold" />
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="2dp"
+
+          android:layout_marginTop="5dp"
+          android:layout_marginBottom="5dp"
+          android:background="@android:color/white" />
+
+      <TextView
+          android:id="@+id/google_first_name_textview"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_horizontal"
+          android:text="Space 2"
+          android:textAlignment="center"
+          android:textColor="@android:color/white"
+          android:textSize="22sp"
+          android:textStyle="bold" />
+
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="2dp"
+          android:layout_marginTop="5dp"
+          android:layout_marginBottom="5dp"
+          android:background="@android:color/white" />
+
+      <TextView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_horizontal"
+          android:text="Last Name"
+          android:textAlignment="center"
+          android:textColor="@android:color/black"
+          android:textSize="22sp"
+          android:textStyle="bold" />
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="2dp"
+          android:layout_marginTop="5dp"
+          android:layout_marginBottom="5dp"
+          android:background="@android:color/white" />
+
+      <TextView
+          android:id="@+id/google_last_name_textview"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_horizontal"
+          android:text="Space 3"
+          android:textAlignment="center"
+          android:textColor="@android:color/white"
+          android:textSize="22sp"
+          android:textStyle="bold" />
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="2dp"
+          android:layout_marginTop="5dp"
+          android:layout_marginBottom="5dp"
+          android:background="@android:color/white" />
+
+      <TextView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_horizontal"
+          android:text="Email"
+          android:textAlignment="center"
+          android:textColor="@android:color/black"
+          android:textSize="22sp"
+          android:textStyle="bold" />
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="2dp"
+          android:layout_marginTop="5dp"
+          android:layout_marginBottom="5dp"
+          android:background="@android:color/white" />
+
+      <TextView
+          android:id="@+id/google_email_textview"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_horizontal"
+          android:text="Space 3"
+          android:textAlignment="center"
+          android:textColor="@android:color/white"
+          android:textSize="22sp"
+          android:textStyle="bold" />
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="2dp"
+          android:layout_marginTop="5dp"
+          android:layout_marginBottom="5dp"
+          android:background="@android:color/white" />
+
+      <TextView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_horizontal"
+          android:text="Profile Pic URL"
+          android:textAlignment="center"
+          android:textColor="@android:color/black"
+          android:textSize="22sp"
+          android:textStyle="bold" />
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="2dp"
+          android:layout_marginTop="5dp"
+          android:layout_marginBottom="5dp"
+          android:background="@android:color/white" />
+
+      <TextView
+          android:id="@+id/google_profile_pic_textview"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_horizontal"
+          android:text="Space 4"
+          android:textAlignment="center"
+          android:textColor="@android:color/white"
+          android:textSize="22sp"
+          android:textStyle="bold" />
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="2dp"
+          android:layout_marginTop="5dp"
+          android:layout_marginBottom="5dp"
+          android:background="@android:color/white" />
+
+      <TextView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_horizontal"
+          android:text="ID Token"
+          android:textAlignment="center"
+          android:textColor="@android:color/black"
+          android:textSize="22sp"
+          android:textStyle="bold" />
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="2dp"
+          android:layout_marginTop="5dp"
+          android:layout_marginBottom="5dp"
+          android:background="@android:color/white" />
+
+      <TextView
+          android:id="@+id/google_id_token_textview"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_horizontal"
+          android:text="Space 5"
+          android:textAlignment="center"
+          android:textColor="@android:color/white"
+          android:textSize="22sp"
+          android:textStyle="bold" />
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="2dp"
+          android:layout_marginTop="5dp"
+          android:layout_marginBottom="5dp"
+          android:background="@android:color/white" />
+
+      <TextView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_horizontal"
+          android:text="MAIN PAGE"
+          android:textAlignment="center"
+          android:textColor="@color/nau_gold"
+          android:textSize="22sp"
+          android:textStyle="bold" />
+
+      <View
+          android:layout_width="match_parent"
+          android:layout_height="2dp"
+          android:layout_marginTop="5dp"
+          android:layout_marginBottom="5dp"
+          android:background="@android:color/white" />
+
+
+    </LinearLayout>
+
+  </ScrollView>
+
+</RelativeLayout>
