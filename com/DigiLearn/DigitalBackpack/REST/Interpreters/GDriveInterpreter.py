@@ -111,7 +111,7 @@ def get_file_list(user_auth, driveid):
         gdrive_list = service.files().list(fields="files(" + _FILE_FIELDS + ")", driveId=driveid,
                                            supportsAllDrives=True, includeItemsFromAllDrives=True, corpora='drive'
                                            ).execute()
-
+    filemeta = {}
     for file in gdrive_list['files']:
         if not file['trashed']:
             try:
@@ -119,12 +119,29 @@ def get_file_list(user_auth, driveid):
                                                        local_file_path=None, drive_path=file['parents'], classpath=None,
                                                        size=file['size'])
             except KeyError as k:
+                if k == 'parents':
+                    try:
+                        filemeta = DigiJsonBuilder.create_file(name=file['name'], drive_id=file['id'], class_id=None,
+                                                               local_file_path=None, drive_path=None,
+                                                               classpath=None,
+                                                               size=file['size'])
+                    except KeyError as k1:
+                        if k1 == 'size':
+                            filemeta = DigiJsonBuilder.create_file(name=file['name'], drive_id=file['id'],
+                                                                   class_id=None,
+                                                                   local_file_path=None, drive_path=None,
+                                                                   classpath=None,
+                                                                   size=None)
                 if k == 'size':
-                    filemeta = DigiJsonBuilder.create_file(name=file['name'], drive_id=file['id'], class_id=None,
-                                                           local_file_path=None, drive_path=file['parents'],
-                                                           classpath=None, size=None)
+                    try:
+                        filemeta = DigiJsonBuilder.create_file(name=file['name'], drive_id=file['id'], class_id=None,
+                                                               local_file_path=None, drive_path=file['parents'],
+                                                               classpath=None,
+                                                               size=None)
+                    except KeyError as k1:
+                        # throw an error
+                        return k1, k
                 else:
-                    # throw an error
                     return k
             try:
                 filemeta.update({'mimeType': file['mimeType']})
