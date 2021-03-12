@@ -5,4 +5,5 @@
     <string name="textview">TextView</string>
     <string name="register_here">Register Here</string>
     <string name="forgot_password">Forgot Password?</string>
+    <string name="serverClientId">867834249770-gqs8vn9kq50u4o99im41eoa5odto9hfu.apps.googleusercontent.com</string>
 </resources>
