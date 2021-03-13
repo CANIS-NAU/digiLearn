@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Search Information Settings</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+* {
+  box-sizing: border-box;
+}
+/* style the nav border */
+.vl {
+  border-left: 6px solid rgb(218, 230, 56);
+  height: 200px;
+}
+
+
+/* Style the header */
+header {
+  background-color: #2f74c2;
+  height: 100px;
+}
+
+/* Create two columns/boxes that floats next to each other */
+nav {
+  float: left;
+}
+
+/* Style the list inside the menu */
+nav ul {
+  list-style-type: none;
+}
+
+article {
+  float: left;
+  width: 1170px;
+  background-color: #2f74c2;
+}
+
+/* Clear floats after the columns */
+section::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+
+/* Responsive layout - makes the two columns/boxes stack on top of each other instead of next to each other, on small screens */
+@media (max-width: 600px) {
+  nav, article {
+    width: 100%;
+    height: auto;
+  }
+}
+</style>
+<link href="digipacksearchinfo.css" rel="stylesheet">
+</head>
+<body>
+
+<header>
+    <!-- header and logo -->
+  <h2 style="font-size:60px;"> <img src="/Users/graceshirey/Downloads/DigiPack-08.png" alt="digilogo" style="float:left;width:100px;height:100px;">Settings</h2>
+</header>
+
+<section>
+  <nav>
+    <!-- navagation border -->
+    <hr class="hl">
+      <!-- navagation -->
+    <ul>
+      <li><a href="digipackgetassignments.html">Get Assignments</a></li>
+      <li><a href="digipackassignmentupload.html">Submit Assignments</a></li>
+      <li><a href="digipackmessageteach.html">Message Teacher</a></li>
+      <li><a href="digipacknotif.html">Notifications</a></li>
+      <li><a class='mainpage' href="digipacksearchinfo.html">Search Info</a></li>
+    </ul>
+  </nav>
+  <!-- article -->
+  <article>
+    <!-- article border -->
+    <hr class="hlart">
+      <!-- header, paragraph and radio buttons -->
+    <h1>Search For Information</h1>
+    <p>Digital Backpack will search for information with Google Search for you.</p>
+    <form>
+        <input type="radio" id="downnew" name="downl" value="downnew">
+        <label for="downnew">Download results of <b>newest</b> queries first.</label><br>
+        <input type="radio" id="downold" name="downl" value="downold">
+        <label for="downold">Download results of <b>oldest</b> queries first.</label><br>
+        <input type="radio" id="downnear" name="downl" value="downnear">
+        <label for="downnear">Download results of queries for <b>assignments with the nearest upcoming due date</b> first.</label><br>
+        <input type="radio" id="downhigh" name="downl" value="downhigh">
+        <label for="downhigh">Download results of queries for <b>assignents with the most points</b> first</label><br>
+      </form>
+  </article>
+</section>
+
+
+</body>
+</html>
