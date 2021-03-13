@@ -8,7 +8,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.Scopes
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.Scope
 import com.google.android.gms.tasks.Task
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -26,6 +28,8 @@ class MainActivity : AppCompatActivity() {
                 GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestEmail()
                         .requestIdToken( getString(R.string.serverClientId) )
+                        .requestScopes( Scope (Scopes.DRIVE_FULL))
+                        .requestServerAuthCode( getString(R.string.serverClientId) )
                         .build()
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
@@ -78,6 +82,9 @@ class MainActivity : AppCompatActivity() {
             // This is not showing on the result area.
             val googleIdToken = userAccount?.idToken ?: ""
             Log.i("Google ID Token", googleIdToken)
+
+            val googleAuthCode = userAccount?.serverAuthCode ?: ""
+            println(googleAuthCode)
 
             // The grabbed items are supposed to be displayed on the DetailsActivity Page
             val myIntent = Intent(this, DetailsActivity::class.java)
