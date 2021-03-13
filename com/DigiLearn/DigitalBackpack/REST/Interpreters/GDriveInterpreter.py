@@ -119,6 +119,21 @@ def get_file_list(user_auth, driveid):
                                                        local_file_path=None, drive_path=file['parents'], classpath=None,
                                                        size=file['size'])
             except KeyError as k:
+                print(k)
+            try:
+                filemeta.update({'mimeType': file['mimeType']})
+                filemeta.update({'capabilities': file['capabilities']})
+            except KeyError as k:
+                print(k)
+            filelist.append(filemeta)
+    '''
+    for file in gdrive_list['files']:
+        if not file['trashed']:
+            try:
+                filemeta = DigiJsonBuilder.create_file(name=file['name'], drive_id=file['id'], class_id=None,
+                                                       local_file_path=None, drive_path=file['parents'], classpath=None,
+                                                       size=file['size'])
+            except KeyError as k:
                 if k == 'parents':
                     try:
                         filemeta = DigiJsonBuilder.create_file(name=file['name'], drive_id=file['id'], class_id=None,
@@ -157,6 +172,7 @@ def get_file_list(user_auth, driveid):
                     filemeta.update({'capabilities': None})
                     # should probably do some logging here...
             filelist.append(filemeta)
+            '''
     # convert to digijson
     return filelist
 

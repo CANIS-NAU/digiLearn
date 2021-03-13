@@ -24,7 +24,7 @@ def create_service(user_auth, api_name, api_version, *scopes):
             cred.refresh(Request())
         else:
             # this might not work because in the demo user_auth is a json file, not just a dict...
-            flow = InstalledAppFlow.from_client_secrets_file(user_auth, _scopes, state)  # InstalledAppFlow.from_client_secrets_file(user_auth, _scopes)
+            flow = InstalledAppFlow.from_client_secrets_file(user_auth, _scopes)  # InstalledAppFlow.from_client_secrets_file(user_auth, _scopes)
             cred = flow.run_local_server()
 
         with open(pickle_file, 'wb') as token:
