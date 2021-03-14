@@ -75,9 +75,11 @@ class AuthenticationManager:
     
     
     def getCredentialsFromDatabase(self, studentGmail):
-        credentialsString = dbm.getCredentials(studentGmail)
-        credentialsObject = self.getCredentialsFromFileOrString(False, fileString=credentialsString)
-        return credentialsObject
+        try:
+            credentialsString = dbm.getCredentials(studentGmail)
+        except:
+            return 0
+        return credentialsString
     
     
 

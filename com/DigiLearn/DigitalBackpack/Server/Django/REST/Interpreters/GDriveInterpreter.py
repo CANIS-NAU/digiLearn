@@ -23,11 +23,11 @@ _DRIVE_FIELDS = ''
 
 # this needs some work with the user_auth stuff but other than that (and some error checking stuff)
 # its done
-def get_file_metadata(user_auth: dict, file_id: str):
+def get_file_metadata(user_auth: dict, user_email, file_id: str):
     # initialize "service"
     #   do some auth, probably need to mess w/ this in GDriveInterface
     gdrive_auth = user_auth  # get_gdrive_auth(user_auth['user_id'])
-    service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES)
+    service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES, user_email=user_email)
     # make request for file metadata
     request = service.files().get(fileId=file_id, fields=_FILE_FIELDS).execute()
     # if the file hasn't been moved to trash by the user
@@ -54,10 +54,10 @@ def get_file_metadata(user_auth: dict, file_id: str):
 
 
 # gets a singular file from google drive, for multiple files call in a loop.
-def get_file(user_auth, file_dict):
+def get_file(user_auth, user_email, file_dict):
     # do auth and create service
     gdrive_auth = get_gdrive_auth(user_auth['user_id'])
-    service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES)
+    service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES, user_email=user_email)
     # get the file itself
     request = service.files().get_media(fileID=file_dict['drive_id'])
     fh = io.BytesIO()
@@ -83,15 +83,16 @@ def get_file(user_auth, file_dict):
 # because of the way that the gdrive API works, this only returns the shared drives for a user
 #   my guess is that this is because every user is assumed to (and required to) have their own drive at drive#my-drive
 #   //might be drive#mydrive idrk
-def get_drive_list(user_auth):
+def get_drive_list(user_auth, user_email):
     # do auth and create service
     gdrive_auth = get_gdrive_auth(user_auth['user_id'])
-    service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES)
+    service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES, user_email=user_email)
+    
     # get list of drive objects (this is like, mydrive, shared drives, etc. no files)
     # with all list getters, there is a list_next(prev_req, prev_resp) that can be used, gonna need a while loop
     # for those in the future but for now well just do one page of results
     gdrive_list = service.drives().list()
-    mydrive = get_file_list(user_auth, 'my-drive')
+    mydrive = get_file_list(user_auth, user_email, 'my-drive')
     drivelist = [mydrive]
     for drive in gdrive_list['drives']:
         driveobj = DigiJsonBuilder.create_drive(drive['id'], get_file_list(user_auth, drive['id']),
@@ -106,7 +107,8 @@ def get_file_list(user_auth, user_email, driveid):
     filelist = []
     # get list of files in the specified drive
     gdrive_auth = user_auth  # get_gdrive_auth(user_auth['user_id'])
-    service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES, user_email)
+    service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES, user_email=user_email)
+    
     # see get_drive_list
     if driveid == 'my-drive':
         gdrive_list = service.files().list(fields="files(" + _FILE_FIELDS + ")").execute()
@@ -180,11 +182,11 @@ def get_file_list(user_auth, user_email, driveid):
     return filelist
 
 
-def get_file_comments(user_auth, fileid):
+def get_file_comments(user_auth, user_email, fileid):
     comments = []
     # do auth and create service
     gdrive_auth = get_gdrive_auth(user_auth['user_id'])
-    service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES)
+    service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES, user_email=user_email)
     # get comments on the file
     file_comm_list = service.comments.list(fileId=fileid)
     # just create a (python)json object
@@ -195,7 +197,7 @@ def get_file_comments(user_auth, fileid):
     return comm
 
 
-def upload_file(user_auth, file_dict, fileobj, drivepath):
+def upload_file(user_auth, user_email, file_dict, fileobj, drivepath):
     uploadjson = None
     gdrive_auth = get_gdrive_auth(user_auth['user_id'])
     service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES)

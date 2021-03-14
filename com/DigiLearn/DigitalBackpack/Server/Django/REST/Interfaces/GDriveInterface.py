@@ -1,6 +1,7 @@
 import datetime
 import pickle
 import os
+import AuthenticationManager
 from google_auth_oauthlib.flow import Flow, InstalledAppFlow
 from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
@@ -11,29 +12,24 @@ from google.oauth2.credentials import Credentials
 
 def create_service(user_auth, api_name, api_version, *scopes, user_email):
     _scopes = [scope for scope in scopes[0]]
-
-    cred = None
-
-    pickle_file = f'token_{api_name}_{api_version}.pickle'
-
-    # gonna have to talk to sebo about the auth stuff here...
-    # this might get moved to the authentication manager, again, talk to sebo about it
     
-    if os.path.exists('credentials.json'):
-        cred = Credentials.from_authorized_user_file('credentials.json', _scopes)
-        print(cred)
+    cred = None
+    filePathFlag = False
 
-
-    if not cred or not cred.valid:
-        if cred and cred.expired and cred.refresh_token:
-            cred.refresh(Request())
-        else:
-            # this might not work because in the demo user_auth is a json file, not just a dict...
-            flow = InstalledAppFlow.from_client_secrets_file(user_auth, _scopes)  # InstalledAppFlow.from_client_secrets_file(user_auth, _scopes)
-            cred = flow.run_local_server()
-
-        with open(pickle_file, 'wb') as token:
-            pickle.dump(cred, token)
+    #instantiate AuthenticationManager object with path to local client secrets
+    am = AuthenticationManager.AuthenticationManager("/Django/webClientSecret.json")
+    
+    #request user credentials from email
+    cred = am.getCredentialsFromDatabase( user_email )
+    
+    #check for credentials recieved
+    if( cred == 0 ):
+        print("Unable to retrieve credentials.")
+        return None
+    
+    #convert cred JSON string to Oauth2 credentials object
+    cred = am.getCredentialsFromFileOrString( filePathFlag, fileString=cred )
+    
 
     try:
         service = build(api_name, api_version, credentials=cred)
