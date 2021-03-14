@@ -1,0 +1,153 @@
+{% load static %}
+
+<!doctype html>
+<html>
+    {% load pwa %}
+    {% progressive_web_app_meta %}
+  <head>
+    <meta charset="utf-8">
+    <!-- this is the temp stylesheet example <link href="{% static 'styles/styles.css' %}" rel="stylesheet"> -->
+    <link rel="icon" href="favicon.png" type="image/x-icon">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <title>Digipack Demo</title>
+	<style>
+
+		body, html {height: 100%;}
+
+		.wrapper {box-sizing: border-box; height: 100%; overflow: auto; }
+
+
+		a {text-decoration: none; color: #333; border-bottom: 3px solid #0068FF;}
+		a:hover {color: #0068FF}
+		p {font-weight: 200; font-size: 20px;}
+
+		.name {font-family: Montserrat; font-size: 45px; text-transform: uppercase; font-weight: 900; padding: 12px; border: 4px solid #0068FF; color: #0068FF; display: inline-block; position: absolute; margin-bottom: 60px; top: 60px; left: 90px;}
+
+		.container {margin: 0 auto; width: 700px; padding: 120px 12px 50px; overflow: auto;}
+		article {padding: 60px;}
+
+		hr {border-bottom: 3px solid #0068FF;}
+
+		.meta {text-transform: uppercase; font-family: Arial, Courier New, Source Sans Pro, sans-serif; font-size: 10px; letter-spacing: .15em;}
+		.meta a:hover {color: #333;}
+
+		.inline-list {list-style: none; margin: 0; padding: 0;}
+		.inline-list li {display: inline-block;}
+
+	</style>
+  </head>
+  <body>
+    <div class="wrapper">
+    <div class="container">
+      <header>
+        <h1 class="name">DigiPack</h1>
+      </header>
+      <article>
+        <p>This is an example page, ideally digipack stuff would go here</p>
+        <p> Forked this html from <a href="https://github.com/jlord/hello" target="_blank">here</a>.</p>
+      </article>
+
+      <textarea id="chat-log" cols="100" rows="20"></textarea> <br> <br> <br>
+
+      <input id="gd-input" type="text" size="60"><br>
+      <input id="gd-submit" type="button" value="GDrive Request"> <br> <br> <br>
+
+      <input id="gc-input" type="text" size="60"><br>
+      <input id="gc-submit" type="button" value="GClass Request"> <br> <br> <br>
+
+      <input id="gs-input" type="text" size="60"><br>
+      <input id="gs-submit" type="button" value="GSearch Request">
+
+      <script>
+  
+          //make socket check routing for which consumer is utilized
+          const chatSocket = new WebSocket(
+              'ws://'
+              + window.location.host
+              + '/ws/digipack/'
+          );
+
+          //print messages to the chat log
+          chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            document.querySelector('#chat-log').value += (data.message + '\n');
+        };
+  
+          chatSocket.onclose = function(e) {
+              console.error('Chat socket closed unexpectedly');
+          };
+          
+          // GOOGLE DRIVE INPUT
+          document.querySelector('#gd-input').focus();
+          document.querySelector('#gd-input').onkeyup = function(e) {
+              if (e.keyCode === 13) {  // enter, return
+                  document.querySelector('#gd-submit').click();
+              }
+          };
+          
+          // GOOGLE CLASS INPUT
+          document.querySelector('#gc-input').focus();
+          document.querySelector('#gc-input').onkeyup = function(e) {
+              if (e.keyCode === 13) {  // enter, return
+                  document.querySelector('#gc-submit').click();
+              }
+          };
+
+          // GOOGLE SEARCH INPUT
+          document.querySelector('#gs-input').focus();
+          document.querySelector('#gs-input').onkeyup = function(e) {
+              if (e.keyCode === 13) {  // enter, return
+                  document.querySelector('#gs-submit').click();
+              }
+          };
+
+          // GOOGLE DRIVE SUBMIT
+          document.querySelector('#gd-submit').onclick = function(e) {
+              const messageInputDom = document.querySelector('#gd-input');
+              const message = messageInputDom.value;
+              chatSocket.send(JSON.stringify({
+                  'message': message,
+                  'interpreter' : 'GDrive'
+              }));
+              messageInputDom.value = '';
+          };
+
+          // GOOGLE CLASS SUBMIT
+          document.querySelector('#gc-submit').onclick = function(e) {
+              const messageInputDom = document.querySelector('#gc-input');
+              const message = messageInputDom.value;
+              chatSocket.send(JSON.stringify({
+                  'message': message,
+                  'interpreter' : 'GClass'
+              }));
+              messageInputDom.value = '';
+          };
+
+          // GOOGLE SEARCH SUBMIT
+          document.querySelector('#gs-submit').onclick = function(e) {
+              const messageInputDom = document.querySelector('#gs-input');
+              const message = messageInputDom.value;
+              chatSocket.send(JSON.stringify({
+                  'message': message,
+                  'interpreter' : 'GSearch'
+              }));
+              messageInputDom.value = '';
+          };
+
+
+          if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('{% url "sw.js" %}', { scope: '/' }).then(function(reg) {
+                    // registration worked
+                    console.log('Registration succeeded. Scope is ' + reg.scope);
+                }).catch(function(error) {
+                    // registration failed
+                    console.log('Registration failed with ' + error);
+                });
+            }
+
+      </script>
+
+  </div>
+  </div>
+  </body>
+</html>
