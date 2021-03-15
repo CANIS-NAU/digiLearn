@@ -2,6 +2,12 @@ package com.example.loginfordigipack
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.TextView
+import android.widget.Toast
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import kotlinx.android.synthetic.main.activity_details.*
 
 class DetailsActivity : AppCompatActivity() {
@@ -25,5 +31,17 @@ class DetailsActivity : AppCompatActivity() {
         google_profile_pic_textview.text = googleProfilePicURL
         google_id_token_textview.text = googleAccessToken
 
+        val mptv = findViewById<TextView>(R.id.mptext)
+        val url = "http://143.110.158.203:8000/login"
+        val queue = Volley.newRequestQueue(this)
+
+        val stringRequest = StringRequest(
+                Request.Method.GET, url,
+                Response.Listener<String> { response ->
+                    mptv.text = "Response is: ${response.substring(0, 500)}"
+                },
+                Response.ErrorListener { error -> mptv.text = "ERROR: %s".format(error.toString()) },
+        )
+        queue.add(stringRequest)
     }
 }
