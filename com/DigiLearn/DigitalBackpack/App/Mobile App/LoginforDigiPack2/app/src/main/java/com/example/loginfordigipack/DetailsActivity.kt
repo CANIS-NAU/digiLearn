@@ -1,5 +1,6 @@
 package com.example.loginfordigipack
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -8,6 +9,7 @@ import android.widget.Toast
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
@@ -15,6 +17,7 @@ import kotlinx.android.synthetic.main.activity_details.*
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import org.json.JSONObject.*
 
 class DetailsActivity : AppCompatActivity() {
 
@@ -39,56 +42,56 @@ class DetailsActivity : AppCompatActivity() {
 
         val mptv = findViewById<TextView>(R.id.mptext)
         val authurl = "http://143.110.158.203:8000/auth/"
-        val getlisturl = "http://143.110.158.203:8000/user=$googleEmail"
+        val getlisturl = "http://143.110.158.203:8000/user/$googleEmail"
         val queue = Volley.newRequestQueue(this)
         val tok = JsauthTok(googleAccessToken, googleEmail)
         val gtok = Gson().toJson(tok)
         val jsobtok = JSONObject(gtok)
         var resp = JSONObject("{Result:noACK}")
 
+
+        /**
+        var fileid = "1-uvoHTPc_AV4yIPy06dpY3klUBNZo_8eNOJIUIw-1k0"
+        val request = StringRequest(Request.Method.GET, "http://143.110.158.203:8000/sd/$googleEmail/$fileid",
+                {response -> Log.i(getString(R.string.app_name), "got a thing %s".format(response.toString()))},
+                {err -> Log.i(getString(R.string.app_name), "errr")}
+                )
+
+        queue.add(request)
+        **/
+
         val request = JsonObjectRequest(Request.Method.POST, authurl, jsobtok,
-            Response.Listener { response -> resp = response },
-                Response.ErrorListener { error ->
+                { response -> resp = response
+                                    if( resp.get("Result") == "ACK"){
+                                        val success = "Authentication Successful"
+                                        mptv.text = success
+
+                                        val user = Jsuser(googleFirstName, googleEmail, googleId)
+                                        val guser = Gson().toJson(user)
+                                        val jsuserobj = JSONObject(guser)
+                                        var filelistResp = JSONObject("{Result:noACK}")
+
+                                        val filelistRequest = JsonObjectRequest(Request.Method.GET, getlisturl, jsuserobj,
+                                                { flresponse -> filelistResp = flresponse
+                                                                    try{
+                                                                        Log.i(getString(R.string.app_name), flresponse.toString())
+                                                                        var intent = Intent(this, FileListViewActivity::class.java)
+                                                                        intent.putExtra("fileListJson", flresponse.toString())
+                                                                        this.startActivity(intent)
+                                                                    }catch(e: JSONException){
+                                                                        Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
+                                                                    }
+                                                                  },
+                                                { err ->  Toast.makeText(applicationContext, err.toString(), Toast.LENGTH_LONG).show()}
+                                                )
+                                        queue.add(filelistRequest)
+                                    }
+                                  },
+                { error ->
                     mptv.text = error.toString() }
                 )
         queue.add(request)
-        println(resp.get("Result"))
-        if( resp.get("Result") == "ACK" ){
-            val success = "Authentication Successful"
-            mptv.text = success
-            //and then start the download with GET file list with email
-            val user = Jsuser(googleFirstName, googleEmail, googleId)
-            val guser = Gson().toJson(user)
-            val jsuserobj = JSONObject(guser)
 
-            var filelistResp = JSONObject("{Result:noACK}")
-
-            val filelistRequest = JsonObjectRequest( Request.Method.GET, getlisturl, jsuserobj,
-                    Response.Listener { response -> filelistResp = response },
-                    Response.ErrorListener { error ->
-                        Toast.makeText(applicationContext, error.toString(), Toast.LENGTH_LONG).show()
-                    }
-                    )
-            queue.add(filelistRequest)
-
-            try{
-                if(filelistResp.get("my-drive") is JSONArray)
-                {
-                    //send it to kristine's part
-                }
-                else{
-                    //idfk how the above call didnt throw an error
-                }
-            } catch (e: JSONException){
-                //idk how to handle this so for now...
-                Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
-            }
-        }
-        else
-        {
-            //handle this some how
-            Log.e(getString(R.string.app_name), "Something broke real bad in the details activity")
-        }
 
     }
 }

@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
                         .requestEmail()
                         .requestIdToken( getString(R.string.serverClientId) )
                         .requestScopes( Scope (Scopes.DRIVE_FULL))
-                        .requestServerAuthCode( getString(R.string.serverClientId) )
+                        .requestServerAuthCode( getString(R.string.serverClientId), true)
                         .build()
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
