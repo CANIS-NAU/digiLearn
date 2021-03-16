@@ -39,7 +39,7 @@ class DetailsActivity : AppCompatActivity() {
 
         val mptv = findViewById<TextView>(R.id.mptext)
         val authurl = "http://143.110.158.203:8000/auth/"
-        val getlisturl = "http://143.110.158.203:8000/user="
+        val getlisturl = "http://143.110.158.203:8000/user=$googleEmail"
         val queue = Volley.newRequestQueue(this)
         val tok = JsauthTok(googleAccessToken, googleEmail)
         val gtok = Gson().toJson(tok)
