@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<style>
+
+.logo-image{
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-top: -6px;
+}
+</style>
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>digiLearn: Requirements/Solution</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="pages_vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <div class="logo-image">
+     <img src="digiLearnLogo.jpg" class="img-fluid">
+        </div>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item ">
+            <a class="nav-link" href="index.html">Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="projectPage.html">Project</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="schedulePage.html">Schedule</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="technologyPage.html">Technology</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="requirements_SolutionPage.html">Requirements/Solution</a>
+              <span class="sr-only">(current)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Content -->
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h1 class="mt-5">The Requirements and Solution</h1>
+        <p class="lead">This page will continue to be updated as we work on our project. </p>
+         <ul class="list-unstyled">
+           <li><strong>Requirements:</strong> The Digital Backpack requires many developments to become a whole.
+              First and foremost a Linux-based proxy server that integrates with Google Classroom API’s
+              and Google Search. It also manages necessary Oath credentials that are required for a
+              user’s “account/identity” to access Google Classroom services and provides a REST API.
+              Along with that, the Digital Backpack also requires a mobile app that automatically uploads
+              assignments, posts, and queries as well as download new content when the mobile device establishes
+              Internet connectivity. The mobile app should also display content delivered from the DigiPack
+              proxy server when the user is offline.
+              <br><br>
+              This high-level description of the purpose of the Digital Backpack served
+              as the basis through which we continued the requirements-gathering process.
+              From here, we developed a series of user stories that illustrated the needs
+              of various user-types and how the Digital Backpack would satisfy those needs.
+              Those user stories were then further refined into the following domain-level
+              requirements:
+              <br><br>
+              <ol align="left">
+                  <li>The Digital Backpack will aid remote education.</li>
+                  <li>The Digital Backpack will provide seamless transitions 
+                      between online and offline functionality.</li>
+                  <li>The Digital Backpack will utilize oCDN functionality in order
+                      to facilitate asynchronous connections and provide a delay-tolerant network. </li>
+                  <li>The Digital Backpack will support three types of end users:
+                      students, teachers, and parents.</li>
+                  <li>The Digital Backpack will be highly accessible in both design
+                      and device requirements in order to accommodate a wide range of users.</li>
+                  <li>The Digital Backpack will securely handle all sensitive 
+                      personal and scholastic user data to prevent unauthorized access.</li>
+              </ol>
+              <br><br>
+              These domain-level requirements where then further defined with more
+              granular functional and performance requirements. For a complete overview
+              of the requirements specifications for this project, please refer to our
+              Requirements Specification document.
+           </li>
+
+           <br><br><br><br>
+          <li><strong>Envisioned Solution:</strong> Dr. Vigil-Hayes and our team have set out
+            to create a solution to this problem by creating a network of "opportunistic
+            content delivery" systems, or “oCDN”. As the student comes into range of any public
+            wifi network, the digiPack will opportunistically connect to the internet and begin
+            uploading and downloading essential content automatically.  This will allow users
+            with limited internet access to connect to services such as Google Classroom,
+            Khan Academy, Youtube, and potentially limitless other resources. The DigiPack will
+            also submit any assignments or search queries that the user may have generated while
+            they were offline. The end result will be a seamless, networked experience for
+            students without internet access at home. 
+            <br><br>
+            To further understand how the architecture of the Digital Backpack system addresses the
+            requirements enumerated above, please consider the following high-level
+            descriptions of our solution vision.<br><br>
+          </li>
+         
+          <ol align="left">
+                  <li>The Digital Backpack aids remote education by retrieving educational
+                  resources for the user and providing the user an interface for those resources
+                  in the DigiPack app.</li>
+                  <li>The Digital Backpack system provides seamless transitions between
+                  online and offline learning by having the user device be completely
+                  usable while offline and by having the proxy server work on the behalf
+                  of the user while they are offline.</li>
+                  <li>The oCDN functionality between the proxy server and the DigiPack
+                  app allows the proxy server to cooperate and do so asynchronously.</li>
+                  <li>The DigiPack app will provide an interface for students and parents. Teachers
+                  will be able to interact with the DigiPack app through Google Classroom. So, 
+                  communications between the teacher and the student will be fascilitated
+                  by the proxy server.</li>
+                  <li>The DigiPack app will reach as many users as possible by being available
+                  on a large variety of platforms, including Android, iOS and Google Chrome. The
+                  DigiPack app will also include multiple, accessible user interfaces that are
+                  designed for high usability and targeted towards specific age groups.</li>
+                  <li>The Digital Backpack system will use standard securtity practices to keep
+                  user data safe both during transmission over the network and while it is being stored
+                  on the end devices. This will be done through encryption. Additionally, the system will
+                  authenticate all connections between the devices through OAuth2 tokens.</li>
+              </ol>
+          
+          <br><br><br><br><br><br>
+          
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="pages_vendor/jquery/jquery.slim.min.js"></script>
+  <script src="pages_vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
