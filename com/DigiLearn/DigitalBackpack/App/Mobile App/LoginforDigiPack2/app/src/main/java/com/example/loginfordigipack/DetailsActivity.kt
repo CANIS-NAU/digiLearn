@@ -82,7 +82,8 @@ class DetailsActivity : AppCompatActivity() {
                                                                         Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
                                                                     }
                                                                   },
-                                                { err ->  Toast.makeText(applicationContext, err.toString(), Toast.LENGTH_LONG).show()}
+                                                { err -> Log.i(getString(R.string.app_name), err.toString())
+                                                    Toast.makeText(applicationContext, err.toString(), Toast.LENGTH_LONG).show()}
                                                 )
                                         queue.add(filelistRequest)
                                     }
