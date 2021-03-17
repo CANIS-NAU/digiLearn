@@ -13,9 +13,24 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.views.generic import TemplateView
 
 urlpatterns = [
+    path('' , include('commanager.urls')),
     path('admin/', admin.site.urls),
-]
+    path('', include('pwa.urls')),
+
+    # allow the service worker to have scope of the full application
+    path
+    (
+        'sw.js',
+        TemplateView.as_view(template_name='sw.js', content_type='application/javascript'),
+        name='sw.js'
+    ),
+] 
+
+urlpatterns += staticfiles_urlpatterns()
