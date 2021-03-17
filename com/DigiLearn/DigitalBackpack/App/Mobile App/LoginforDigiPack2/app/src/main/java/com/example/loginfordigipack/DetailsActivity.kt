@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import com.android.volley.Request
@@ -74,10 +75,15 @@ class DetailsActivity : AppCompatActivity() {
                                         val filelistRequest = JsonObjectRequest(Request.Method.GET, getlisturl, jsuserobj,
                                                 { flresponse -> filelistResp = flresponse
                                                                     try{
-                                                                        Log.i(getString(R.string.app_name), flresponse.toString())
+                                                                        Log.i(getString(R.string.app_name), "in details act, %s".format(flresponse.toString()))
                                                                         var intent = Intent(this, FileListViewActivity::class.java)
                                                                         intent.putExtra("fileListJson", flresponse.toString())
-                                                                        this.startActivity(intent)
+
+                                                                        val nextbtn = findViewById<Button>(R.id.btn_pick)
+                                                                        nextbtn.setOnClickListener(){
+                                                                            this.startActivity(intent)
+                                                                        }
+
                                                                     }catch(e: JSONException){
                                                                         Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
                                                                     }
