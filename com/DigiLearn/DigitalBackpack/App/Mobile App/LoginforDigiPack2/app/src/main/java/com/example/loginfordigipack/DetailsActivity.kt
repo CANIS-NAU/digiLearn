@@ -42,26 +42,15 @@ class DetailsActivity : AppCompatActivity() {
         google_id_token_textview.text = googleAccessToken
 
         val mptv = findViewById<TextView>(R.id.mptext)
-        val authurl = "http://143.110.158.203:8000/auth/"
-        val getlisturl = "http://143.110.158.203:8000/user/$googleEmail"
-        val queue = Volley.newRequestQueue(this)
+        val authurl = "auth/"
+        val getlisturl = "user/$googleEmail"
+        val queue = RequestQueueSingleton.getInstance(this.applicationContext).requestQueue
         val tok = JsauthTok(googleAccessToken, googleEmail)
         val gtok = Gson().toJson(tok)
         val jsobtok = JSONObject(gtok)
         var resp = JSONObject("{Result:noACK}")
 
-
-        /**
-        var fileid = "1-uvoHTPc_AV4yIPy06dpY3klUBNZo_8eNOJIUIw-1k0"
-        val request = StringRequest(Request.Method.GET, "http://143.110.158.203:8000/sd/$googleEmail/$fileid",
-                {response -> Log.i(getString(R.string.app_name), "got a thing %s".format(response.toString()))},
-                {err -> Log.i(getString(R.string.app_name), "errr")}
-                )
-
-        queue.add(request)
-        **/
-
-        val request = JsonObjectRequest(Request.Method.POST, authurl, jsobtok,
+        val request = JsonObjectRequest(Request.Method.POST, getString(R.string.serverUrl).plus(authurl), jsobtok,
                 { response -> resp = response
                                     if( resp.get("Result") == "ACK"){
                                         val success = "Authentication Successful"
@@ -72,18 +61,17 @@ class DetailsActivity : AppCompatActivity() {
                                         val jsuserobj = JSONObject(guser)
                                         var filelistResp = JSONObject("{Result:noACK}")
 
-                                        val filelistRequest = JsonObjectRequest(Request.Method.GET, getlisturl, jsuserobj,
+                                        val filelistRequest = JsonObjectRequest(Request.Method.GET, getString(R.string.serverUrl).plus(getlisturl), jsuserobj,
                                                 { flresponse -> filelistResp = flresponse
                                                                     try{
                                                                         Log.i(getString(R.string.app_name), "in details act, %s".format(flresponse.toString()))
-                                                                        var intent = Intent(this, FileListViewActivity::class.java)
-                                                                        intent.putExtra("fileListJson", flresponse.toString())
-
+                                                                        var flintent = Intent(this, FileListViewActivity::class.java)
+                                                                        flintent.putExtra("fileListJson", flresponse.toString())
+                                                                        flintent.putExtra("gsoData", intent.extras)
                                                                         val nextbtn = findViewById<Button>(R.id.btn_pick)
                                                                         nextbtn.setOnClickListener(){
-                                                                            this.startActivity(intent)
+                                                                            this.startActivity(flintent)
                                                                         }
-
                                                                     }catch(e: JSONException){
                                                                         Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
                                                                     }
@@ -98,8 +86,6 @@ class DetailsActivity : AppCompatActivity() {
                     mptv.text = error.toString() }
                 )
         queue.add(request)
-
-
     }
 }
 
