@@ -44,7 +44,7 @@ class DetailsActivity : AppCompatActivity() {
         val mptv = findViewById<TextView>(R.id.mptext)
         val authurl = "auth/"
         val getlisturl = "user/$googleEmail"
-        val queue = RequestQueueSingleton.getInstance(this.applicationContext).requestQueue
+        val queue = RequestQueueSingleton.getInstance(this.applicationContext)
         val tok = JsauthTok(googleAccessToken, googleEmail)
         val gtok = Gson().toJson(tok)
         val jsobtok = JSONObject(gtok)
@@ -79,13 +79,13 @@ class DetailsActivity : AppCompatActivity() {
                                                 { err -> Log.i(getString(R.string.app_name), err.toString())
                                                     Toast.makeText(applicationContext, err.toString(), Toast.LENGTH_LONG).show()}
                                                 )
-                                        queue.add(filelistRequest)
+                                        queue.addToRequestQueue(filelistRequest)
                                     }
                                   },
                 { error ->
                     mptv.text = error.toString() }
                 )
-        queue.add(request)
+        queue.addToRequestQueue(request)
     }
 }
 

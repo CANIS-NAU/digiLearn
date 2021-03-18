@@ -17,29 +17,32 @@ import java.io.IOException
 
 
 class FileListViewActivity : AppCompatActivity() {
-    var filenames = arrayListOf<String>()
-    var fileids = arrayListOf<String>()
-
     var email : String? = null
-    var url = getString(R.string.serverUrl).plus("download/goat.jpeg")
+    var url : String = ""
+    //val getlisturl = "user/$email"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_file_list_view)
 
-        read_json()
+        var filenames = ArrayList<String>()
+        var fileids = ArrayList<String>()
+
+        read_json(filenames, fileids)
         write_to_ui_and_listen(filenames)
     }
 
     // Read the json file and the display it on the activity layout
-    fun read_json(){
+    fun read_json(filenames: ArrayList<String>, fileids: ArrayList<String>){
 
         try {
+           url = getString(R.string.serverUrl).plus("download/goat.jpeg")
+
             // Read the text file
 
             var json : String? = intent.getStringExtra("fileListJson")
             var gsodata = intent.getBundleExtra("gsoData")
-            println(gsodata?.getString("google_email"))
+            //email = gsodata?.getString("google_email")
 
             // Prints the Json File
             //json_info.text = json
@@ -73,7 +76,7 @@ class FileListViewActivity : AppCompatActivity() {
     fun write_to_ui_and_listen(fileNames: ArrayList<String>)
     {
         try{
-            var adapterView = ArrayAdapter(this, android.R.layout.simple_list_item_1, filenames)
+            var adapterView = ArrayAdapter(this, android.R.layout.simple_list_item_1, fileNames)
 
             json_info.adapter = adapterView
 
@@ -81,7 +84,7 @@ class FileListViewActivity : AppCompatActivity() {
             json_info.onItemClickListener = AdapterView.OnItemClickListener{
                 parent, view, position, id->
                 //position is the index of the list item that corresponds to the button clicked
-                Toast.makeText(applicationContext, "Type Selected is" + filenames[position],Toast.LENGTH_LONG).show()
+                Toast.makeText(applicationContext, "Type Selected is" + fileNames[position],Toast.LENGTH_LONG).show()
 
                 //url should not be global in prod
                 //should be created dynamically for the task at hand
@@ -94,15 +97,16 @@ class FileListViewActivity : AppCompatActivity() {
         }
     }
 
-    fun refreshList(queue: RequestQueue, reqMethodCode: Int,request: JSONObject, getFileUrl: String){
+    fun refreshList(queue: RequestQueueSingleton, reqMethodCode: Int,request: JSONObject, getFileUrl: String){
         val req = JsonObjectRequest(reqMethodCode, getFileUrl, request,
-                { resp ->
+                { resp -> println("asdf")
                     //do something with a positive response
                 },
-                { err ->
+                { err -> println("fdas")
                     //do something with an error
                 }
                 )
+        queue.addToRequestQueue(req)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
