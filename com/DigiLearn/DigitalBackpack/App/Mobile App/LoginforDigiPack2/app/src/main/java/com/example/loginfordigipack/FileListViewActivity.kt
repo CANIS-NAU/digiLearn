@@ -10,6 +10,7 @@ import android.widget.Toast
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.JsonObjectRequest
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_file_list_view.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -17,7 +18,7 @@ import java.io.IOException
 
 
 class FileListViewActivity : AppCompatActivity() {
-    var email : String? = null
+
     var url : String = ""
     //val getlisturl = "user/$email"
 
@@ -27,9 +28,17 @@ class FileListViewActivity : AppCompatActivity() {
 
         var filenames = ArrayList<String>()
         var fileids = ArrayList<String>()
+        var queue = RequestQueueSingleton.getInstance(this.applicationContext)
+
+        var googleFirstName = intent.getBundleExtra("gsoData")?.getString("google_first_name")
+        var googleId = intent.getBundleExtra("gsoData")?.getString("google_id")
+        var email = intent.getBundleExtra("gsoData")?.getString("google_email")
 
         read_json(filenames, fileids)
         write_to_ui_and_listen(filenames)
+        //on refresh:
+        //refreshList(queue, email, googleFirstName, googleId)
+        //read_json(filenames, fileids)
     }
 
     // Read the json file and the display it on the activity layout
@@ -97,12 +106,18 @@ class FileListViewActivity : AppCompatActivity() {
         }
     }
 
-    fun refreshList(queue: RequestQueueSingleton, reqMethodCode: Int,request: JSONObject, getFileUrl: String){
+    fun refreshList(queue: RequestQueueSingleton, googleEmail: String?, googleFirstName: String?, googleId: String? ){
+        val reqMethodCode = Request.Method.GET
+        val getFileUrl = getString(R.string.serverUrl).plus("user/").plus(googleEmail)
+
+        val request = JSONObject(Gson().toJson(Jsuser(googleFirstName, googleEmail, googleId)))
         val req = JsonObjectRequest(reqMethodCode, getFileUrl, request,
-                { resp -> println("asdf")
+                { resp -> intent.removeExtra("fileListJson")
+                    intent.putExtra("fileListJson", resp.toString())
                     //do something with a positive response
                 },
                 { err -> println("fdas")
+                    Log.e(getString(R.string.app_name), "FileListViewActivity refeshList error: %s".format(err.toString()))
                     //do something with an error
                 }
                 )
