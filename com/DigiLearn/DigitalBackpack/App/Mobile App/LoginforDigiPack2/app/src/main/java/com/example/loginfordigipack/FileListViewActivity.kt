@@ -20,7 +20,7 @@ import java.io.IOException
 class FileListViewActivity : AppCompatActivity() {
 
     var url : String = ""
-    //val getlisturl = "user/$email"
+    lateinit var email : String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,10 +32,11 @@ class FileListViewActivity : AppCompatActivity() {
 
         var googleFirstName = intent.getBundleExtra("gsoData")?.getString("google_first_name")
         var googleId = intent.getBundleExtra("gsoData")?.getString("google_id")
-        var email = intent.getBundleExtra("gsoData")?.getString("google_email")
+        email = intent.getBundleExtra("gsoData")?.getString("google_email").toString()
+
 
         read_json(filenames, fileids)
-        write_to_ui_and_listen(filenames)
+        write_to_ui_and_listen(filenames, fileids, queue)
         //on refresh:
         //refreshList(queue, email, googleFirstName, googleId)
         //read_json(filenames, fileids)
@@ -45,7 +46,6 @@ class FileListViewActivity : AppCompatActivity() {
     fun read_json(filenames: ArrayList<String>, fileids: ArrayList<String>){
 
         try {
-           url = getString(R.string.serverUrl).plus("download/Caitlin Abuel Resume.pdf")
             //goat.jpeg
             //lion.png
             //Caitlin Abuel Resume.pdf
@@ -85,7 +85,7 @@ class FileListViewActivity : AppCompatActivity() {
 
     }
 
-    fun write_to_ui_and_listen(fileNames: ArrayList<String>)
+    fun write_to_ui_and_listen(fileNames: ArrayList<String>, fileids: ArrayList<String>, queue: RequestQueueSingleton)
     {
         try{
             var adapterView = ArrayAdapter(this, android.R.layout.simple_list_item_1, fileNames)
@@ -97,16 +97,39 @@ class FileListViewActivity : AppCompatActivity() {
                 parent, view, position, id->
                 //position is the index of the list item that corresponds to the button clicked
                 Toast.makeText(applicationContext, "Type Selected is" + fileNames[position],Toast.LENGTH_LONG).show()
-
+                url = getString(R.string.serverUrl).plus("download/${fileNames[position]}")
                 //url should not be global in prod
                 //should be created dynamically for the task at hand
+                getfile(queue, email, "mynamejef", fileids[position], "alsoyef")
                 FileDownloader().getFile(this, url)
-
             }
         }catch(e: IOException){
             //handle errors eventually
             Log.e(getString(R.string.app_name), "FileListViewActivity write_to_ui error: %s".format(e.toString()))
         }
+    }
+
+    fun getfile(queue: RequestQueueSingleton, googleEmail: String?, googleFirstName: String?, fileid: String?, googleId: String?): Boolean {
+        val reqMethodCode = Request.Method.GET
+        val getFileUrl = getString(R.string.serverUrl).plus("sd/${googleEmail}/${fileid}")
+        val request = JSONObject(Gson().toJson(Jsuser(googleFirstName, googleEmail, googleId)))
+
+        var flag : Boolean = false
+
+        val req = JsonObjectRequest(reqMethodCode, getFileUrl, request,
+            { resp ->
+                //do something response
+                flag = true
+            },
+            { err ->
+                //so domething err
+                flag = false
+            }
+        )
+
+        queue.addToRequestQueue(req)
+
+        return flag
     }
 
     fun refreshList(queue: RequestQueueSingleton, googleEmail: String?, googleFirstName: String?, googleId: String? ){

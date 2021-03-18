@@ -123,8 +123,8 @@ class FileDownloader {
         val request = DownloadManager.Request(downloadUri).apply {
             setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
                     .setAllowedOverRoaming(false)
-                    .setTitle("Digital Backpack Download")
-                    .setDescription("Downloading:${url.substring(url.lastIndexOf("/") + 1)}")
+                    .setTitle(url.substring(url.lastIndexOf("/") + 1))
+                    .setDescription("Digital Backpack Download")
                     .setDestinationInExternalPublicDir(
                             directory.toString(),
                             url.substring(url.lastIndexOf("/") + 1)
