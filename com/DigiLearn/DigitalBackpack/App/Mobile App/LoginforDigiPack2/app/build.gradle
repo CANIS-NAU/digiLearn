@@ -51,7 +51,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     implementation 'com.android.volley:volley:1.2.0'
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.code.gson:gson:2.8.6'
 
     implementation("io.ktor:ktor-client-core:1.5.2")
     implementation("io.ktor:ktor-client-cio:1.5.2")

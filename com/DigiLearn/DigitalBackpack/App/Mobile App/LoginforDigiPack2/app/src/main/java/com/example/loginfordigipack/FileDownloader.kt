@@ -2,10 +2,9 @@ package com.example.loginfordigipack
 
 import android.Manifest
 import android.annotation.TargetApi
-import android.app.Activity
-import android.app.AlertDialog
-import android.app.DownloadManager
+import android.app.*
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
@@ -13,6 +12,8 @@ import android.os.Build
 import android.os.Environment
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import java.io.File
 
@@ -29,7 +30,7 @@ class FileDownloader {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             askPermissions(url)
         } else {
-            downloadImage(url)
+            downloadFile(url)
         }
     }
 
@@ -77,7 +78,7 @@ class FileDownloader {
             }
         } else {
             // Permission has already been granted
-            downloadImage(imageUrl)
+            downloadFile(imageUrl)
         }
     }
 
@@ -92,7 +93,7 @@ class FileDownloader {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     // permission was granted, yay!
                     // Download the Image
-                    downloadImage(fileUrl)
+                    downloadFile(fileUrl)
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
@@ -108,8 +109,8 @@ class FileDownloader {
         }
     }
 
-    private fun downloadImage(url: String) {
-        val directory = File(Environment.DIRECTORY_PICTURES)
+    private fun downloadFile(url: String) {
+        val directory = File(Environment.DIRECTORY_DOWNLOADS)
 
         if (!directory.exists()) {
             directory.mkdirs()
@@ -122,21 +123,25 @@ class FileDownloader {
         val request = DownloadManager.Request(downloadUri).apply {
             setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI or DownloadManager.Request.NETWORK_MOBILE)
                     .setAllowedOverRoaming(false)
-                    .setTitle(url.substring(url.lastIndexOf("/") + 1))
-                    .setDescription("")
+                    .setTitle("Digital Backpack Download")
+                    .setDescription("Downloading:${url.substring(url.lastIndexOf("/") + 1)}")
                     .setDestinationInExternalPublicDir(
                             directory.toString(),
                             url.substring(url.lastIndexOf("/") + 1)
                     )
+                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
         }
 
         val downloadId = downloadManager.enqueue(request)
         val query = DownloadManager.Query().setFilterById(downloadId)
+
         Thread(Runnable {
             var downloading = true
             while (downloading) {
                 val cursor: Cursor = downloadManager.query(query)
+
                 cursor.moveToFirst()
+
                 if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
                     downloading = false
                 }

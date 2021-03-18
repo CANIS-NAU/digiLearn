@@ -45,7 +45,10 @@ class FileListViewActivity : AppCompatActivity() {
     fun read_json(filenames: ArrayList<String>, fileids: ArrayList<String>){
 
         try {
-           url = getString(R.string.serverUrl).plus("download/goat.jpeg")
+           url = getString(R.string.serverUrl).plus("download/Caitlin Abuel Resume.pdf")
+            //goat.jpeg
+            //lion.png
+            //Caitlin Abuel Resume.pdf
 
             // Read the text file
 
