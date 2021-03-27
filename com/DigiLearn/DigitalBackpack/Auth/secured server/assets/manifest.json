@@ -1,0 +1,8 @@
+{
+    "name" : "DigiPack PWA",
+    "short_name" : "digipackpwa",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#fff",
+    "description": "The Digipack provides seemless transition between offline and online learning."
+}

@@ -1,0 +1,169 @@
+what will the rest service(s) need to do?
+
+Gdrive:
+  get a list of all available documents
+  download any document
+  upload any document
+  get date of upload/download
+  get date document was edited
+  some how be able to do all of this for potentially infinite users
+    handle their authentication both with DigiLearn and with Google
+
+Gclassroom:
+  for students:
+    get teachers name
+    get students in class
+    get all assignments
+    get date assignment was uploaded
+    get date assignment is due
+    get feedback from assignment
+    get assignment rubrics
+    *get class calendar
+  for teachers:
+    add assignment
+    add calendar event
+    add class meeting
+    ***delete all of the above things
+    download all assignments to be graded
+    upload grades for specific assignment
+    upload feedback for specific assignment
+
+Khan:
+  API has been removed from service as of 2020
+
+
+interpreters should only convert resource data to local JSON
+  and/or convert local JSON to resource format for requests/uploads
+
+  anything done on the server should be done w/ JSON
+
+  import json
+
+local JSON file:
+  general metadata from resource
+    fileMetadata: { fileID: str,
+                    fileName: str,
+                    fileSize: long (bytes),
+                    userIDAssociations: str[] (this is mostly just for creating database entries),
+                    createdTime: date (on resource),
+                    modifiedTime: date last modified (on resource),
+                  }
+
+  general data for/on DigiLearn
+    digiLearnMetadata: {  localPointer: str (where stored on server),
+                          createdTimeLocal: date,
+                          associatedUsers: [  { userID: str,
+                                                lastLogOn: date,
+                                                **other meta stuff about user, possibly just reference database?**
+                                              }, ...
+                                           ],
+                          classKeys: [     {  classKey: str,
+                                              teacherKey: str,
+                                              **other params: yep
+                                           }, ...
+                                     ] (for files specified for (a) classroom(s))
+                       }
+
+  user auth stuff
+    auth: { ***probably gonna need to talk to sebo about this***
+            oAuth2: that whole client_secret.json shit from the demo probably
+              this will probably be a lot of things
+              localUID, localAuth, resourceAuth, etc.
+            localUserID: str (for database references),
+            authenticated: bool,
+          }
+
+  user stuff
+    userSession: {  userID: str,
+                    userRequests: [ { requestType: str (resource, local), requestDate: str, resourceRequest: [see below], localRequest: {see below}},
+                                    { requestType: local, requestDate: str, resourceRequest: null, localRequest: { lastAccessed: date (date user last accessed the server),
+                                                                                                                   parts: bool (if parts of one or more files are missing from last connection),
+                                                                                                                   partsNeeded: [ { fileID: str,
+                                                                                                                                    startMarker: str,
+                                                                                                                                    endMarker: str
+                                                                                                                                  },..
+                                                                                                                                ]
+                                                                                                                  }
+                                    },
+                                    { requestType: resource, requestDate: str, resourceRequest: [ { resourceKey: str (gdrive, gclass, khan)
+                                                                                                    requestType: str (upload, download, submit, search )
+                                                                                                    requestParams: [ {this:will, be:made, on:the, fly:as, well:iguess}, ... ]
+                                                                                                  }, ...
+                                                                                                ], localRequest: null
+
+                                    },...
+                                  ]
+                    sessionID: str,
+                    sessionStart: date,
+                }
+
+
+-----------------------------------------------
+
+{
+  file: {
+          fileMetadata: { fileID: str,
+                          fileName: str,
+                          fileSize: long (bytes),
+                          userIDAssociations: str[] (this is mostly just for creating database entries),
+                          createdTime: date (on resource),
+                          modifiedTime: date last modified (on resource),
+                        },
+          digiLearnMeta: {  localPointer: str (where stored on server),
+                            createdTimeLocal: date,
+                            associatedUsers: [  { userID: str,
+                                                  lastLogOn: date,
+                                                  **other meta stuff about user, possibly just reference database?**
+                                                }, ...
+                                             ],
+                            classKeys: [     {  classKey: str,
+                                                teacherKey: str,
+                                                **other params: yep
+                                             }, ...
+                                       ] (for files specified for (a) classroom(s))
+                             },
+           ***
+        },
+
+  auth: {
+          ***probably gonna need to talk to sebo about this***
+          oAuth2: {
+                    **that whole client_secret.json shit from the demo probably**
+                    **for the sake of modularity i dont think this should have specific sections for specific resources**
+                    **just local + pointer/key for other resources stored in auth db**
+                    local: {},
+                    resourceKeys: {}
+                  },
+          digiAuth: {
+                      **anything we might need for authentication for the server, contacting resources w/ our server, etc**
+                    },
+          ***
+        },
+
+  user: {
+          sessionID: str,
+          sessionStart: date,
+          userSession:  {
+                          userRequests: [ { requestType: str (resource, local), requestDate: str, resourceRequest: [see below], localRequest: {see below}},
+                                          { requestType: local, requestDate: str, resourceRequest: null, localRequest: { lastAccessed: date (date user last accessed the server),
+                                                                                                                         parts: bool (if parts of one or more files are missing from last connection),
+                                                                                                                         partsNeeded: [ { fileID: str,
+                                                                                                                                          startMarker: str,
+                                                                                                                                          endMarker: str
+                                                                                                                                        },..
+                                                                                                                                      ]
+                                                                                                                        }
+                                          },
+                                          { requestType: resource, requestDate: str, resourceRequest: [ { resourceKey: str (gdrive, gclass, khan)
+                                                                                                          requestType: str (upload, download, submit, search )
+                                                                                                          requestParams: [ {this:will, be:made, on:the, fly:as, well:iguess}, ... ]
+                                                                                                        }, ...
+                                                                                                      ], localRequest: null
+
+                                          },...
+                                        ]
+                        },
+          sessionEnd: date,
+          sessionEndSignal: connectionSignal value (connectionSignal is an object with some values, like a typedef?)
+        },
+}
