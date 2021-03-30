@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
             myIntent.putExtra("google_last_name", googleLastName)
             myIntent.putExtra("google_email", googleEmail)
             myIntent.putExtra("google_profile_pic_url", googleProfilePicURL)
-            myIntent.putExtra("google_id_token", googleIdToken)
+            myIntent.putExtra("google_auth_code", googleIdToken)
             this.startActivity(myIntent)
         }
 
@@ -50,7 +50,11 @@ class MainActivity : AppCompatActivity() {
                 GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestEmail()
                         .requestIdToken( getString(R.string.serverClientId) )
-                        .requestScopes( Scope (Scopes.DRIVE_FULL))
+                        .requestScopes( Scope (Scopes.DRIVE_FULL),
+                                Scope ("https://www.googleapis.com/auth/classroom.courses"),
+                                Scope ("https://www.googleapis.com/auth/classroom.coursework.me"),
+                                Scope ("https://www.googleapis.com/auth/classroom.announcements"),
+                                Scope ("https://www.googleapis.com/auth/classroom.guardianlinks.me.readonly") )
                         .requestServerAuthCode( getString(R.string.serverClientId), true)
                         .build()
 
@@ -115,7 +119,7 @@ class MainActivity : AppCompatActivity() {
             myIntent.putExtra("google_last_name", googleLastName)
             myIntent.putExtra("google_email", googleEmail)
             myIntent.putExtra("google_profile_pic_url", googleProfilePicURL)
-            myIntent.putExtra("google_id_token", googleIdToken)
+            myIntent.putExtra("google_auth_code", googleAuthCode)
             this.startActivity(myIntent)
         } catch (e: ApiException) {
             // Checks if the sign in is unsuccessful, if not then throws an error code

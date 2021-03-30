@@ -34,7 +34,7 @@ class DetailsActivity : AppCompatActivity() {
         val googleLastName = intent.getStringExtra("google_last_name")
         val googleEmail = intent.getStringExtra("google_email")
         val googleProfilePicURL = intent.getStringExtra("google_profile_pic_url")
-        val googleAccessToken = intent.getStringExtra("google_id_token")
+        val googleAccessToken = intent.getStringExtra("google_auth_code")
 
         google_first_name_textview.text = googleFirstName
         //google_email_textview.text = googleEmail
@@ -126,7 +126,7 @@ class DetailsActivity : AppCompatActivity() {
         val googleLastName = intent.getStringExtra("google_last_name")
         val googleEmail = intent.getStringExtra("google_email")
         val googleProfilePicURL = intent.getStringExtra("google_profile_pic_url")
-        val googleAccessToken = intent.getStringExtra("google_id_token")
+        val googleAccessToken = intent.getStringExtra("google_auth_code")
 
         // For the debug
         val mptv = findViewById<TextView>(R.id.mptext)
