@@ -49,6 +49,7 @@ class DetailsActivity : AppCompatActivity() {
                                 clouds.setImageResource(R.drawable.sun_connection)
                                 //internet_connection.text = "Wifi Connection"
                                 connectToServer()
+
                             }
                             ConnectionType.Cellular -> {
                                 clouds.setImageResource(R.drawable.sun_connection)
@@ -66,6 +67,7 @@ class DetailsActivity : AppCompatActivity() {
                 }
             }
         }
+
         // Automatically calls connection to the server
         connectToServer()
     }
@@ -129,7 +131,7 @@ class DetailsActivity : AppCompatActivity() {
         val googleAccessToken = intent.getStringExtra("google_auth_code")
 
         // For the debug
-        val mptv = findViewById<TextView>(R.id.mptext)
+        //val mptv = findViewById<TextView>(R.id.mptext)
 
         val authurl = "auth/"
         val getlisturl = "user/$googleEmail"
@@ -172,7 +174,8 @@ class DetailsActivity : AppCompatActivity() {
                 }
             },
             { error ->
-                mptv.text = error.toString() }
+                //mptv.text = error.toString()
+                }
         )
         queue.addToRequestQueue(request)
     }
