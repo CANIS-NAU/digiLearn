@@ -34,7 +34,7 @@ class DetailsActivity : AppCompatActivity() {
         gsearchIntent = Intent(this, gSearchActivity::class.java)
 
         // Change title
-        supportActionBar?.title = Html.fromHtml("<font color='#01345A'>DigiPack</font>");
+        supportActionBar?.title = Html.fromHtml("<font color='#01345A'>DigiPack</font>")
 
         val googleId = intent.getStringExtra("google_id")
         val googleFirstName = intent.getStringExtra("google_first_name")
@@ -147,16 +147,16 @@ class DetailsActivity : AppCompatActivity() {
         var resp = JSONObject("{Result:noACK}")
 
         val request = JsonObjectRequest(Request.Method.POST, getString(R.string.serverUrl).plus(authurl), jsobtok,
-            { response -> resp = response
-                if( resp.get("Result") == "ACK"){
-                    val success = "Authentication Successful"
-                    //mptv.text = success
-                    getFileList(googleFirstName, googleEmail, googleId)
-                    getClassList(googleFirstName, googleEmail, googleId)
-                }
-            },
-            { error ->
-                //mptv.text = error.toString()
+                { response -> resp = response
+                    if( resp.get("Result") == "ACK"){
+                        val success = "Authentication Successful"
+                        //mptv.text = success
+                        getFileList(googleFirstName, googleEmail, googleId)
+                        getClassList(googleFirstName, googleEmail, googleId)
+                    }
+                },
+                { error ->
+                    //mptv.text = error.toString()
                 }
         )
         queue.addToRequestQueue(request)
@@ -226,17 +226,17 @@ class DetailsActivity : AppCompatActivity() {
 }
 
 data class Jsuser(
-    @SerializedName("userName")
-    var userName: String? = null,
-    @SerializedName("googleEmail")
-    var email: String? = null,
-    @SerializedName("googleId")
-    var gid: String? = null
+        @SerializedName("userName")
+        var userName: String? = null,
+        @SerializedName("googleEmail")
+        var email: String? = null,
+        @SerializedName("googleId")
+        var gid: String? = null
 )
 
 data class JsauthTok (
-    @SerializedName("googleAccessToken")
-    var authToken: String? = null,
-    @SerializedName("gooogleEmail")
-    var email: String? = null
+        @SerializedName("googleAccessToken")
+        var authToken: String? = null,
+        @SerializedName("gooogleEmail")
+        var email: String? = null
 )

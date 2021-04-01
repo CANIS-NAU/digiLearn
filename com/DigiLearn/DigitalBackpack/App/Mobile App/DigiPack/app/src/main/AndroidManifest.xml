@@ -15,10 +15,18 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
-        <activity android:name=".FileListViewActivity"></activity>
-        <activity android:name=".gClassActivity"></activity>
-        <activity android:name=".gSearchActivity"></activity>
-
+        <activity android:name=".FileListViewActivity"
+                  android:theme="@style/Theme.AppCompat.Light"
+                  android:label="Files"></activity>
+        <activity android:name=".gClassActivity"
+                  android:theme="@style/Theme.AppCompat.Light"
+                  android:label="Classroom"></activity>
+        <activity android:name=".gSearchActivity"
+                  android:theme="@style/Theme.AppCompat.Light"
+                  android:label="Search"></activity>
+        <activity android:name=".classCourseDetails"
+            android:theme="@style/Theme.AppCompat.Light"
+            android:label="Course"></activity>
 
         <activity android:name=".DetailsActivity"
             android:theme="@style/Theme.AppCompat.Light"></activity>

@@ -8,22 +8,6 @@
     android:background="@drawable/background"
     tools:context=".FileListViewActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/gray_white"
-
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        tools:ignore="MissingConstraints">
-
-        <androidx.appcompat.widget.Toolbar
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:title="Files"
-            app:titleTextColor="@color/nau_blue"
-            ></androidx.appcompat.widget.Toolbar>
-    </com.google.android.material.appbar.AppBarLayout>
-
     <Button
         android:id="@+id/openFileButton"
         android:layout_width="wrap_content"
@@ -43,19 +27,21 @@
         android:layout_width="415dp"
         android:layout_height="550dp"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="65dp"
+        android:layout_marginTop="5dp"
         android:choiceMode="singleChoice"
-        android:listSelector="@color/nau_gold"/>
+        android:listSelector="@color/nau_gold" />
 
     <ImageView
         android:layout_width="match_parent"
         android:id="@+id/clouds"
         android:layout_height="142dp"
+
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="0dp"
         android:layout_marginEnd="0dp"
         android:layout_marginBottom="8dp" />
+
 
 </RelativeLayout>

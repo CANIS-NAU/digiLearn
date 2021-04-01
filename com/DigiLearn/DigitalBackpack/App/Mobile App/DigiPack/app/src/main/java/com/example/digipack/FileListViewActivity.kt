@@ -3,17 +3,19 @@ package com.example.digipack
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.DocumentsContract
+import android.text.Html
 import android.util.Log
-import android.view.Menu
 import android.view.MenuItem
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.Toast
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.documentfile.provider.DocumentFile
 import com.android.volley.Request
@@ -37,9 +39,14 @@ class FileListViewActivity : AppCompatActivity() {
     // Call the network detector tool
     private val networkMonitor = networkDetectorTool(this)
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_file_list_view)
+
+
+        // Change title color
+        supportActionBar?.title = Html.fromHtml("<font color='#01345A'>Files</font>")
 
         var filenames = ArrayList<String>()
         var fileids = ArrayList<String>()
@@ -56,6 +63,12 @@ class FileListViewActivity : AppCompatActivity() {
         //on refresh:
         //refreshList(queue, email, googleFirstName, googleId)
         //read_json(filenames, fileids)
+
+        // Get the action button
+        val actionBr = supportActionBar
+        if(actionBr != null){
+            actionBr.setDisplayHomeAsUpEnabled(true)
+        }
 
         // Looking for the file button connection
         val openFileButton = findViewById<Button>(R.id.openFileButton)
@@ -135,6 +148,13 @@ class FileListViewActivity : AppCompatActivity() {
         }
     }
 
+    // function for the back to the main page button
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val myIntent = Intent(this, DetailsActivity::class.java)
+        this.startActivity(myIntent)
+        return super.onOptionsItemSelected(item)
+    }
+
     // Read the json file and the display it on the activity layout
     fun read_json(filenames: ArrayList<String>, fileids: ArrayList<String>){
 
@@ -178,6 +198,7 @@ class FileListViewActivity : AppCompatActivity() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     fun write_to_ui_and_listen(fileNames: ArrayList<String>, fileids: ArrayList<String>, queue: RequestQueueSingleton)
     {
         try{
@@ -193,13 +214,20 @@ class FileListViewActivity : AppCompatActivity() {
                 //url should not be global in prod
                 //should be created dynamically for the task at hand
                 getfile(queue, email, "mynamejef", fileids[position], "alsoyef")
-                FileDownloader().getFile(this, url)
+                var getUserFile = FileDownloader().getFile(this, url)
+
+
+                // Keeps the item picked remain highlighted
+                if(getUserFile != null){
+                    view.setBackgroundColor(getColor(R.color.nau_gold))
+                }
             }
         }catch (e: IOException){
             //handle errors eventually
             Log.e(getString(R.string.app_name), "FileListViewActivity write_to_ui error: %s".format(e.toString()))
         }
     }
+
 
     fun getfile(queue: RequestQueueSingleton, googleEmail: String?, googleFirstName: String?, fileid: String?, googleId: String?): Boolean {
         val reqMethodCode = Request.Method.GET
@@ -212,12 +240,14 @@ class FileListViewActivity : AppCompatActivity() {
                 { resp ->
                     //do something response
                     flag = true
+
                 },
                 { err ->
                     //so something err
                     flag = false
                 }
         )
+
         queue.addToRequestQueue(req)
         return flag
     }
@@ -236,7 +266,7 @@ class FileListViewActivity : AppCompatActivity() {
                 },
                 { err ->
                     println("fdas")
-                    Log.e(getString(R.string.app_name), "FileListViewActivity refeshList error: %s".format(err.toString()))
+                    Log.e(getString(R.string.app_name), "FileListViewActivity refreshList error: %s".format(err.toString()))
                     //do something with an error
                 }
         )
@@ -247,7 +277,6 @@ class FileListViewActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         FileDownloader().onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
-
 
     override fun onResume() {
         super.onResume()
