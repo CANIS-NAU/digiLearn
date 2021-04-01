@@ -134,7 +134,8 @@ class DetailsActivity : AppCompatActivity() {
         //val mptv = findViewById<TextView>(R.id.mptext)
 
         val authurl = "auth/"
-        val getlisturl = "user/$googleEmail"
+        val drivelisturl = "drive/$googleEmail"
+        val classlisturl = "gclass/$googleEmail"
         val queue = RequestQueueSingleton.getInstance(this.applicationContext)
         val tok = JsauthTok(googleAccessToken, googleEmail)
         val gtok = Gson().toJson(tok)
@@ -152,7 +153,7 @@ class DetailsActivity : AppCompatActivity() {
                     val jsuserobj = JSONObject(guser)
                     var filelistResp = JSONObject("{Result:noACK}")
 
-                    val filelistRequest = JsonObjectRequest(Request.Method.GET, getString(R.string.serverUrl).plus(getlisturl), jsuserobj,
+                    val filelistRequest = JsonObjectRequest(Request.Method.GET, getString(R.string.serverUrl).plus(drivelisturl), jsuserobj,
                         { flresponse -> filelistResp = flresponse
                             try{
                                 Log.i(getString(R.string.app_name), "in details act, %s".format(flresponse.toString()))
