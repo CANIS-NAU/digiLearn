@@ -8,6 +8,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.gson.annotations.SerializedName
 import kotlinx.android.synthetic.main.activity_file_list_view.*
 import org.json.JSONArray
 import org.json.JSONObject
@@ -20,6 +21,9 @@ class gClassActivity : AppCompatActivity(){
 
         var classnames = ArrayList<String>()
         var classids = ArrayList<String>()
+        var announcements = ArrayList<String>()
+        var coursework = ArrayList<String>()
+
 
         var gso = intent.getBundleExtra("gsoData")
         var classlist = intent.getStringExtra("classJson")
@@ -34,10 +38,10 @@ class gClassActivity : AppCompatActivity(){
             var json = JSONObject(classtr)
             Log.i(getString(R.string.app_name), "gclassactivity json: %s".format(json.toString()))
 
-            var jsarray = JSONArray(json.getString("Courses"))
+            var coursearray = JSONArray(json.getString("Courses"))
 
-            for(i in 0..(jsarray.length()-1)){
-                var job = jsarray.getJSONObject(i)
+            for(i in 0..(coursearray.length()-1)){
+                var job = coursearray.getJSONObject(i)
 
                 classnames.add(job.getString("name"))
                 classids.add(job.getString("courseID"))
@@ -61,5 +65,13 @@ class gClassActivity : AppCompatActivity(){
             Log.e(getString(R.string.app_name), "gclassactivity write_to_ui error: %s".format(e.toString()))
         }
     }
+
+    data class course(
+            @SerializedName("name")
+            var coursename: String? = null,
+            @SerializedName("courseID")
+            var courseID: String? = null,
+            //var announcements: ArrayList<E>? = null,
+    )
 
 }
