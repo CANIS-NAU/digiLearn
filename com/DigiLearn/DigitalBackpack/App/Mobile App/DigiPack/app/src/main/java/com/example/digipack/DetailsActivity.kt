@@ -22,9 +22,16 @@ class DetailsActivity : AppCompatActivity() {
     // Call the network detector tool
     private val networkMonitor = networkDetectorTool(this)
 
+    private lateinit var flintent : Intent
+    private lateinit var gclassIntent : Intent
+    private lateinit var gsearchIntent : Intent
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_details)
+        flintent = Intent(this, FileListViewActivity::class.java)
+        gclassIntent = Intent(this, gClassActivity::class.java)
+        gsearchIntent = Intent(this, gSearchActivity::class.java)
 
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>DigiPack</font>");
@@ -90,9 +97,7 @@ class DetailsActivity : AppCompatActivity() {
         val id = item.getItemId()
 
         // Fix linking to google drive
-        var flintent = Intent(this, FileListViewActivity::class.java)
-        var gclassIntent = Intent(this, gClassActivity::class.java)
-        var gsearchIntent = Intent(this, gSearchActivity::class.java)
+
 
         if (id == R.id.googleDriveBtn) {
             // Makes a toast mssg for the user
@@ -107,7 +112,6 @@ class DetailsActivity : AppCompatActivity() {
             Toast.makeText(this, "Google Classroom Page", Toast.LENGTH_LONG).show()
             // Go to GClass page
             startActivity(gclassIntent)
-
             return true
         }
         if (id == R.id.googleSearchBtn) {
@@ -147,31 +151,8 @@ class DetailsActivity : AppCompatActivity() {
                 if( resp.get("Result") == "ACK"){
                     val success = "Authentication Successful"
                     //mptv.text = success
-
-                    val user = Jsuser(googleFirstName, googleEmail, googleId)
-                    val guser = Gson().toJson(user)
-                    val jsuserobj = JSONObject(guser)
-                    var filelistResp = JSONObject("{Result:noACK}")
-
-                    val filelistRequest = JsonObjectRequest(Request.Method.GET, getString(R.string.serverUrl).plus(drivelisturl), jsuserobj,
-                        { flresponse -> filelistResp = flresponse
-                            try{
-                                Log.i(getString(R.string.app_name), "in details act, %s".format(flresponse.toString()))
-                                var flintent = Intent(this, FileListViewActivity::class.java)
-                                flintent.putExtra("fileListJson", flresponse.toString())
-                                flintent.putExtra("gsoData", intent.extras)
-                                val nextbtn = findViewById<Button>(R.id.btn_pick)
-                                nextbtn.setOnClickListener(){
-                                    this.startActivity(flintent)
-                                }
-                            }catch(e: JSONException){
-                                Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
-                            }
-                        },
-                        { err -> Log.i(getString(R.string.app_name), err.toString())
-                            Toast.makeText(applicationContext, err.toString(), Toast.LENGTH_LONG).show()}
-                    )
-                    queue.addToRequestQueue(filelistRequest)
+                    getFileList(googleFirstName, googleEmail, googleId)
+                    getClassList(googleFirstName, googleEmail, googleId)
                 }
             },
             { error ->
@@ -179,6 +160,58 @@ class DetailsActivity : AppCompatActivity() {
                 }
         )
         queue.addToRequestQueue(request)
+    }
+
+    private fun getClassList(googleFirstName: String?, googleEmail: String?, googleId: String?){
+        val classlisturl = "gclass/$googleEmail"
+        val queue = RequestQueueSingleton.getInstance(this.applicationContext)
+        val user = Jsuser(googleFirstName, googleEmail, googleId)
+        val guser = Gson().toJson(user)
+        val jsuserobj = JSONObject(guser)
+        var gcresp = JSONObject("{Result:noACK}")
+        val gclassRequest = JsonObjectRequest(Request.Method.GET, getString(R.string.serverUrl).plus(classlisturl), jsuserobj,
+                { classresp -> gcresp = classresp
+                    try{
+                        Log.i(getString(R.string.app_name), "in details act/getClassList, %s".format(gcresp.toString()))
+                        gclassIntent.putExtra("classJson", gcresp.toString())
+                        gclassIntent.putExtra("gsoData", intent.extras)
+                    }catch(e: JSONException){
+                        Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
+                    }
+                },
+                {
+                    err ->
+                    Log.i(getString(R.string.app_name), err.toString())
+                    Toast.makeText(applicationContext, err.toString(), Toast.LENGTH_LONG).show()
+                }
+        )
+        queue.addToRequestQueue(gclassRequest)
+    }
+
+    private fun getFileList(googleFirstName:String?, googleEmail:String?, googleId:String?) {
+        val drivelisturl = "drive/$googleEmail"
+        val queue = RequestQueueSingleton.getInstance(this.applicationContext)
+        val user = Jsuser(googleFirstName, googleEmail, googleId)
+        val guser = Gson().toJson(user)
+        val jsuserobj = JSONObject(guser)
+        var filelistResp = JSONObject("{Result:noACK}")
+        val filelistRequest = JsonObjectRequest(Request.Method.GET, getString(R.string.serverUrl).plus(drivelisturl), jsuserobj,
+                { flresponse -> filelistResp = flresponse
+                    try{
+                        Log.i(getString(R.string.app_name), "in details act/getFileList, %s".format(flresponse.toString()))
+                        flintent.putExtra("fileListJson", flresponse.toString())
+                        flintent.putExtra("gsoData", intent.extras)
+                        btn_pick.setOnClickListener{
+                            startActivity(flintent)
+                        }
+                    }catch(e: JSONException){
+                        Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
+                    }
+                },
+                { err -> Log.i(getString(R.string.app_name), err.toString())
+                    Toast.makeText(applicationContext, err.toString(), Toast.LENGTH_LONG).show()}
+        )
+        queue.addToRequestQueue(filelistRequest)
     }
 
     override fun onResume() {
