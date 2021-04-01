@@ -22,9 +22,16 @@ class DetailsActivity : AppCompatActivity() {
     // Call the network detector tool
     private val networkMonitor = networkDetectorTool(this)
 
+    private lateinit var flintent : Intent
+    private lateinit var gclassIntent : Intent
+    private lateinit var gsearchIntent : Intent
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_details)
+        flintent = Intent(this, FileListViewActivity::class.java)
+        gclassIntent = Intent(this, gClassActivity::class.java)
+        gsearchIntent = Intent(this, gSearchActivity::class.java)
 
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>DigiPack</font>");
@@ -90,9 +97,7 @@ class DetailsActivity : AppCompatActivity() {
         val id = item.getItemId()
 
         // Fix linking to google drive
-        var flintent = Intent(this, FileListViewActivity::class.java)
-        var gclassIntent = Intent(this, gClassActivity::class.java)
-        var gsearchIntent = Intent(this, gSearchActivity::class.java)
+
 
         if (id == R.id.googleDriveBtn) {
             // Makes a toast mssg for the user
@@ -107,7 +112,6 @@ class DetailsActivity : AppCompatActivity() {
             Toast.makeText(this, "Google Classroom Page", Toast.LENGTH_LONG).show()
             // Go to GClass page
             startActivity(gclassIntent)
-
             return true
         }
         if (id == R.id.googleSearchBtn) {
@@ -148,6 +152,7 @@ class DetailsActivity : AppCompatActivity() {
                     val success = "Authentication Successful"
                     //mptv.text = success
                     getFileList(googleFirstName, googleEmail, googleId)
+                    getClassList(googleFirstName, googleEmail, googleId)
                 }
             },
             { error ->
@@ -168,14 +173,8 @@ class DetailsActivity : AppCompatActivity() {
                 { classresp -> gcresp = classresp
                     try{
                         Log.i(getString(R.string.app_name), "in details act/getClassList, %s".format(gcresp.toString()))
-                        var classintent = Intent(this, gClassActivity::class.java)
-                        classintent.putExtra("classJson", gcresp.toString())
-                        classintent.putExtra("gsoData", intent.extras)
-                        val btn = findViewById<Button>(R.id.googleClassBtn)
-                        btn.setOnClickListener(){
-                            this.startActivity(classintent)
-                        }
-
+                        gclassIntent.putExtra("classJson", gcresp.toString())
+                        gclassIntent.putExtra("gsoData", intent.extras)
                     }catch(e: JSONException){
                         Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
                     }
@@ -189,7 +188,7 @@ class DetailsActivity : AppCompatActivity() {
         queue.addToRequestQueue(gclassRequest)
     }
 
-    private fun getFileList(googleFirstName:String?, googleEmail:String?, googleId:String?){
+    private fun getFileList(googleFirstName:String?, googleEmail:String?, googleId:String?) {
         val drivelisturl = "drive/$googleEmail"
         val queue = RequestQueueSingleton.getInstance(this.applicationContext)
         val user = Jsuser(googleFirstName, googleEmail, googleId)
@@ -200,12 +199,10 @@ class DetailsActivity : AppCompatActivity() {
                 { flresponse -> filelistResp = flresponse
                     try{
                         Log.i(getString(R.string.app_name), "in details act/getFileList, %s".format(flresponse.toString()))
-                        var flintent = Intent(this, FileListViewActivity::class.java)
                         flintent.putExtra("fileListJson", flresponse.toString())
                         flintent.putExtra("gsoData", intent.extras)
-                        val btn = findViewById<Button>(R.id.googleDriveBtn)
-                        btn.setOnClickListener(){
-                            this.startActivity(flintent)
+                        btn_pick.setOnClickListener{
+                            startActivity(flintent)
                         }
                     }catch(e: JSONException){
                         Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
