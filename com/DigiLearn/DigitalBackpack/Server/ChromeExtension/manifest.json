@@ -1,0 +1,27 @@
+{
+  "name": "DigiPack",
+  "description": "DigiPack",
+  "version": "1.0",
+  "manifest_version": 3,
+  "options_page": "options.html",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["storage", "activeTab", "scripting"],
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "/images/digipack-13.png",
+      "32": "/images/digipack-13.png",
+      "48": "/images/digipack-13.png",
+      "128": "/images/digipack-13.png"
+    },
+     "icons": {
+    "16": "/images/digipack-13.png",
+    "32": "/images/digipack-13.png",
+    "48": "/images/digipack-13.png",
+    "128": "/images/digipack-13.png"
+  }
+  }
+ 
+}
