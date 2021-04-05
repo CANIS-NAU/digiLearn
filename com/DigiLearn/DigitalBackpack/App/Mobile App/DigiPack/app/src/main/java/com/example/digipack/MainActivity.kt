@@ -19,15 +19,17 @@ class MainActivity : AppCompatActivity() {
     lateinit var mGoogleSignInClient: GoogleSignInClient
     private val RC_SIGN_IN = 100
 
-    // Initialize the Google Sign in
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //get the account the user signed in with
         val account = GoogleSignIn.getLastSignedInAccount(this)
 
+        //if the user already signed in
         if(account != null )
         {
+            //extract profile information, ID token
             val googleEmail = account.email
             val googleFirstName = account.givenName
             val googleLastName = account.familyName
@@ -35,7 +37,7 @@ class MainActivity : AppCompatActivity() {
             val googleIdToken = account.idToken
             val googleId = account.id
 
-
+            //construct and start intent for Details activity
             val myIntent = Intent(this, DetailsActivity::class.java)
             myIntent.putExtra("google_id", googleId)
             myIntent.putExtra("google_first_name", googleFirstName)
@@ -43,9 +45,13 @@ class MainActivity : AppCompatActivity() {
             myIntent.putExtra("google_email", googleEmail)
             myIntent.putExtra("google_profile_pic_url", googleProfilePicURL)
             myIntent.putExtra("google_auth_code", googleIdToken)
+            myIntent.putExtra("firstSignIn", false)
+
             this.startActivity(myIntent)
         }
+        //else user isnt signed in
 
+        //initialize google sign in object
         val gso =
                 GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestEmail()
@@ -65,20 +71,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+    //sign in function for the google sign in button
     private fun signIn() {
         val userSignInIntent = mGoogleSignInClient.signInIntent
         startActivityForResult(
-                userSignInIntent, RC_SIGN_IN
+                userSignInIntent, RC_SIGN_IN //Passes result to onActivityResult
         )
     }
 
     // Checks if the requestCode is the same, if so then continue the sign in process
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
+        //if block handled activityResult for signIn
         if (requestCode == RC_SIGN_IN) {
             val task =
                     GoogleSignIn.getSignedInAccountFromIntent(data)
-            handleSignInResult(task)
+            handleSignInResult(task) //passes task to handleSignInResult
         }
     }
 
@@ -88,7 +98,7 @@ class MainActivity : AppCompatActivity() {
             val userAccount = completedTask.getResult(
                     ApiException::class.java
             )
-            // Signed in successfully
+            // Signed in successfully, extract progile information
             val googleId = userAccount?.id ?: ""
             Log.i("Google ID",googleId)
 
@@ -104,15 +114,13 @@ class MainActivity : AppCompatActivity() {
             val googleProfilePicURL = userAccount?.photoUrl.toString()
             Log.i("Google Profile Pic URL", googleProfilePicURL)
 
-            // The ID Token needed for the backend ????
-            // This is not showing on the result area.
             val googleIdToken = userAccount?.idToken ?: ""
             Log.i("Google ID Token", googleIdToken)
 
-            val googleAuthCode = userAccount?.serverAuthCode ?: ""
+            val googleAuthCode = userAccount?.serverAuthCode ?: "" //auth code used for registration with server
             println(googleAuthCode)
 
-            // The grabbed items are supposed to be displayed on the DetailsActivity Page
+            // construct and launch an intent for DetailsActivity
             val myIntent = Intent(this, DetailsActivity::class.java)
             myIntent.putExtra("google_id", googleId)
             myIntent.putExtra("google_first_name", googleFirstName)
@@ -120,6 +128,7 @@ class MainActivity : AppCompatActivity() {
             myIntent.putExtra("google_email", googleEmail)
             myIntent.putExtra("google_profile_pic_url", googleProfilePicURL)
             myIntent.putExtra("google_auth_code", googleAuthCode)
+            myIntent.putExtra("firstSignIn", true)
             this.startActivity(myIntent)
         } catch (e: ApiException) {
             // Checks if the sign in is unsuccessful, if not then throws an error code
