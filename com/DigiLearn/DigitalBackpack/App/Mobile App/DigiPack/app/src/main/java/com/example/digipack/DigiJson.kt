@@ -1,8 +1,11 @@
 package com.example.digipack
 
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 
 class DigiJson {
+
+    @Serializable
     data class Jsuser(
         @SerializedName("userName")
         var userName: String? = null,
@@ -12,6 +15,7 @@ class DigiJson {
         var gid: String? = null
     )
 
+    @Serializable
     data class JsauthTok (
         @SerializedName("googleAccessToken")
         var authToken: String? = null,
@@ -19,11 +23,13 @@ class DigiJson {
         var email: String? = null
     )
 
+    @Serializable
     data class CourseList(
             @SerializedName("Courses")
             var courselist: ArrayList<Course>?
     )
 
+    @Serializable
     data class Course(
         @SerializedName("name")
         var coursename: String? = null,
@@ -35,6 +41,7 @@ class DigiJson {
         var courseWorkList: ArrayList<CourseWork>?
     )
 
+    @Serializable
     data class Announcement(
         @SerializedName("announcementID")
         var announcementID: String? = null,
@@ -47,6 +54,7 @@ class DigiJson {
         //there are other values passed to the app but i dont think we need them...
     )
 
+    @Serializable
     data class CourseWork(
         @SerializedName("courseworkID")
         var courseworkID: String? = null,
@@ -69,6 +77,7 @@ class DigiJson {
         var details: String? = null
     )
 
+    @Serializable
     data class Material(
         //psure these shouldnt be strings...
         @SerializedName("drivefiles")
@@ -84,11 +93,13 @@ class DigiJson {
         //according to my code? yeah they're strings lol
     )
 
+    @Serializable
     data class DF(
         @SerializedName("drivefiles")
         var drivefiles: ArrayList<DriveFile>?
     )
 
+    @Serializable
     data class Drive(
         @SerializedName("driveid")
         var driveid: String? = null,
@@ -98,6 +109,7 @@ class DigiJson {
         var permissions: String? = null
     )
 
+    @Serializable
     data class DriveFile(
         @SerializedName("name")
         var name: String? = null,
@@ -115,6 +127,7 @@ class DigiJson {
         var filesize: String? = null
     )
 
+    @Serializable
     data class DigiFile(
         @SerializedName("fileName")
         var fileName: String? = null,
@@ -122,6 +135,7 @@ class DigiJson {
         var fileid: String? = null
     )
 
+    @Serializable
     data class Duedate(
         @SerializedName("year")
         var year : Int? = null,
@@ -131,6 +145,7 @@ class DigiJson {
         var day: Int? = null
     )
 
+    @Serializable
     data class Duetime(
         @SerializedName("hours")
         var hours: Int? = null,

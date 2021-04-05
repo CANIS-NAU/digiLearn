@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
             val googleEmail = account.email
             val googleFirstName = account.givenName
             val googleLastName = account.familyName
-            val googleProfilePicURL = account.photoUrl
+            val googleProfilePicURL = account.photoUrl.toString()
             val googleIdToken = account.idToken
             val googleId = account.id
 
