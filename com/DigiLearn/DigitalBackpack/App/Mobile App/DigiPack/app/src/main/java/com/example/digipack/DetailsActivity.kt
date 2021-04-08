@@ -1,4 +1,4 @@
-package com.example.digipack
+ package com.example.digipack
 
 
 
@@ -172,21 +172,21 @@ class DetailsActivity : AppCompatActivity() {
         }
         val googleId = intent.getStringExtra("google_id")
         val googleFirstName = intent.getStringExtra("google_first_name")
-        val googleEmail = intent.getStringExtra("google_email")
-        getFileList(googleFirstName, googleEmail, googleId)
-        getClassList(googleFirstName, googleEmail, googleId)
+        val googleIdToken = intent.getStringExtra("google_id")
+        getFileList(googleFirstName, googleIdToken, googleId)
+        getClassList(googleFirstName, googleIdToken, googleId)
     }
 
     //helper function for connectToServer handles acquisition of GCLass data
-    private fun getClassList(googleFirstName: String?, googleEmail: String?, googleId: String?){
+    private fun getClassList(googleFirstName: String?, googleIdToken: String?, googleId: String?){
         when{
             this::gclassIntent.isInitialized -> {
                 Log.i(getString(R.string.app_name), "Details_act: classIntent already initialized")
             }
             else -> {
-                val classlisturl = "gclass/$googleEmail"
+                val classlisturl = "gclass/$googleIdToken"
                 val queue = RequestQueueSingleton.getInstance(this.applicationContext)
-                val user = DigiJson.Jsuser(googleFirstName, googleEmail, googleId)
+                val user = DigiJson.Jsuser(googleFirstName, googleIdToken, googleId)
                 val guser = Gson().toJson(user)
                 val jsuserobj = JSONObject(guser)
                 var gcresp = JSONObject("{Result:noACK}")
@@ -219,15 +219,15 @@ class DetailsActivity : AppCompatActivity() {
     }
 
     //helper function for connectToServer handles acquisition of GDrive data
-    private fun getFileList(googleFirstName:String?, googleEmail:String?, googleId:String?) {
+    private fun getFileList(googleFirstName:String?, googleIdToken:String?, googleId:String?) {
         when{
             this::flintent.isInitialized -> {
                 Log.i(getString(R.string.app_name), "Details_act: flintent already initialized")
             }
             else -> {
-                val drivelisturl = "drive/$googleEmail"
+                val drivelisturl = "drive/$googleIdToken"
                 val queue = RequestQueueSingleton.getInstance(this.applicationContext)
-                val user = DigiJson.Jsuser(googleFirstName, googleEmail, googleId)
+                val user = DigiJson.Jsuser(googleFirstName, googleIdToken, googleId)
                 val guser = Gson().toJson(user)
                 val jsuserobj = JSONObject(guser)
                 var filelistResp = JSONObject("{Result:noACK}")

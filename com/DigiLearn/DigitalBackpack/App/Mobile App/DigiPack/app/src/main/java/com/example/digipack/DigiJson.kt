@@ -9,7 +9,7 @@ class DigiJson {
     data class Jsuser(
         @SerializedName("userName")
         var userName: String? = null,
-        @SerializedName("googleEmail")
+        @SerializedName("googleIdToken")
         var email: String? = null,
         @SerializedName("googleId")
         var gid: String? = null
