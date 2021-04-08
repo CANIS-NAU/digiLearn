@@ -39,12 +39,12 @@ class MainActivity : AppCompatActivity() {
 
             //construct and start intent for Details activity
             val myIntent = Intent(this, DetailsActivity::class.java)
-            myIntent.putExtra("google_id", googleId)
+            myIntent.putExtra("google_id", googleIdToken)
             myIntent.putExtra("google_first_name", googleFirstName)
             myIntent.putExtra("google_last_name", googleLastName)
             myIntent.putExtra("google_email", googleEmail)
             myIntent.putExtra("google_profile_pic_url", googleProfilePicURL)
-            myIntent.putExtra("google_auth_code", googleIdToken)
+            myIntent.putExtra("google_auth_code", "")
             myIntent.putExtra("firstSignIn", false)
 
             this.startActivity(myIntent)
@@ -122,7 +122,7 @@ class MainActivity : AppCompatActivity() {
 
             // construct and launch an intent for DetailsActivity
             val myIntent = Intent(this, DetailsActivity::class.java)
-            myIntent.putExtra("google_id", googleId)
+            myIntent.putExtra("google_id", googleIdToken)
             myIntent.putExtra("google_first_name", googleFirstName)
             myIntent.putExtra("google_last_name", googleLastName)
             myIntent.putExtra("google_email", googleEmail)

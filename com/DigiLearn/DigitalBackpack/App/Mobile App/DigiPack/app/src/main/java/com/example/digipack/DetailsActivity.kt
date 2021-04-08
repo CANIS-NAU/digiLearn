@@ -38,7 +38,7 @@ class DetailsActivity : AppCompatActivity() {
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>DigiPack</font>");
 
-        val googleId = intent.getStringExtra("google_id")
+        val googleIdToken = intent.getStringExtra("google_id")
         val googleFirstName = intent.getStringExtra("google_first_name")
         val googleLastName = intent.getStringExtra("google_last_name")
         val googleEmail = intent.getStringExtra("google_email")
