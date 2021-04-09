@@ -15,6 +15,8 @@ import android.view.animation.DecelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.ColorUtils
 import kotlinx.android.synthetic.main.activity_popup.*
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 class popUp : AppCompatActivity(){
     private var popupTitle = ""
@@ -36,7 +38,8 @@ class popUp : AppCompatActivity(){
         popupButton = bundle?.getString("popupbtn", "Button") ?: ""
         darkStatusBar = bundle?.getBoolean("darkstatusbar", false) ?: false
 
-
+        var ddate = Json.decodeFromString<DigiJson.Duedate>(popupdueDate)
+        popupdueDate = "${ddate.day}/${ddate.month}/${ddate.year}"
         // Set the data
         popup_window_title.text = popupTitle
         popup_window_text.text = popupText

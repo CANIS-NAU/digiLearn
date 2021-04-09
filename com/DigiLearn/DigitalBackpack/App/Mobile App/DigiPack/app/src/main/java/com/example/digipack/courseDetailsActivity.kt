@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.activity_course_details.*
 import kotlinx.android.synthetic.main.activity_gclass.*
 import kotlinx.android.synthetic.main.activity_gsearch.view.*
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.IOException
 
@@ -65,7 +66,7 @@ class courseDetailsActivity : AppCompatActivity(){
             var courseDetail = course.courseWorkList!![position]
             var hwName = courseDetail.title.toString()
             var hwDesc = courseDetail.description.toString()
-            var hwDueDate = courseDetail.duedate.toString()
+            var hwDueDate = Json.encodeToString(courseDetail.duedate)
 
 
             // FIX THE DUE DATE ADN DESCRIPTION

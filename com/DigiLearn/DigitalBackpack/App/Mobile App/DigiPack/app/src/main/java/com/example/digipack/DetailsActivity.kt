@@ -212,7 +212,7 @@ class DetailsActivity : AppCompatActivity() {
                             Toast.makeText(applicationContext, err.toString(), Toast.LENGTH_LONG).show()
                         }
                 )
-                gclassRequest.retryPolicy = DefaultRetryPolicy(10000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
+                gclassRequest.retryPolicy = DefaultRetryPolicy(20000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT)
                 queue.addToRequestQueue(gclassRequest)
             }
         }
