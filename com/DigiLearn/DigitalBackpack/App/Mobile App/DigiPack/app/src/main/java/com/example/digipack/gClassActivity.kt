@@ -15,6 +15,8 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.android.synthetic.main.activity_file_list_view.*
 import kotlinx.android.synthetic.main.activity_file_list_view.json_info
 import kotlinx.android.synthetic.main.activity_gclass.*
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
@@ -72,6 +74,9 @@ class gClassActivity : AppCompatActivity(){
             course_names.onItemClickListener = AdapterView.OnItemClickListener{ parent, view, position, id ->
                 //Toast.makeText(applicationContext, "${classnames[position]} selected", Toast.LENGTH_LONG).show()
                 var courseDetails = Intent(this, courseDetailsActivity::class.java)
+                var course = cl.courselist!![position]
+                var c = Json.encodeToString(course)
+                courseDetails.putExtra("course", c)
                 this.startActivity(courseDetails)
             }
         }catch(e: IOException) {

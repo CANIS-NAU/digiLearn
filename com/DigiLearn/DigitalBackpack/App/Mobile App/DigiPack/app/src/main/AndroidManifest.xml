@@ -26,6 +26,8 @@
             android:theme="@style/Theme.AppCompat.Light"></activity>
         <activity android:name=".courseDetailsActivity"
             android:theme="@style/Theme.AppCompat.Light"></activity>
+        <activity android:name=".popUp"></activity>
+
 
         <activity android:name=".MainActivity"
             android:noHistory="true"> <!--Keeps the Google Sign In page off of the activity stack-->
