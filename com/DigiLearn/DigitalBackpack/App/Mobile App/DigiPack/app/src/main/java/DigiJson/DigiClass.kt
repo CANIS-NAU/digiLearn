@@ -1,33 +1,15 @@
-package com.example.digipack
+package DigiJson
 
 import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
 
-class DigiJson {
-
-    @Serializable
-    data class Jsuser(
-        @SerializedName("userName")
-        var userName: String? = null,
-        @SerializedName("googleEmail")
-        var email: String? = null,
-        @SerializedName("googleId")
-        var gid: String? = null
-    )
-
-    @Serializable
-    data class JsauthTok (
-        @SerializedName("googleAccessToken")
-        var authToken: String? = null,
-        @SerializedName("gooogleEmail")
-        var email: String? = null
-    )
+class DigiClass {
 
     @Serializable
     data class CourseList(
-            @SerializedName("Courses")
-            var courselist: ArrayList<Course>?
-    )
+        @SerializedName("Courses")
+        var courselist: ArrayList<Course>?
+    ) : java.io.Serializable
 
     @Serializable
     data class Course(
@@ -39,7 +21,7 @@ class DigiJson {
         var announcements: ArrayList<Announcement>?,
         @SerializedName("coursework")
         var courseWorkList: ArrayList<CourseWork>?
-    )
+    ) : java.io.Serializable
 
     @Serializable
     data class Announcement(
@@ -75,13 +57,13 @@ class DigiJson {
         //this one idk ill have to check my code
         @SerializedName("details")
         var details: String? = null
-    )
+    ) : java.io.Serializable
 
     @Serializable
     data class Material(
         //psure these shouldnt be strings...
         @SerializedName("drivefiles")
-        var drivefiles: DF?,
+        var drivefiles: DigiDrive.DF?,
         @SerializedName("ytlinks")
         var ytlinks: String? = null,
         @SerializedName("links")
@@ -93,47 +75,7 @@ class DigiJson {
         //according to my code? yeah they're strings lol
     )
 
-    @Serializable
-    data class DF(
-        @SerializedName("drivefiles")
-        var drivefiles: ArrayList<DriveFile>?
-    )
 
-    @Serializable
-    data class Drive(
-        @SerializedName("driveid")
-        var driveid: String? = null,
-        @SerializedName("files")
-        var files: ArrayList<DriveFile>,
-        @SerializedName("permissions")
-        var permissions: String? = null
-    )
-
-    @Serializable
-    data class DriveFile(
-        @SerializedName("name")
-        var name: String? = null,
-        @SerializedName("driveID")
-        var driveID: String? = null,
-        @SerializedName("classID")
-        var classID: String? = null,
-        @SerializedName("localpath")
-        var localpath: String? = null,
-        @SerializedName("drivepath")
-        var drivepath: String? = null,
-        @SerializedName("classroompath")
-        var classroompath: String? = null,
-        @SerializedName("filesize")
-        var filesize: String? = null
-    )
-
-    @Serializable
-    data class DigiFile(
-        @SerializedName("fileName")
-        var fileName: String? = null,
-        @SerializedName("fileid")
-        var fileid: String? = null
-    )
 
     @Serializable
     data class Duedate(
@@ -152,5 +94,4 @@ class DigiJson {
         @SerializedName("minutes")
         var minutes: Int? = null
     )
-
 }

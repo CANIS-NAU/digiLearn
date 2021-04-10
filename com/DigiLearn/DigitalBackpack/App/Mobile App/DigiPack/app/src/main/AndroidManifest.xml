@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.digipack">
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -17,31 +16,21 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
 
-        <!--Activity Declarations-->
-        <activity android:name=".FileListViewActivity"
-            android:theme="@style/Theme.AppCompat.Light"></activity>
-        <activity android:name=".gClassActivity"
-            android:theme="@style/Theme.AppCompat.Light"></activity>
-        <activity android:name=".gSearchActivity"
-            android:theme="@style/Theme.AppCompat.Light"></activity>
-        <activity android:name=".courseDetailsActivity"
-            android:theme="@style/Theme.AppCompat.Light"></activity>
-        <activity android:name=".popUp"></activity>
-
-
-        <activity android:name=".MainActivity"
-            android:noHistory="true"> <!--Keeps the Google Sign In page off of the activity stack-->
+        <!-- activities -->
+        <activity android:name="com.example.digipack.SignInActivity"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".DetailsActivity"
-            android:theme="@style/Theme.AppCompat.Light">
-        </activity>
-
+        <activity android:name="com.example.digipack.CourseDetailsActivity" android:theme="@style/Theme.AppCompat.Light"/>
+        <activity android:name="com.example.digipack.DetailsActivity" android:theme="@style/Theme.AppCompat.Light"/>
+        <activity android:name="com.example.digipack.FileListViewActivity" android:theme="@style/Theme.AppCompat.Light"/>
+        <activity android:name="com.example.digipack.GClassActivity"  android:theme="@style/Theme.AppCompat.Light"/>
+        <activity android:name="com.example.digipack.popUp"  android:theme="@style/Theme.AppCompat.Light"/>
 
     </application>
+
 </manifest>

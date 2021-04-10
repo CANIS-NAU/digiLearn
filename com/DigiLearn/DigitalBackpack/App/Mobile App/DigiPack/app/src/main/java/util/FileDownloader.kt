@@ -1,4 +1,4 @@
-package com.example.digipack
+package util
 
 import android.Manifest
 import android.annotation.TargetApi
@@ -139,28 +139,28 @@ class FileDownloader {
          * removing this cause its not needed, we just display the download in the notification
          * might be useful for the download status thing in the future but for now we dont need it
         Thread(Runnable {
-            var downloading = true
-            while (downloading) {
-                val cursor: Cursor = downloadManager.query(query)
+        var downloading = true
+        while (downloading) {
+        val cursor: Cursor = downloadManager.query(query)
 
-                cursor.moveToFirst()
+        cursor.moveToFirst()
 
-                if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
-                    downloading = false
-                }
-                val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
-                msg = statusMessage(url, directory, status)
-                if (msg != lastMsg) {
-                    context.runOnUiThread {
-                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-                    }
-                    lastMsg = msg ?: ""
-                }
-                cursor.close()
-            }
+        if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
+        downloading = false
+        }
+        val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
+        msg = statusMessage(url, directory, status)
+        if (msg != lastMsg) {
+        context.runOnUiThread {
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+        }
+        lastMsg = msg ?: ""
+        }
+        cursor.close()
+        }
         }).start()
 
-        **/
+         **/
     }
 
     private fun statusMessage(url: String, directory: File, status: Int): String {

@@ -1,4 +1,4 @@
-package com.example.digipack
+package util
 
 import android.content.BroadcastReceiver
 import android.content.Context

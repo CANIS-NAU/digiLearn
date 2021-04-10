@@ -1,4 +1,4 @@
-package com.example.digipack
+package util
 
 import android.Manifest
 import android.app.Activity
@@ -17,7 +17,7 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 
 
-const val REQUEST_CODE = 1;
+const val REQUEST_CODE = 1
 
 /**
  * Class of utility functions which aid in storing and retrieving data from external app storage
