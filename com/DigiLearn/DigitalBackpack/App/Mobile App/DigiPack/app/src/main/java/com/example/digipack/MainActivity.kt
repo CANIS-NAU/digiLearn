@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
                                 Scope("https://www.googleapis.com/auth/classroom.coursework.me"),
                                 Scope("https://www.googleapis.com/auth/classroom.announcements"),
                                 Scope("https://www.googleapis.com/auth/classroom.guardianlinks.me.readonly"))
-                        .requestServerAuthCode(getString(R.string.serverClientId), true)
+                        .requestServerAuthCode(getString(R.string.serverClientId))
                         .build()
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
@@ -47,14 +47,14 @@ class MainActivity : AppCompatActivity() {
             signIn()
         }
 
+        //silent sign in operation gets new id token
         mGoogleSignInClient.silentSignIn()
                 .addOnCompleteListener(
                         this,
                         OnCompleteListener<GoogleSignInAccount?> { task -> handleSignInResult(task) })
     }
 
-
-    //sign in function for the google sign in button
+        //sign in function for the google sign in button
     private fun signIn() {
         val userSignInIntent = mGoogleSignInClient.signInIntent
         startActivityForResult(
