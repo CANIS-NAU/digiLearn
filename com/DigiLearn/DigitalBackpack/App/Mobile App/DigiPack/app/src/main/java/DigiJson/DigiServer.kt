@@ -8,5 +8,5 @@ class DigiServer {
     data class succ(
         @SerializedName("success")
         var success: Int? = null
-    )
+    ) : java.io.Serializable
 }

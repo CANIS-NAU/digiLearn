@@ -13,7 +13,7 @@ class DigiUser {
         var email: String? = null,
         @SerializedName("googleId")
         var gid: String? = null
-    )
+    ) : java.io.Serializable
 
     @Serializable
     data class JsauthTok (

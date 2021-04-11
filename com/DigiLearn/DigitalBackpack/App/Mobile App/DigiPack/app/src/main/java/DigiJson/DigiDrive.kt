@@ -19,7 +19,7 @@ class DigiDrive {
         var files: ArrayList<DriveFile>,
         @SerializedName("permissions")
         var permissions: String? = null
-    )
+    ) : java.io.Serializable
 
     @Serializable
     data class DriveFile(
@@ -37,7 +37,7 @@ class DigiDrive {
         var classroompath: String? = null,
         @SerializedName("filesize")
         var filesize: String? = null
-    )
+    ) : java.io.Serializable
 
     @Serializable
     data class DigiFile(
@@ -45,5 +45,5 @@ class DigiDrive {
         var fileName: String? = null,
         @SerializedName("fileid")
         var fileid: String? = null
-    )
+    ) : java.io.Serializable
 }

@@ -34,7 +34,7 @@ class DigiClass {
         @SerializedName("creationtime")
         var creationtime: String? = null,
         //there are other values passed to the app but i dont think we need them...
-    )
+    ) : java.io.Serializable
 
     @Serializable
     data class CourseWork(
@@ -73,7 +73,7 @@ class DigiClass {
         @SerializedName("localfiles")
         var localfiles: String? = null
         //according to my code? yeah they're strings lol
-    )
+    ) : java.io.Serializable
 
 
 
@@ -85,7 +85,7 @@ class DigiClass {
         var month: Int? = null,
         @SerializedName("day")
         var day: Int? = null
-    )
+    ) : java.io.Serializable
 
     @Serializable
     data class Duetime(
@@ -93,5 +93,5 @@ class DigiClass {
         var hours: Int? = null,
         @SerializedName("minutes")
         var minutes: Int? = null
-    )
+    ) : java.io.Serializable
 }
