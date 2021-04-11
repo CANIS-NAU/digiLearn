@@ -11,15 +11,18 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.Scopes
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.Scope
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import kotlinx.android.synthetic.main.activity_main.*
+
+//results codes
+private const val RC_SIGN_IN = 100
+private const val EXPLICIT_SIGN_IN = 201
+private const val IMPLICIT_SIGN_IN = 202
 
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var mGoogleSignInClient: GoogleSignInClient
-    private val RC_SIGN_IN = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,9 +52,7 @@ class MainActivity : AppCompatActivity() {
 
         //silent sign in operation gets new id token
         mGoogleSignInClient.silentSignIn()
-                .addOnCompleteListener(
-                        this,
-                        OnCompleteListener<GoogleSignInAccount?> { task -> handleSignInResult(task) })
+                .addOnCompleteListener( this) { task -> handleSignInResult(task, IMPLICIT_SIGN_IN) }
     }
 
         //sign in function for the google sign in button
@@ -70,12 +71,12 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == RC_SIGN_IN) {
             val task =
                     GoogleSignIn.getSignedInAccountFromIntent(data)
-            handleSignInResult(task) //passes task to handleSignInResult
+            handleSignInResult(task, EXPLICIT_SIGN_IN) //passes task to handleSignInResult
         }
     }
 
     // The user is signed in successfully and will get the user's basic info
-    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
+    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>, resultCode: Int) {
         try {
             println("handle sign in entered")
             val userAccount = completedTask.getResult(
@@ -107,13 +108,21 @@ class MainActivity : AppCompatActivity() {
 
             // construct and launch an intent for DetailsActivity
             val myIntent = Intent(this, DetailsActivity::class.java)
-            myIntent.putExtra("google_id", googleIdToken)
+            myIntent.putExtra("google_id_token", googleIdToken)
             myIntent.putExtra("google_first_name", googleFirstName)
             myIntent.putExtra("google_last_name", googleLastName)
             myIntent.putExtra("google_email", googleEmail)
             myIntent.putExtra("google_profile_pic_url", googleProfilePicURL)
             myIntent.putExtra("google_auth_code", googleAuthCode)
-            myIntent.putExtra("firstSignIn", true)
+
+            //if explicit sign in, put as first sign in
+            if( resultCode == EXPLICIT_SIGN_IN){
+                myIntent.putExtra("firstSignIn", true)
+            }
+            else{
+                myIntent.putExtra("firstSignIn", false)
+            }
+
             this.startActivity(myIntent)
         } catch (e: ApiException) {
             // Checks if the sign in is unsuccessful, if not then throws an error code
