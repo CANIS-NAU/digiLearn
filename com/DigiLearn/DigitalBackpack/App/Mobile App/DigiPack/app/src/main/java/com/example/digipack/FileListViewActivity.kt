@@ -11,9 +11,7 @@ import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_file_list_view.*
-import util.networkDetectorTool
 import util.FileDownloader
-import util.ServerInteraction
 import java.io.IOException
 
 const val PICK_PDF_FILE = 2
@@ -25,6 +23,7 @@ class FileListViewActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.i(getString(R.string.app_name), "FileListView: created")
         var layoutselect = intent.getBooleanExtra("layoutselection", false)
         if(layoutselect){
             setContentView(R.layout.kids_activity_file_list_view)
@@ -38,8 +37,8 @@ class FileListViewActivity : AppCompatActivity() {
         //initialization
         var context : Context = this
         var user = intent.getSerializableExtra("guser") as GUser
-        var df = intent.getSerializableExtra("fileList") as DigiDrive.DF
-        var filelist = df.drivefiles
+        var df = intent.getSerializableExtra("filelist") as DigiDrive.DF
+        var filelist = df.Files
 
         //write to ui and listen for click
         if (filelist != null) {
@@ -77,7 +76,8 @@ class FileListViewActivity : AppCompatActivity() {
             // Creates an onclick listener when the user clicks on the driveID that would be referenced to driveID
             json_info.onItemClickListener = AdapterView.OnItemClickListener{ parent, view, position, id->
                 //position is the index of the list item that corresponds to the button clicked
-                fileClicked(user, files, position)
+                //fileClicked(user, files, position)
+                Toast.makeText(this, "File \"${filenamelist[position]} clicked", Toast.LENGTH_SHORT).show()
 
             }
         }catch (e: IOException){
@@ -85,7 +85,7 @@ class FileListViewActivity : AppCompatActivity() {
             Log.e(getString(R.string.app_name), "FileListViewActivity write_to_ui error: %s".format(e.toString()))
         }
     }
-
+/**
     private fun fileClicked(user: GUser, files: ArrayList<DigiDrive.DigiFile>, position: Int) {
         //build url
         //should probably not be a global value in prod
@@ -101,7 +101,7 @@ class FileListViewActivity : AppCompatActivity() {
             }
         }
     }
-
+**/
     // Checks if the requestCode is the same, if so then continue the sign in process
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         super.onActivityResult(requestCode, resultCode, resultData)

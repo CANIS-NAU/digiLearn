@@ -1,4 +1,4 @@
-package util
+package com.example.digipack
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -40,10 +40,10 @@ class networkDetectorTool(context: Context) {
                     super.onCapabilitiesChanged(network, networkCapabilities)
                     when {
                         networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {
-                            result(true,ConnectionType.Wifi)
+                            result(true, ConnectionType.Wifi)
                         }
                         else -> {
-                            result(true,ConnectionType.Cellular)
+                            result(true, ConnectionType.Cellular)
                         }
                     }
                 }

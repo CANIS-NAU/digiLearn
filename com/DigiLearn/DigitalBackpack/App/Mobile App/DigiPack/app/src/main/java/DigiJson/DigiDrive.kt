@@ -7,8 +7,8 @@ class DigiDrive {
 
     @Serializable
     data class DF(
-        @SerializedName("drivefiles")
-        var drivefiles: ArrayList<DigiFile>?
+        @SerializedName("Files")
+        var Files: ArrayList<DigiFile>?
     ) : java.io.Serializable
 
     @Serializable
