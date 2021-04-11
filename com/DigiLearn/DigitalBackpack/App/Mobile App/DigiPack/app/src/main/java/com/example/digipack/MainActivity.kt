@@ -11,8 +11,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.Scopes
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.Scope
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import kotlinx.android.synthetic.main.activity_main.*
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,45 +25,20 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //get the account the user signed in with
-        val account = GoogleSignIn.getLastSignedInAccount(this)
 
-        //if the user already signed in
-        if(account != null )
-        {
-            //extract profile information, ID token
-            val googleEmail = account.email
-            val googleFirstName = account.givenName
-            val googleLastName = account.familyName
-            val googleProfilePicURL = account.photoUrl.toString()
-            val googleIdToken = account.idToken
-            val googleId = account.id
-
-            //construct and start intent for Details activity
-            val myIntent = Intent(this, DetailsActivity::class.java)
-            myIntent.putExtra("google_id", googleIdToken)
-            myIntent.putExtra("google_first_name", googleFirstName)
-            myIntent.putExtra("google_last_name", googleLastName)
-            myIntent.putExtra("google_email", googleEmail)
-            myIntent.putExtra("google_profile_pic_url", googleProfilePicURL)
-            myIntent.putExtra("google_auth_code", "")
-            myIntent.putExtra("firstSignIn", false)
-
-            this.startActivity(myIntent)
-        }
         //else user isnt signed in
 
         //initialize google sign in object
         val gso =
                 GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestEmail()
-                        .requestIdToken( getString(R.string.serverClientId) )
-                        .requestScopes( Scope (Scopes.DRIVE_FULL),
-                                Scope ("https://www.googleapis.com/auth/classroom.courses"),
-                                Scope ("https://www.googleapis.com/auth/classroom.coursework.me"),
-                                Scope ("https://www.googleapis.com/auth/classroom.announcements"),
-                                Scope ("https://www.googleapis.com/auth/classroom.guardianlinks.me.readonly") )
-                        .requestServerAuthCode( getString(R.string.serverClientId), true)
+                        .requestIdToken(getString(R.string.serverClientId))
+                        .requestScopes(Scope(Scopes.DRIVE_FULL),
+                                Scope("https://www.googleapis.com/auth/classroom.courses"),
+                                Scope("https://www.googleapis.com/auth/classroom.coursework.me"),
+                                Scope("https://www.googleapis.com/auth/classroom.announcements"),
+                                Scope("https://www.googleapis.com/auth/classroom.guardianlinks.me.readonly"))
+                        .requestServerAuthCode(getString(R.string.serverClientId), true)
                         .build()
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
@@ -69,6 +46,11 @@ class MainActivity : AppCompatActivity() {
         google_sign_in_button.setOnClickListener {
             signIn()
         }
+
+        mGoogleSignInClient.silentSignIn()
+                .addOnCompleteListener(
+                        this,
+                        OnCompleteListener<GoogleSignInAccount?> { task -> handleSignInResult(task) })
     }
 
 
@@ -95,12 +77,15 @@ class MainActivity : AppCompatActivity() {
     // The user is signed in successfully and will get the user's basic info
     private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
         try {
+            println("handle sign in entered")
             val userAccount = completedTask.getResult(
                     ApiException::class.java
             )
+            println("user account value obtained")
+
             // Signed in successfully, extract progile information
             val googleId = userAccount?.id ?: ""
-            Log.i("Google ID",googleId)
+            Log.i("Google ID", googleId)
 
             val googleFirstName = userAccount?.givenName ?: ""
             Log.i("Google First Name", googleFirstName)
