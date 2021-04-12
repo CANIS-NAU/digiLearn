@@ -1,4 +1,5 @@
 import requests
+from REST.JSONBuilders import DigiJsonBuilder
 
 URL = "https://www.googleapis.com/customsearch/v1?"
 ENGINE_ID = "276d40ae1923ea29f"
@@ -16,7 +17,13 @@ def make_request(query):
 
     if results is not None:
         for item in results:
-            a = ""
+            title = item["title"] if "title" in item else "No Title"
+            link = item["link"] if "link" in item else "No Link Found"
+            dlink = item["displayLink"] if "displayLink" in item else "No Display Link"
+            snip = item["snippet"] if "snippet" in item else "No Snippet"
+            mime = item["mime"] if "mime" in item else None
+            ff = item["fileFormat"] if "fileFormat" in item else "No File Format"
+            DigiJsonBuilder.create_search_result(title, link, dlink, snip, mime, ff)
 
 
 
