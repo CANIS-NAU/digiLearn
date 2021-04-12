@@ -1,15 +1,15 @@
 # local dependencies
 from REST.JSONBuilders import DigiJsonBuilder
-from REST.Interfaces.GDriveInterface import create_service
+from REST.JSONBuilders import GDriveJsonBuilder
+from REST.Interfaces.GoogleInterface import create_service
 from Auth.AuthenticationManager import get_gdrive_auth
 from src.DataManagers.DataManager import store_file
 from err import DigiExceptions
-#import Exception
-
-#/com/DigiLearn/DigitalBackpack/Server/Django/REST/Interpreters
 
 # python dependencies
 import io
+import os
+import mimetypes
 # google dependencies
 from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient.http import MediaFileUpload
@@ -31,35 +31,20 @@ def get_file_metadata(user_auth: dict, user_email, file_id: str):
     service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES, user_email=user_email)
     # make request for file metadata
     request = service.files().get(fileId=file_id, fields=_FILE_FIELDS).execute()
+    fname = request["name"] if "name" in request else "<No File Name>"
+    did = request["id"] if "id" in request else "<No Drive ID>"
+    cid = None
+    lfp = None
+    dpath = request["parents"] if "parents" in request else "<No Drive Path>"
+    cpath = None
+    size = request["size"] if "size" in request else "<No Size>"
+    mtp = request["mimeType"] if "mimeType" in request else None
+    cap = request["capabilities"] if "capabilities" in request else None
 
-    filemeta = request
+    filemeta = DigiJsonBuilder.create_file(fname, did, cid, lfp, dpath, cpath, size)
+    filemeta.update({'mimeType': mtp, 'capabilities': cap})
 
-    '''
-    # if the file hasn't been moved to trash by the user
-    if not request['trashed']:
-        # build the file object with no local_file_path, can be added with a second call to get_file
-
-        try:
-            filemeta = DigiJsonBuilder.create_file(name=request['name'], drive_id=request['id'], class_id=None,
-                                                   local_file_path=None, drive_path=request['parents'], classpath=None,
-                                                   size=request['size'])
-        except KeyError as k:
-            if k == 'size':
-                filemeta = DigiJsonBuilder.create_file(name=request['name'], drive_id=request['id'], class_id=None,
-                                                       local_file_path=None, drive_path=request['parents'],
-                                                       classpath=None,
-                                                       size=None)
-
-        # add the other stuff we get from gdrive to the object, don't necessarily need it but might be useful eventually
-        filemeta.update({'mimeType': request['mimeType'], 'capabilities': request['capabilities']})
-        # return metadata
-    '''
     return filemeta
-
-    #else:
-        # throw an error here
-    #    raise DigiExceptions.TrashedFileError(file_id, '%s file has been moved to trash by user and cannot be accessed'
-    #                                          % file_id)
 
 
 # gets a singular file from google drive, for multiple files call in a loop.
@@ -69,10 +54,10 @@ def get_file(user_auth: dict, user_email, file_dict):
     service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES, user_email=user_email)
     # get the file itself
     try:
-        request = service.files().get_media(fileId=file_dict['id'])
+        request = service.files().get_media(fileId=file_dict['driveID'])
     except Exception:
-        request = service.files().export_media(fileId=file_dict['id'], mimeType = file_dict["mimeType"])
-        
+        request = service.files().export_media(fileId=file_dict['driveID'], mimeType = file_dict["mimeType"])
+
      #.get_media(fileId=file_dict['id'])
     fh = io.BytesIO()
     downloader = MediaIoBaseDownload(fd=fh, request=request)
@@ -82,15 +67,20 @@ def get_file(user_auth: dict, user_email, file_dict):
     while not done:
         status, done = downloader.next_chunk()
         # log the progress somewhere
-        print('download progress {0}'.format(status.progress() * 100))
+        #print('download progress {0}'.format(status.progress() * 100))
 
     fh.seek(0)
     # store it on the server somewhere
     #   this will be done by the datamanager
     #   pass the recieved string of bits to the datamanager with location,
     #   driveid(just gonna use these for naming ease), and ya well figure that out when we get there
-    file_path = store_file(user_auth, file_dict, fh, "drive_storage")
-    file_dict['localpath'] = file_path
+    sfres = store_file(user_auth, file_dict, fh, "drive_storage")
+    if sfres:
+        file_path = './DriveStorage/' + file_dict["name"]
+        file_dict['localpath'] = file_path
+        file_dict['filesize'] = os.path.getsize(file_path)
+        mt = mimetypes.guess_type(file_path, strict=True)
+        file_dict.update({"mimetype": mt[0]})
     return file_dict
 
 
@@ -99,9 +89,9 @@ def get_file(user_auth: dict, user_email, file_dict):
 #   //might be drive#mydrive idrk
 def get_drive_list(user_auth, user_email):
     # do auth and create service
-    gdrive_auth = get_gdrive_auth(user_auth['user_id'])
+    gdrive_auth = user_auth  # get_gdrive_auth(user_auth['user_id'])
     service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES, user_email=user_email)
-    
+
     # get list of drive objects (this is like, mydrive, shared drives, etc. no files)
     # with all list getters, there is a list_next(prev_req, prev_resp) that can be used, gonna need a while loop
     # for those in the future but for now well just do one page of results
@@ -109,8 +99,10 @@ def get_drive_list(user_auth, user_email):
     mydrive = get_file_list(user_auth, user_email, 'my-drive')
     drivelist = [mydrive]
     for drive in gdrive_list['drives']:
-        driveobj = DigiJsonBuilder.create_drive(drive['id'], get_file_list(user_auth, drive['id']),
-                                                drive['capabilities'])
+        did = drive['id'] if 'id' in drive else None
+        cap = drive['capabilities'] if 'capabilities' in drive else None
+        fl = get_file_list(user_auth, did)
+        driveobj = DigiJsonBuilder.create_drive(did, fl, cap)
         driveobj = _get_drive_permissions(driveobj, drive)
         drivelist.append(driveobj)
     # convert to digijson
@@ -122,7 +114,7 @@ def get_file_list(user_auth, user_email, driveid):
     # get list of files in the specified drive
     gdrive_auth = user_auth  # get_gdrive_auth(user_auth['user_id'])
     service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES, user_email=user_email)
-    
+
     # see get_drive_list
     if driveid == 'my-drive':
         gdrive_list = service.files().list(fields="files(" + _FILE_FIELDS + ")").execute()
@@ -130,68 +122,24 @@ def get_file_list(user_auth, user_email, driveid):
         gdrive_list = service.files().list(fields="files(" + _FILE_FIELDS + ")", driveId=driveid,
                                            supportsAllDrives=True, includeItemsFromAllDrives=True, corpora='drive'
                                            ).execute()
-    filemeta = {}
     for file in gdrive_list['files']:
-        if not file['trashed']:
-            try:
-                filemeta = DigiJsonBuilder.create_file(name=file['name'], drive_id=file['id'], class_id=None,
-                                                       local_file_path=None, drive_path=file['parents'], classpath=None,
-                                                       size=file['size'])
-            except KeyError as k:
-                print(k)
-            try:
-                filemeta.update({'mimeType': file['mimeType']})
-                filemeta.update({'capabilities': file['capabilities']})
-            except KeyError as k:
-                print(k)
-            filelist.append(filemeta)
-    '''
-    for file in gdrive_list['files']:
-        if not file['trashed']:
-            try:
-                filemeta = DigiJsonBuilder.create_file(name=file['name'], drive_id=file['id'], class_id=None,
-                                                       local_file_path=None, drive_path=file['parents'], classpath=None,
-                                                       size=file['size'])
-            except KeyError as k:
-                if k == 'parents':
-                    try:
-                        filemeta = DigiJsonBuilder.create_file(name=file['name'], drive_id=file['id'], class_id=None,
-                                                               local_file_path=None, drive_path=None,
-                                                               classpath=None,
-                                                               size=file['size'])
-                    except KeyError as k1:
-                        if k1 == 'size':
-                            filemeta = DigiJsonBuilder.create_file(name=file['name'], drive_id=file['id'],
-                                                                   class_id=None,
-                                                                   local_file_path=None, drive_path=None,
-                                                                   classpath=None,
-                                                                   size=None)
-                if k == 'size':
-                    try:
-                        filemeta = DigiJsonBuilder.create_file(name=file['name'], drive_id=file['id'], class_id=None,
-                                                               local_file_path=None, drive_path=file['parents'],
-                                                               classpath=None,
-                                                               size=None)
-                    except KeyError as k1:
-                        # throw an error
-                        return k1, k
-                else:
-                    return k
-            try:
-                filemeta.update({'mimeType': file['mimeType']})
-                filemeta.update({'capabilities': file['capabilities']})
-            except KeyError as k:
-                if k == 'mimeType':
-                    try:
-                        filemeta.update({'capabilities': file['capabilities']})
-                    except KeyError as k1:
-                        # throw an error? or just log?
-                        return None
-                if k == 'capabilities':
-                    filemeta.update({'capabilities': None})
-                    # should probably do some logging here...
-            filelist.append(filemeta)
-            '''
+        if "mimeType" in file and file["mimeType"] != 'application/vnd.google-apps.folder':
+            if not file["trashed"]:
+                fname = file['name'] if 'name' in file else "<No File Name>"
+                fid = file['id'] if 'id' in file else "<No File ID>"
+                cid = None
+                lfp = None
+                dpath = file["parents"] if "parents" in file else "<No Drive Path>"
+                cpath = None
+                size = file["size"] if "size" in file else "<No Size>"
+                cap = file["capabilities"] if "capabilities" in file else None
+                mtp = file["mimeType"] if "mimeType" in file else None
+
+                filemeta = DigiJsonBuilder.create_file(fname, fid, cid, lfp, dpath, cpath, size)
+                filemeta.update({'mimeType': mtp})
+                filemeta.update({'capabilities': cap})
+
+                filelist.append(filemeta)
     # convert to digijson
     return filelist
 
@@ -199,53 +147,44 @@ def get_file_list(user_auth, user_email, driveid):
 def get_file_comments(user_auth, user_email, fileid):
     comments = []
     # do auth and create service
-    gdrive_auth = get_gdrive_auth(user_auth['user_id'])
+    gdrive_auth = user_auth  # get_gdrive_auth(user_auth['user_id'])
     service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES, user_email=user_email)
     # get comments on the file
     file_comm_list = service.comments.list(fileId=fileid)
     # just create a (python)json object
     # because json i can just slap that shit in there and not care about it lol
     comm = {
-        "comments": file_comm_list['comments']
+        "comments": file_comm_list['comments'] if 'comments' in file_comm_list else None
     }
     return comm
 
 
-def upload_file(user_auth, user_email, file_dict, fileobj, drivepath):
+def upload_file(user_auth, user_email, file_dict, drivepath=None):
     uploadjson = None
-    gdrive_auth = get_gdrive_auth(user_auth['user_id'])
-    service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES)
+    gdrive_auth = user_auth  # get_gdrive_auth(user_auth['user_id'])
+    service = create_service(gdrive_auth, _API_NAME, _API_VERSION, _SCOPES, user_email=user_email)
     # get the (local) file and needed data to upload to drive
+    filepath = file_dict["localpath"]
     # create drive json
-    # make sure file got uploaded correctly/completely
-    uploadsuccess = service.files().create(body='json object', media_body='filepath')
-    return uploadsuccess
+    gdrivejson = GDriveJsonBuilder.createfilejson(file_dict)
+    mt = file_dict['mimetype'] if 'mimetype' in file_dict else mimetypes.guess_type(filepath, strict=True)[0]
+    if 'mimetype' not in file_dict:
+        file_dict.update({"mimetype": mt})
+    # create media file upload
+    media = MediaFileUpload(filepath, mimetype=mt)
+    # upload file
+    fid = service.files().create(body=gdrivejson, media_body=media, fields='id').execute()
+    file_dict["driveID"] = fid['id'] if 'id' in fid else None
+    if file_dict["driveID"] != None:
+        return file_dict
+    return None
 
 
 def _get_drive_permissions(drive, gdrive):
     # get the permissions that the user has for the drive
     permissions = {
-        "restrictions": gdrive['restrictions'],
-        "capabilities": gdrive['capabilities']
+        "restrictions": gdrive['restrictions'] if 'restrictions' in gdrive else None,
+        "capabilities": gdrive['capabilities'] if 'capabilities' in gdrive else None
     }
     drive.update(permissions)  # works like append
     return drive
-
-
-def _beforeanything(user_auth):
-    interpretername = "Google Drive Interpreter"
-
-    # i need to figure out more testing to do here and how to properly handle errors
-    if type(user_auth) != dict:
-        errstr = "Incorrect Data Type for Google Drive Interpreter User Authentication variable"
-        # throw an error about this
-        return False
-    if "installed" not in user_auth:
-        errstr = "User Authentication has no value 'installed', no Google Drive authentication values for this user"
-        # throw an error about this
-        return False
-    if type(user_auth["installed"]) != dict:
-        errstr = "User Authentication values either not set, or set incorrectly for Google Drive Interpreter"
-        # throw
-        return False
-    return True
