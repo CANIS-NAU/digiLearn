@@ -1,0 +1,267 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+{% load pwa %}
+{% progressive_web_app_meta %}
+
+<head>
+    <link href="{% static 'styles/mainpage.css' %}" rel="stylesheet">
+    <link rel="icon" href="{% static 'icons/favicon.png' %}" type="image/x-icon">
+</head>
+
+<body>
+
+    <div class="header">
+        <a href="/"><img src="{% static 'icons/logo.png' %}" alt="Digipack Logo"></a>
+
+        <li>
+            <ul><i id="lastUpdated"> </i></ul>
+            <ul> Connection Status: <strong id="networkStatus"> </strong> </ul>
+        </li>
+    </div>
+    <div class="nav">
+        <a href="">Settings</a>
+    </div>
+
+    <div class="container">
+        <div id="links">
+            <li>
+                <ul><a href="#" onClick="getAssignments('https://digipackweb.com:8000/gclass/team.digilearn@gmail.com')">My Assignments</a></ul>
+                <ul><a href="#" onClick="test1('hello!')">My Searches</a></ul>
+                <ul><a href="#" onClick="getFiles('https://digipackweb.com:8000/drive/team.digilearn@gmail.com')">My
+                        Files</a></ul>
+            </li>
+        </div>
+
+        <div id="content">
+            <h1 id="contentTitle"> Welcome! </h1>
+            <div id="items">
+                <q>The more that you read, the more things you will know, the more that you learn, the more places
+                    you'll go.</q>
+                <p>- Dr. Suess</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('{% url "sw.js" %}', { scope: '/' }).then(function (reg) {
+                // registration worked
+                console.log('Registration succeeded. Scope is ' + reg.scope);
+            }).catch(function (error) {
+                // registration failed
+                console.log('Registration failed with ' + error);
+            });
+        }
+
+        // Check network status & get date/time
+        var ifConnected = window.navigator.onLine;
+        if (ifConnected) {
+            document.getElementById("networkStatus").innerHTML = "Online";
+            var currentdate = new Date();
+            var datetime = "Last Updated: "
+                + (currentdate.getMonth() + 1) + "/"
+                + currentdate.getDate() + "/"
+                + currentdate.getFullYear() + " @ "
+                + currentdate.getHours() + ":"
+                + currentdate.getMinutes() + ":"
+                + currentdate.getSeconds();
+            document.getElementById("lastUpdated").innerHTML = datetime;
+        } else {
+            document.getElementById("networkStatus").innerHTML = "Offline";
+        }
+        // Check again every 1 seconds & update date/time
+        setInterval(function () {
+            var ifConnected = window.navigator.onLine;
+            if (ifConnected) {
+                document.getElementById("networkStatus").innerHTML = "Online";
+                var currentdate = new Date();
+                var datetime = "Last Updated: "
+                    + (currentdate.getMonth() + 1) + "/"
+                    + currentdate.getDate() + "/"
+                    + currentdate.getFullYear() + " @ "
+                    + currentdate.getHours() + ":"
+                    + currentdate.getMinutes() + ":"
+                    + currentdate.getSeconds();
+                document.getElementById("lastUpdated").innerHTML = datetime;
+
+            } else {
+                document.getElementById("networkStatus").innerHTML = "Offline";
+            }
+
+        }, 1000);
+
+        function displayFiles(data) {
+            // get filedata from data
+            var filedata = data.Files;
+
+            // create json object out of filedata
+            var obj = JSON.parse(filedata);
+
+            // initialize HTML string to inject later
+            var html = '';
+
+            // create html elements for each file
+            for (i = 0; i < obj.length; i++) {
+                url = 'https://digipackweb.com:8000/pwa/team.digilearn@gmail.com/' + obj[i].fileid + '/' + obj[i].fileName + '/'; //TODO: remove hard coded
+                html += '<li><a href="' + url + '">' + obj[i].fileName + '</a></li>';
+            }
+
+            document.getElementById("items").innerHTML = html
+            document.getElementById("contentTitle").innerHTML = "My Files"
+        }
+
+        function getFiles(myrequest) {
+            var networkDataReceived = false;
+
+            // fetch fresh data
+            var networkUpdate = fetch(myrequest).then(function (response) {
+                return response.json();
+            }).then(function (data) {
+                networkDataReceived = true;
+                displayFiles(data);
+            });
+
+            // fetch cached data
+            caches.match(myrequest).then(function (response) {
+                if (!response) throw Error("No data");
+                return response.json();
+            }).then(function (data) {
+                // don't overwrite newer network data
+                if (!networkDataReceived) {
+                    displayFiles(data);
+                }
+            }).catch(function () {
+                // we didn't get cached data, the network is our last hope:
+                return networkUpdate;
+            });
+        }
+
+        function getAssignments(myrequest) {
+            var networkDataReceived = false;
+
+            // fetch fresh data
+            var networkUpdate = fetch(myrequest).then(function (response) {
+                return response.json();
+            }).then(function (data) {
+                networkDataReceived = true;
+                displayAssignments(data);
+            });
+
+            // fetch cached data
+            caches.match(myrequest).then(function (response) {
+                if (!response) throw Error("No data");
+                return response.json();
+            }).then(function (data) {
+                // don't overwrite newer network data
+                if (!networkDataReceived) {
+                    displayAssignments(data);
+                }
+            }).catch(function () {
+                // we didn't get cached data, the network is our last hope:
+                return networkUpdate;
+            });
+        }
+
+        function displayAssignments(data) {
+            // get courses from data
+            var courses = data.Courses;
+
+            console.log(data);
+            console.log(courses);
+
+            // initialize HTML string to inject later
+            var html = '';
+            html += '<th>Class</th>';
+            html += '<th>Assignment</th>';
+            html += '<th>Due Date</th>';
+            html += '<th>Points</th>';
+            html += '<th>Status</th>';
+
+            // wrap in a tr tag
+            html = '<tr>' + html + '</tr>'
+
+            // create table 
+            for (i = 0; i < courses.length; i++) {
+                for (j = 0; j < courses[i].coursework.length; j++) {
+
+                  info = '\'' + courses[i].coursework[j].title + '\', \'' + courses[i].coursework[j].maxPoints + '\', \'' + getDueDate(courses[i].coursework[j].duedate) + '\', \'' + courses[i].coursework[j].description + '\'';
+                  console.log(info);
+                  console.log('hi world')
+                  // Class
+                  html += '<td>' + courses[i].name + '</td>';
+                  // Assignment
+                  html += '<td><a href=\"#\" onClick=\"showDetails(' + info + ')\">' + courses[i].coursework[j].title + '</a></td>';
+                  // Due Date
+                  html += '<td>' + getDueDate(courses[i].coursework[j].duedate) + '</td>';
+                  // Points
+                  html += '<td>' + courses[i].coursework[j].maxPoints + '</td>';
+                  // Status
+                  html += '<td>' + '[TODO]' + '</td>';
+
+                  // wrap in a tr tag
+                  html = '<tr>' + html + '</tr>'
+
+                }
+            }
+            
+            // wrap in a table element
+            html = '<table id="assignments">' + html + '</table>';
+
+            document.getElementById("items").innerHTML = html;
+            document.getElementById("contentTitle").innerHTML = "My Assignments";
+        }
+
+        function getDueDate(duedate) {
+            if (duedate != null){
+                date = duedate.month + '/' + duedate.day + '/' + duedate.year;
+                return date;
+            }
+            return 'None';
+        }
+
+        function showDetails(title, points, due, description) {
+            
+            info = points + ' Points | Due: ' + due + '<br><br>' + description;
+
+            html = '';
+            html += '<th>' + title + '</th>';
+            html += '<tr><td>' + info + '</tr></td>';
+
+            // wrap in a table element
+            html = '<table width=100%>' + html + '</table>';
+
+            // wrap in a div
+            html = '<div id=\"assignment\">' + html + '</div>'
+
+
+            // Create turn in area
+
+            turnin = '';
+            turnin = '<div id=\"buttons\"><h2> Your Work </h2>'
+            
+            turnin += '<button class="button add">+ Add or create</button>';
+            turnin += '<button class="button submit"> Turn In </button></div>';
+
+            
+            // wrap in a div
+            turnin = '<div id=\"turnIn\">' + turnin + '</div>';
+
+
+            html += turnin;
+
+            document.getElementById("items").innerHTML = html;
+        }
+
+        function test1(text) {
+            console.log(text);
+        }
+    </script>
+
+
+</body>
+
+</html>

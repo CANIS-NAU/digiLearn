@@ -41,13 +41,12 @@ Excaptions: in the case of invalid data, no student created and 0 returned for
 def addStudent( email, jsonString ):
     #create student
     
-    print("add student function")
-    print("Add student says email is " + email)
+    print("[addStudent]- userId is: " + str(email))
     #check for student id already in use
     try:
     	student = Student.objects.get(pk=email)
     	
-    	print("Credentials already in use, updating student")
+    	print("[addStudent]- userId " + str(email) + " already in use, no action.")
     	#student exists, update credentals
     	#student.credentials = jsonString
     	return 0
@@ -56,7 +55,7 @@ def addStudent( email, jsonString ):
 	#save student
         newStudent = Student( studentId=email, credentials=jsonString )
         newStudent.save()
-        print("Credentials inserted")
+        print("[addStudent]- Credentials inserted")
         return 1
 
 
@@ -94,17 +93,16 @@ def removeStudent( studentId ):
 
 
 def getCredentials (email ):
-    print("GET CREDENTIALS DBM METHOD ENTERED")
-    print("DBM SAYS USER EMAIL IS " + email)
+    print("[getCredentials]- userId is: " + str(email))
     try:
         requestedStudent = Student.objects.get( studentId=email )
     
     except Student.DoesNotExist:
         #report failure
-        print("DBM RETURNED FAILURE")
+        print("[getCredentials]- No student with userId " + str(email) + ", returning failure.")
         traceback.print_exc()
         return 0
-        
+    print("[getCredentials]- Credentials retrieved for userId = " + str(email))
     return requestedStudent.credentials
 
 
@@ -120,6 +118,7 @@ def getStudent( studentId ):
         requestedStudent = Student.objects.get( pk= studentId )
     
     except Student.DoesNotExist:
+        print("[getStudent]- no student found with userId " + str(studentId) )
         #report failure
         traceback.print_exc()
         return 0
