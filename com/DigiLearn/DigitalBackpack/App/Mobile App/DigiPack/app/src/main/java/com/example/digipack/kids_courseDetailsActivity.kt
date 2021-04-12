@@ -12,22 +12,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_course_details.*
-import kotlinx.android.synthetic.main.activity_details.*
+import kotlinx.android.synthetic.main.activity_course_details.homeworkList
 import kotlinx.android.synthetic.main.activity_gclass.*
-import kotlinx.android.synthetic.main.activity_gclass.clouds
 import kotlinx.android.synthetic.main.activity_gsearch.view.*
+import kotlinx.android.synthetic.main.activity_kid_course_details.*
+import kotlinx.android.synthetic.main.activity_kid_course_details.view.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import java.io.IOException
 
-class courseDetailsActivity : AppCompatActivity(){
-
-    // Call the network detector tool
-    private val networkMonitor = networkDetectorTool(this)
-
+class kids_courseDetailsActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_course_details)
+        setContentView(R.layout.activity_kid_course_details)
 
         //unpack intent to get course data
         var cstring = intent.getStringExtra("course")
@@ -35,34 +32,18 @@ class courseDetailsActivity : AppCompatActivity(){
         var course = cstring?.let { Json.decodeFromString<DigiJson.Course>(it) }
         Log.i(getString(R.string.app_name), course.toString())
 
-        // Calls the network detector class
-        networkMonitor.result = { isAvailable, type ->
-            runOnUiThread {
-                when (isAvailable) {
-                    true -> {
-                        when (type) {
-                            //changed this to only call the server once since we dont care what type
-                            //of connection is happening currently
-                            ConnectionType.Wifi, ConnectionType.Cellular  -> {
-                                clouds.setImageResource(R.drawable.sun_connection)
-                            }
-                            else -> { }
-                        }
-                    }
-                    false -> {
-                        clouds.setImageResource(R.drawable.networkclouds)
-                        //internet_connection.text = "No Connection"
-
-                    }
-                }
-            }
-        }
-
         // Change title
         if (course != null) {
             supportActionBar?.title = Html.fromHtml("<font color='#01345A'>${course.coursename}</font>")
         }
 
+        // Grab the course announcement and display it under the Announcement
+        val cAnnouncementText = findViewById<TextView>(R.id.class_announcement)
+
+        // NEED TO GET THE ANNOUNCEMENT
+        
+        //var getAnnouncement = course?.announcements
+        //cAnnouncementText.setText(getAnnouncement?.text)
 
         // Add the course title
         val courseName = findViewById<TextView>(R.id.courseName)
@@ -109,20 +90,7 @@ class courseDetailsActivity : AppCompatActivity(){
             intent.putExtra("darkstatusbar", false)
             startActivity(intent)
         }
-    }
 
-    // Network connection detector
-    override fun onResume() {
-        super.onResume()
-        networkMonitor.register()
-    }
-
-    // Network connection detector
-    override fun onStop() {
-        super.onStop()
-        networkMonitor.unregister()
     }
 }
-
-
 

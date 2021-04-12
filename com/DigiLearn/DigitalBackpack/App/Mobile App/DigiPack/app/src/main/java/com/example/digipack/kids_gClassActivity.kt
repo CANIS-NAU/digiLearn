@@ -73,7 +73,7 @@ class kids_gClassActivity : AppCompatActivity(){
 
             course_names.onItemClickListener = AdapterView.OnItemClickListener{ parent, view, position, id ->
                 //Toast.makeText(applicationContext, "${classnames[position]} selected", Toast.LENGTH_LONG).show()
-                var courseDetails = Intent(this, courseDetailsActivity::class.java)
+                var courseDetails = Intent(this, kids_courseDetailsActivity::class.java)
                 var course = cl.courselist!![position]
                 var c = Json.encodeToString(course)
                 courseDetails.putExtra("course", c)

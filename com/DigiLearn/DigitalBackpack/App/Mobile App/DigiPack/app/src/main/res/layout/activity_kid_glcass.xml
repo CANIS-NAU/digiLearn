@@ -8,13 +8,12 @@
     android:background="@drawable/background"
     tools:context=".kids_gClassActivity">
 
-
     <ListView
         android:id="@+id/course_names"
         android:layout_width="415dp"
         android:layout_height="550dp"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="1dp"
         android:choiceMode="singleChoice"
         android:listSelector="@color/nau_gold" />
 
