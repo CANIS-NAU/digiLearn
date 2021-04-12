@@ -1,0 +1,168 @@
+body {
+    margin: 0;
+    font-family: "Century Gothic", sans-serif;
+}
+
+.header {
+    height: 100px;
+    margin: 0;
+    padding: 0;
+    background: rgb(0,102,179);
+    box-shadow: 0px 2px 50px rgb(195, 184, 178);
+}
+
+.header li {
+    float: right;
+    color: #f2f2f2;
+    padding: 0px 10px;
+    list-style: none;
+    font-size: 20px;
+    text-align: right;
+    font-family: "Calibri Light", sans-serif;
+  }
+
+.header img {
+    float: left;
+    height: 100px;
+    padding: 0px 0px 10px;
+}
+
+.nav {
+    padding-top:10px;
+    width: 98%;
+}
+
+.nav a {
+    float: right;
+    padding: 10px 10px;
+}
+
+.container {
+    padding-top:80px;
+    padding-left:35px;
+    padding-right:35px;
+    width: 80%;
+}
+
+#links {
+    margin-top: 70px;
+    float: left;
+    width: 38%;
+    text-align: right;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    border-right: thin solid gray;
+}
+
+#links a {
+    font-size: xx-large;
+    text-decoration: none;
+    color: black;
+}
+
+#links a:hover {
+    font-weight: bolder;
+    color: rgb(241,179,0);
+}
+
+#links li {
+    list-style: none;
+}
+
+#items li {
+    list-style: none;
+    font-size: xx-large;
+}
+
+/* TODO: might change this later  */
+#items a {
+    text-decoration: none;
+    color: rgb(0,51,102);
+}
+
+#items a:hover {
+    text-decoration: none;
+    color: rgb(244,119,34);
+}
+
+#items li:nth-child(odd) {
+    background: rgb(240,240,240);
+  }
+
+
+#items td, #items th {
+    font-size: large;
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+
+#items tr:nth-child(even){background-color: #f2f2f2;}
+
+#items tr:hover {background-color: #ddd;}
+
+#items th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #41B6E6;
+  color: white;
+}
+
+
+#content {
+    float: right;
+    width: 55%;
+}
+
+#content h1{
+    font-size: xx-large;
+}
+
+q {
+    font-size: xx-large;
+    font-family: "Century Gothic", sans-serif;
+    color:midnightblue;
+}
+
+#assignment {
+    width: 60%;
+    float: left;
+}
+
+#turnIn {
+    width: 35%;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    float: right;
+    display: flex;
+    justify-content: center;
+}
+
+#turnIn h2 {
+    text-align: center;
+}
+
+#buttons {
+    padding: auto;
+    margin: auto;
+}
+
+.button {
+    border: none;
+    color: #002454;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
+.submit {
+    background-color: #FAC01A;
+    color: black;
+}
