@@ -1,23 +1,19 @@
 package com.example.digipack
 
+import DigiJson.DigiClass
+import DigiJson.GUserJson.GUser
 import android.content.Intent
 import android.os.Bundle
 import android.text.Html
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
-import com.google.gson.annotations.SerializedName
 import kotlinx.android.synthetic.main.activity_file_list_view.*
-import kotlinx.android.synthetic.main.activity_file_list_view.json_info
 import kotlinx.android.synthetic.main.activity_gclass.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 import java.lang.Exception
@@ -30,42 +26,25 @@ class gClassActivity : AppCompatActivity(){
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>Classroom</font>")
 
-        var classnames = ArrayList<String>()
-        var classids = ArrayList<String>()
-        var announcements = ArrayList<String>()
-        var coursework = ArrayList<String>()
 
-        var gso = intent.getBundleExtra("gsoData")
-        var classlist = intent.getStringExtra("classJson")
+        var guser = intent.getSerializableExtra("guser") as GUser
+        var classlist = intent.getSerializableExtra("courselist") as DigiClass.CourseList
 
         println("GCLASS SAYS CLASSLIST IS : " + classlist.toString())
 
-        var courselist = read_json()
+        var courselist = classlist.Courses
         if(courselist != null){
-            write_to_ui_and_listen(courselist)
+            write_to_ui_and_listen(guser, courselist)
         }
     }
 
-    fun read_json(): DigiJson.CourseList? {
+    fun write_to_ui_and_listen(guser: GUser, cl: ArrayList<DigiClass.Course>){
         try{
-            var classstr : String? = intent.getStringExtra("classJson")
-            var classjson = JSONObject(classstr)
-            var cl = Gson().fromJson(classjson.toString(), DigiJson.CourseList::class.java)
-            Log.i(getString(R.string.app_name), "gclasssact gsonobj?: %s".format(cl.toString()))
-
-            return cl
-
-        }catch(e: Exception){
-            Log.e(getString(R.string.app_name), "error: %s".format(e.toString()))
-        }
-        return null
-    }
-
-    fun write_to_ui_and_listen(cl: DigiJson.CourseList){
-        try{
+            var courseDetails = Intent(this, courseDetailsActivity::class.java)
+            courseDetails.putExtra("guser", guser)
             var classnames = ArrayList<String>()
-            for( i in cl.courselist!!){
-                i.coursename?.let { classnames.add(it) }
+            for( i in cl){
+                i.name?.let { classnames.add(it) }
             }
 
             var adapterView = ArrayAdapter(this, android.R.layout.simple_list_item_1, classnames)
@@ -73,10 +52,9 @@ class gClassActivity : AppCompatActivity(){
 
             course_names.onItemClickListener = AdapterView.OnItemClickListener{ parent, view, position, id ->
                 //Toast.makeText(applicationContext, "${classnames[position]} selected", Toast.LENGTH_LONG).show()
-                var courseDetails = Intent(this, courseDetailsActivity::class.java)
-                var course = cl.courselist!![position]
-                var c = Json.encodeToString(course)
-                courseDetails.putExtra("course", c)
+
+                var course = cl[position]
+                courseDetails.putExtra("course", course)
                 this.startActivity(courseDetails)
             }
         }catch(e: IOException) {

@@ -25,6 +25,12 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.IOException
+import DigiJson.DigiDrive
+import DigiJson.DigiUser
+import DigiJson.GUserJson.GUser
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 
 const val PICK_PDF_FILE = 2
@@ -44,16 +50,17 @@ class FileListViewActivity : AppCompatActivity() {
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>Files</font>")
 
-        var files = ArrayList<DigiJson.DigiFile>()
+        var files = ArrayList<DigiDrive.DigiFile>()
         var queue = RequestQueueSingleton.getInstance(this.applicationContext)
         var context: Context = this
 
-        var googleFirstName = intent.getBundleExtra("gsoData")?.getString("google_first_name")
-        var googleId = intent.getBundleExtra("gsoData")?.getString("google_id")
-        email = intent.getBundleExtra("gsoData")?.getString("google_email").toString()
+        var guser = intent.getSerializableExtra("guser") as GUser
+        var df = intent.getSerializableExtra("filelist") as DigiDrive.DF
+        var filelist = df.Files
 
-        read_json(files)
-        write_to_ui_and_listen(files, queue)
+        if (filelist != null) {
+            write_to_ui_and_listen(guser, filelist, queue)
+        }
 
         //on refresh:
         //refreshList(queue, email, googleFirstName, googleId)
@@ -136,34 +143,7 @@ class FileListViewActivity : AppCompatActivity() {
         }
     }
 
-    // Read the json file and the display it on the activity layout
-    fun read_json(files: ArrayList<DigiJson.DigiFile>){
-        var json : String? = intent.getStringExtra("fileListJson")
-
-        try {
-            // Read the text file
-            var gsodata = intent.getBundleExtra("gsoData")
-            //do some flips to get to the actual json object
-            var jsonobj = JSONObject(json)
-            Log.i(getString(R.string.app_name), "filelistview jsonobj: %s".format(jsonobj.toString()))
-            // Creates an JSON array which will contain data from our Json file
-            var jsonArray = JSONArray(jsonobj.getString("Files"))
-            Log.i(getString(R.string.app_name), "filelistview jsonArray: %s".format(jsonArray.toString()))
-
-            for( i in 0..jsonArray.length() - 1){
-                files.add(Gson().fromJson(jsonArray.getJSONObject(i).toString(), DigiJson.DigiFile::class.java))
-            }
-
-            Log.i(getString(R.string.app_name), "gson?: $files")
-        }catch (e: IOException){
-            //handle errors eventually
-            Log.e(getString(R.string.app_name), "error: %s".format(e.toString()))
-        }catch (e: IllegalStateException){
-            Log.e(getString(R.string.app_name), "FLVA err, gson didnt like something: ${e.toString()}")
-        }
-    }
-
-    fun write_to_ui_and_listen(files: ArrayList<DigiJson.DigiFile>, queue: RequestQueueSingleton)
+    fun write_to_ui_and_listen(guser: GUser, files: ArrayList<DigiDrive.DigiFile>, queue: RequestQueueSingleton)
     {
         try{
             var filenamelist = ArrayList<String>()
@@ -189,7 +169,7 @@ class FileListViewActivity : AppCompatActivity() {
                 url = getString(R.string.serverUrl).plus("download/${files[position].fileName}")
                 //url should not be global in prod
                 //should be created dynamically for the task at hand
-                getfile(queue, files[position].fileid)
+                getfile(guser, queue, files[position].fileid)
                 FileDownloader().getFile(this, url)
             }
         }catch (e: IOException){
@@ -198,15 +178,13 @@ class FileListViewActivity : AppCompatActivity() {
         }
     }
 
-    fun getfile(queue: RequestQueueSingleton, fileid: String?): Boolean {
-        val gso = intent.getBundleExtra("gsoData")
-        val googleEmail = gso?.getString("google_email")
-        val googleFirstName = gso?.getString("google_first_name")
-        val googleId = gso?.getString("google_id")
+    fun getfile(guser: GUser, queue: RequestQueueSingleton, fileid: String?): Boolean {
+
 
         val reqMethodCode = Request.Method.GET
-        val getFileUrl = getString(R.string.serverUrl).plus("sd/${googleEmail}/${fileid}")
-        val request = JSONObject(Gson().toJson(DigiJson.Jsuser(googleFirstName, googleEmail, googleId)))
+        val getFileUrl = getString(R.string.serverUrl).plus("sd/${guser.email}/${fileid}")
+        val juser = DigiUser.Jsuser(guser.firstName, guser.email, guser.userID)
+        val request = JSONObject( Json.encodeToString(juser) )
 
         var flag : Boolean = false
 
@@ -225,15 +203,17 @@ class FileListViewActivity : AppCompatActivity() {
     }
 
     // Refresh the page
-    fun refreshList(queue: RequestQueueSingleton, googleEmail: String?, googleFirstName: String?, googleId: String?){
+    fun refreshList(guser: GUser, queue: RequestQueueSingleton, googleEmail: String?, googleFirstName: String?, googleId: String?){
         val reqMethodCode = Request.Method.GET
         val getFileUrl = getString(R.string.serverUrl).plus("user/").plus(googleEmail)
 
-        val request = JSONObject(Gson().toJson(DigiJson.Jsuser(googleFirstName, googleEmail, googleId)))
+        val juser = DigiUser.Jsuser(guser.firstName, guser.email, guser.userID)
+        val request = JSONObject( Json.encodeToString(juser) )
         val req = JsonObjectRequest(reqMethodCode, getFileUrl, request,
             { resp ->
-                intent.removeExtra("fileListJson")
-                intent.putExtra("fileListJson", resp.toString())
+                intent.removeExtra("filelist")
+                val flist : DigiDrive.DF = Json.decodeFromString(resp.toString())
+                intent.putExtra("filelist", flist)
                 //do something with a positive response
             },
             { err ->

@@ -1,5 +1,6 @@
 package com.example.digipack
 
+import DigiJson.GUserJson.GUser
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -33,18 +34,13 @@ class MainActivity : AppCompatActivity() {
             val googleEmail = account.email
             val googleFirstName = account.givenName
             val googleLastName = account.familyName
-            val googleProfilePicURL = account.photoUrl.toString()
-            val googleIdToken = account.idToken
+            val authCode = account.idToken
             val googleId = account.id
 
             val myIntent = Intent(this, change_ui_activity::class.java)
 
-            myIntent.putExtra("google_id", googleId)
-            myIntent.putExtra("google_first_name", googleFirstName)
-            myIntent.putExtra("google_last_name", googleLastName)
-            myIntent.putExtra("google_email", googleEmail)
-            myIntent.putExtra("google_profile_pic_url", googleProfilePicURL)
-            myIntent.putExtra("google_auth_code", googleIdToken)
+            val guser = GUser( googleId, googleFirstName, googleLastName, googleEmail, authCode )
+            myIntent.putExtra("guser", guser)
             myIntent.putExtra("firstSignIn", false)
 
             this.startActivity(myIntent)
@@ -112,23 +108,17 @@ class MainActivity : AppCompatActivity() {
             val googleEmail = userAccount?.email ?: ""
             Log.i("Google Email", googleEmail)
 
-            val googleProfilePicURL = userAccount?.photoUrl.toString()
-            Log.i("Google Profile Pic URL", googleProfilePicURL)
 
-            val googleIdToken = userAccount?.idToken ?: ""
-            Log.i("Google ID Token", googleIdToken)
+            val authCode = userAccount?.idToken ?: ""
+            Log.i("Google ID Token", authCode)
 
             val googleAuthCode = userAccount?.serverAuthCode ?: "" //auth code used for registration with server
             println(googleAuthCode)
 
             // construct and launch an intent for DetailsActivity
             val myIntent = Intent(this, change_ui_activity::class.java)
-            myIntent.putExtra("google_id", googleId)
-            myIntent.putExtra("google_first_name", googleFirstName)
-            myIntent.putExtra("google_last_name", googleLastName)
-            myIntent.putExtra("google_email", googleEmail)
-            myIntent.putExtra("google_profile_pic_url", googleProfilePicURL)
-            myIntent.putExtra("google_auth_code", googleAuthCode)
+            val guser = GUser( googleId, googleFirstName, googleLastName, googleEmail, authCode )
+            myIntent.putExtra("guser", guser)
             myIntent.putExtra("firstSignIn", true)
             this.startActivity(myIntent)
 

@@ -1,5 +1,6 @@
 package com.example.digipack
 
+import DigiJson.GUserJson.GUser
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -12,8 +13,9 @@ class change_ui_activity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_change_ui)
 
-        val googleFirstName = intent.getStringExtra("google_first_name")
-        google_first_name_textview.text = googleFirstName
+        val guser = intent.getSerializableExtra("guser") as GUser
+        val fso = intent.getBooleanExtra("firstSignIn", true)
+        google_first_name_textview.text = guser.firstName
 
         // Looking for the file button connection
         val kidUIBttn = findViewById<Button>(R.id.kid_ui_bttn)
@@ -27,24 +29,13 @@ class change_ui_activity : AppCompatActivity(){
             //if the user already signed in
             if(account != null )
             {
-                //extract profile information, ID token
-                val googleEmail = account.email
-                val googleFirstName = account.givenName
-                val googleLastName = account.familyName
-                val googleProfilePicURL = account.photoUrl.toString()
-                val googleIdToken = account.idToken
-                val googleId = account.id
 
                 //construct and start intent for Details activity
                 val myIntent = Intent(this, kid_main_page::class.java)
 
-                myIntent.putExtra("google_id", googleId)
-                myIntent.putExtra("google_first_name", googleFirstName)
-                myIntent.putExtra("google_last_name", googleLastName)
-                myIntent.putExtra("google_email", googleEmail)
-                myIntent.putExtra("google_profile_pic_url", googleProfilePicURL)
-                myIntent.putExtra("google_auth_code", googleIdToken)
-                myIntent.putExtra("firstSignIn", false)
+                myIntent.putExtra("guser", guser)
+                myIntent.putExtra("firstSignIn", fso)
+                myIntent.putExtra("uiSelect", false)
 
                 this.startActivity(myIntent)
             }
@@ -57,25 +48,12 @@ class change_ui_activity : AppCompatActivity(){
             //if the user already signed in
             if(account != null )
             {
-                //extract profile information, ID token
-                val googleEmail = account.email
-                val googleFirstName = account.givenName
-                val googleLastName = account.familyName
-                val googleProfilePicURL = account.photoUrl.toString()
-                val googleIdToken = account.idToken
-                val googleId = account.id
-
                 //construct and start intent for Details activity
                 val myIntent = Intent(this, DetailsActivity::class.java)
 
-                myIntent.putExtra("google_id", googleId)
-                myIntent.putExtra("google_first_name", googleFirstName)
-                myIntent.putExtra("google_last_name", googleLastName)
-                myIntent.putExtra("google_email", googleEmail)
-                myIntent.putExtra("google_profile_pic_url", googleProfilePicURL)
-                myIntent.putExtra("google_auth_code", googleIdToken)
-                myIntent.putExtra("firstSignIn", false)
-
+                myIntent.putExtra("guser", guser)
+                myIntent.putExtra("firstSignIn", fso)
+                myIntent.putExtra("uiSelect", true)
                 this.startActivity(myIntent)
             }
         }

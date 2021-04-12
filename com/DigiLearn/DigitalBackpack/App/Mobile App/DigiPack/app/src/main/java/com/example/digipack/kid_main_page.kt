@@ -2,6 +2,10 @@ package com.example.digipack
 
 
 
+import DigiJson.DigiClass
+import DigiJson.DigiDrive
+import DigiJson.DigiUser
+import DigiJson.GUserJson.GUser
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,13 +14,15 @@ import android.util.Log
 import android.view.Menu
 import android.widget.Toast
 import android.view.MenuItem
-import android.widget.Button
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.google.gson.Gson
-import com.google.gson.annotations.SerializedName
 import kotlinx.android.synthetic.main.activity_details.*
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -31,21 +37,16 @@ class kid_main_page : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_kid_main_page)
+        setContentView(R.layout.activity_details)
 
         gsearchIntent = Intent(this, kids_gSearchActivity::class.java)
 
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>DigiPack</font>");
 
-        val googleId = intent.getStringExtra("google_id")
-        val googleFirstName = intent.getStringExtra("google_first_name")
-        val googleLastName = intent.getStringExtra("google_last_name")
-        val googleEmail = intent.getStringExtra("google_email")
-        val googleProfilePicURL = intent.getStringExtra("google_profile_pic_url")
-        val googleAccessToken = intent.getStringExtra("google_auth_code")
+        val guser = intent.getSerializableExtra("guser") as GUser
 
-        google_first_name_textview.text = googleFirstName
+        google_first_name_textview.text = guser.firstName
         //google_email_textview.text = googleEmail
 
         // Calls the network detector class
@@ -59,7 +60,7 @@ class kid_main_page : AppCompatActivity() {
                             ConnectionType.Wifi, ConnectionType.Cellular  -> {
                                 clouds.setImageResource(R.drawable.sun_connection)
                                 //internet_connection.text = "Wifi Connection"
-                                connectToServer()
+                                connectToServer(guser)
                             }
                             else -> { }
                         }
@@ -69,44 +70,82 @@ class kid_main_page : AppCompatActivity() {
                         //internet_connection.text = "No Connection"
 
                         //build activities from cache
-                        buildActivitiesFromCache()
+                        buildActivitiesFromCache(guser)
                     }
                 }
             }
         }
-
-        // GDrive Button
-        val googleDriveButton = findViewById<Button>(R.id.googleDriveBtn)
-        googleDriveButton.setOnClickListener{
-            startActivity(flintent)
-        }
-
-        // GClass Button
-        val googleClassButton = findViewById<Button>(R.id.googleClassBtn)
-        googleClassButton.setOnClickListener{
-            startActivity(gclassIntent)
-        }
-
-        // GSearch Button
-        val googleSearchButton = findViewById<Button>(R.id.googleSearchBtn)
-        googleSearchButton.setOnClickListener{
-            startActivity(gsearchIntent)
-        }
     }
 
+    // When menu bar is clicked
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
+    }
+
+    // Function to do when items on the menu option are clicked
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.getItemId()
+
+        //case google drive button
+        if (id == R.id.googleDriveBtn) {
+            // Makes a toast mssg for the user
+            //Toast.makeText(this, "Google Drive", Toast.LENGTH_LONG).show()
+            // Go to the Google Drive page
+            when{
+                this::flintent.isInitialized -> startActivity(flintent)
+                else ->{  //google drive intent not initialized; block activity and report unavailable
+                    Toast.makeText(this, "Google Drive not available, check again later", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            return true
+        }
+
+        // case google class button
+        if (id == R.id.googleClassBtn) {
+            // Makes a toast mssg for the user
+            //Toast.makeText(this, "Google Classroom Page", Toast.LENGTH_LONG).show()
+            // Go to GClass page
+            when{  //google class intent not initialized; block activity and report unavailable
+                this::gclassIntent.isInitialized -> startActivity(gclassIntent)
+                else ->{
+                    Toast.makeText(this, "Google Classroom not available, check again later", Toast.LENGTH_SHORT).show()
+                }
+            }
+            return true
+        }
+
+        //case google search button
+        if (id == R.id.googleSearchBtn) {
+            // Makes a toast mssg for the user
+            //Toast.makeText(this, "Google Search Clicked", Toast.LENGTH_LONG).show()
+            // Go to GSearch Page
+            when{
+                this::gsearchIntent.isInitialized -> startActivity(gsearchIntent)
+            }
+
+            return true
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+
     //serverAuth handles initial sign-in authentication with the server.
-    private fun serverAuth(){
-        val googleEmail = intent.getStringExtra("google_email")
-        val googleAccessToken = intent.getStringExtra("google_auth_code")
+    private fun serverAuth(guser: GUser){
+        val googleEmail = guser.email
+        val googleAccessToken = guser.authCode
 
         // For the debug
         //val mptv = findViewById<TextView>(R.id.mptext)
 
         val authurl = "auth/"
         val queue = RequestQueueSingleton.getInstance(this.applicationContext)
-        val tok = DigiJson.JsauthTok(googleAccessToken, googleEmail)
-        val gtok = Gson().toJson(tok)
-        val jsobtok = JSONObject(gtok)
+        val tok = Json.encodeToString(DigiUser.JsauthTok(googleAccessToken, googleEmail))
+        val jsobtok = JSONObject(tok)
 
         val request = JsonObjectRequest(Request.Method.POST, getString(R.string.serverUrl).plus(authurl), jsobtok,
                 { response ->
@@ -124,45 +163,44 @@ class kid_main_page : AppCompatActivity() {
 
     //Retrieves and caches initial data from the server
     //including: GDrive data, GClass data
-    private fun connectToServer(){
+    private fun connectToServer(guser: GUser){
         //need to add something in here to check the server if theres new content and if so then
         //run all the other methods again and reinitialize the intents
         val fso = intent.getBooleanExtra("firstSignIn", true)
         if(fso){
-            serverAuth()
+            serverAuth(guser)
         }
-        val googleId = intent.getStringExtra("google_id")
-        val googleFirstName = intent.getStringExtra("google_first_name")
-        val googleEmail = intent.getStringExtra("google_email")
-        getFileList(googleFirstName, googleEmail, googleId)
-        getClassList(googleFirstName, googleEmail, googleId)
+
+        getFileList(guser)
+        getClassList(guser)
     }
 
     //helper function for connectToServer handles acquisition of GCLass data
-    private fun getClassList(googleFirstName: String?, googleEmail: String?, googleId: String?){
+    private fun getClassList(guser: GUser){
         when{
             this::gclassIntent.isInitialized -> {
                 Log.i(getString(R.string.app_name), "Details_act: classIntent already initialized")
             }
             else -> {
-                val classlisturl = "gclass/$googleEmail"
+                val classlisturl = "gclass/${guser.email}"
                 val queue = RequestQueueSingleton.getInstance(this.applicationContext)
-                val user = DigiJson.Jsuser(googleFirstName, googleEmail, googleId)
-                val guser = Gson().toJson(user)
-                val jsuserobj = JSONObject(guser)
+                val user = DigiUser.Jsuser(guser.firstName, guser.email, guser.userID)
+                val jsuserobj = JSONObject(Json.encodeToString(user))
                 var gcresp = JSONObject("{Result:noACK}")
                 val gclassRequest = JsonObjectRequest(Request.Method.GET, getString(R.string.serverUrl).plus(classlisturl), jsuserobj,
                         { classresp -> gcresp = classresp
                             try{
                                 //get json response as string, pass to CacheUtility
                                 val cacheManager = CacheUtility()
+                                val classjson : DigiClass.CourseList = Json.decodeFromString(gcresp.toString())
+
                                 cacheManager.cacheString(classresp.toString(), getString(R.string.classList), this)
 
                                 //build gclassIntent
                                 gclassIntent = Intent(this, kids_gClassActivity::class.java)
                                 Log.i(getString(R.string.app_name), "in details act/getClassList, %s".format(gcresp.toString()))
-                                gclassIntent.putExtra("classJson", gcresp.toString())
-                                gclassIntent.putExtra("gsoData", intent.extras)
+                                gclassIntent.putExtra("courselist", classjson)
+                                gclassIntent.putExtra("guser", guser)
                             }catch(e: JSONException){
                                 Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
                             }
@@ -180,34 +218,29 @@ class kid_main_page : AppCompatActivity() {
     }
 
     //helper function for connectToServer handles acquisition of GDrive data
-    private fun getFileList(googleFirstName:String?, googleEmail:String?, googleId:String?) {
+    private fun getFileList(guser: GUser) {
         when{
             this::flintent.isInitialized -> {
                 Log.i(getString(R.string.app_name), "Details_act: flintent already initialized")
             }
             else -> {
-                val drivelisturl = "drive/$googleEmail"
+                val drivelisturl = "drive/${guser.email}"
                 val queue = RequestQueueSingleton.getInstance(this.applicationContext)
-                val user = DigiJson.Jsuser(googleFirstName, googleEmail, googleId)
-                val guser = Gson().toJson(user)
-                val jsuserobj = JSONObject(guser)
+                val user = DigiUser.Jsuser(guser.firstName, guser.email, guser.userID)
+                val jsuserobj = JSONObject(Json.encodeToString(user))
                 var filelistResp = JSONObject("{Result:noACK}")
                 val filelistRequest = JsonObjectRequest(Request.Method.GET, getString(R.string.serverUrl).plus(drivelisturl), jsuserobj,
                         { flresponse -> filelistResp = flresponse
                             try{
                                 val cacheManager = CacheUtility()
+                                val filelist : DigiDrive.DF = Json.decodeFromString(flresponse.toString())
                                 cacheManager.cacheString(flresponse.toString(), getString(R.string.fileList), this)
 
                                 flintent = Intent(this, kids_gDriveFileActivity::class.java)
                                 Log.i(getString(R.string.app_name), "in details act/getFileList, %s".format(flresponse.toString()))
-                                flintent.putExtra("fileListJson", flresponse.toString())
-                                flintent.putExtra("gsoData", intent.extras)
 
-                                /*
-                                btn_pick.setOnClickListener{
-                                    startActivity(flintent)
-                                }
-                                */
+                                flintent.putExtra("filelist", filelist)
+                                flintent.putExtra("guser", guser)
 
                             }catch(e: JSONException){
                                 Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
@@ -228,7 +261,7 @@ class kid_main_page : AppCompatActivity() {
      * In the case that a specific json is not available, Toasts the user that the associated
      * service is unavailable.
      */
-    fun buildActivitiesFromCache(){
+    fun buildActivitiesFromCache(guser: GUser){
         //initialize variables
         val cacheManager = CacheUtility()
         val fileData = cacheManager.getStringFromCache( getString(R.string.fileList), this)
@@ -251,12 +284,12 @@ class kid_main_page : AppCompatActivity() {
         //else data available
         else {
             //assemble as json object
-            val fileList = JSONObject(fileData)
+            val fileList : DigiDrive.DF = Json.decodeFromString(fileData)
 
             //set call activity intent
             flintent = Intent(this, kids_gDriveFileActivity::class.java)
-            flintent.putExtra("fileListJson", fileList.toString())
-            flintent.putExtra("gsoData", intent.extras)
+            flintent.putExtra("filelist", fileList)
+            flintent.putExtra("guser", guser)
 
             /*
             //bind intent to view files button
@@ -284,12 +317,12 @@ class kid_main_page : AppCompatActivity() {
         else {
             println("CLASS DATA ELSE ENTERED")
             //assemble as json object
-            val classData = JSONObject(classData)
+            val classData : DigiClass.CourseList = Json.decodeFromString(classData)
 
             //set call activity intent
             gclassIntent = Intent(this, kids_gClassActivity::class.java)
-            gclassIntent.putExtra("classJson", classData.toString())
-            gclassIntent.putExtra("gsoData", intent.extras)
+            gclassIntent.putExtra("courselist", classData)
+            gclassIntent.putExtra("guser", guser)
         }
     }
 

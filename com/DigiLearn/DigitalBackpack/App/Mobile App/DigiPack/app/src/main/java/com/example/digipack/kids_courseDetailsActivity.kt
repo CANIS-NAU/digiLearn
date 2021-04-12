@@ -1,5 +1,7 @@
 package com.example.digipack
 
+import DigiJson.DigiClass
+import DigiJson.GUserJson
 import android.content.Intent
 import android.os.Bundle
 import android.text.Html
@@ -27,14 +29,13 @@ class kids_courseDetailsActivity : AppCompatActivity(){
         setContentView(R.layout.activity_kid_course_details)
 
         //unpack intent to get course data
-        var cstring = intent.getStringExtra("course")
-        print("cstring $cstring")
-        var course = cstring?.let { Json.decodeFromString<DigiJson.Course>(it) }
+        var course = intent.getSerializableExtra("course") as DigiClass.Course
+        var guser = intent.getSerializableExtra("guser") as GUserJson.GUser
         Log.i(getString(R.string.app_name), course.toString())
 
         // Change title
         if (course != null) {
-            supportActionBar?.title = Html.fromHtml("<font color='#01345A'>${course.coursename}</font>")
+            supportActionBar?.title = Html.fromHtml("<font color='#01345A'>${course.name}</font>")
         }
 
         // Grab the course announcement and display it under the Announcement
@@ -47,12 +48,12 @@ class kids_courseDetailsActivity : AppCompatActivity(){
 
         // Add the course title
         val courseName = findViewById<TextView>(R.id.courseName)
-        courseName?.setText(course?.coursename)
+        courseName?.setText(course.name)
 
         // Add the list of assignments
         var classHomework = ArrayList<String>()
 
-        for(items in course?.courseWorkList!!){
+        for(items in course.coursework!!){
             try{
                 when{
                     items.title == null->{
@@ -70,10 +71,10 @@ class kids_courseDetailsActivity : AppCompatActivity(){
         var adapterView = ArrayAdapter(this, android.R.layout.simple_list_item_1, classHomework)
         homeworkList.adapter = adapterView
 
-        var courseDetail = course.courseWorkList
+        var courseDetail = course.coursework
 
         homeworkList.onItemClickListener = AdapterView.OnItemClickListener{ parent, view, position, id->
-            var courseDetail = course.courseWorkList!![position]
+            var courseDetail = course.coursework!![position]
             var hwName = courseDetail.title.toString()
             var hwDesc = courseDetail.description.toString()
 

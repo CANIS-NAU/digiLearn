@@ -1,5 +1,7 @@
 package com.example.digipack
 
+import DigiJson.DigiClass
+import DigiJson.GUserJson.GUser
 import android.content.Intent
 import android.os.Bundle
 import android.text.Html
@@ -9,8 +11,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.get
-import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_course_details.*
 import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.android.synthetic.main.activity_gclass.*
@@ -30,9 +30,8 @@ class courseDetailsActivity : AppCompatActivity(){
         setContentView(R.layout.activity_course_details)
 
         //unpack intent to get course data
-        var cstring = intent.getStringExtra("course")
-        print("cstring $cstring")
-        var course = cstring?.let { Json.decodeFromString<DigiJson.Course>(it) }
+        var course = intent.getSerializableExtra("course") as DigiClass.Course
+        var guser = intent.getSerializableExtra("guser") as GUser
         Log.i(getString(R.string.app_name), course.toString())
 
         // Calls the network detector class
@@ -60,18 +59,18 @@ class courseDetailsActivity : AppCompatActivity(){
 
         // Change title
         if (course != null) {
-            supportActionBar?.title = Html.fromHtml("<font color='#01345A'>${course.coursename}</font>")
+            supportActionBar?.title = Html.fromHtml("<font color='#01345A'>${course.name}</font>")
         }
 
 
         // Add the course title
         val courseName = findViewById<TextView>(R.id.courseName)
-        courseName?.setText(course?.coursename)
+        courseName?.setText(course.name)
 
         // Add the list of assignments
         var classHomework = ArrayList<String>()
 
-        for(items in course?.courseWorkList!!){
+        for(items in course.coursework!!){
             try{
                 when{
                     items.title == null->{
@@ -89,10 +88,10 @@ class courseDetailsActivity : AppCompatActivity(){
         var adapterView = ArrayAdapter(this, android.R.layout.simple_list_item_1, classHomework)
         homeworkList.adapter = adapterView
 
-        var courseDetail = course.courseWorkList
+        var courseDetail = course.coursework
 
         homeworkList.onItemClickListener = AdapterView.OnItemClickListener{ parent, view, position, id->
-            var courseDetail = course.courseWorkList!![position]
+            var courseDetail = course.coursework!![position]
             var hwName = courseDetail.title.toString()
             var hwDesc = courseDetail.description.toString()
 
