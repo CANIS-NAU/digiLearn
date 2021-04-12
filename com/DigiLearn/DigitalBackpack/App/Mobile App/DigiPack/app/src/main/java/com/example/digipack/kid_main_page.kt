@@ -20,7 +20,7 @@ import kotlinx.android.synthetic.main.activity_details.*
 import org.json.JSONException
 import org.json.JSONObject
 
-class DetailsActivity : AppCompatActivity() {
+class kid_main_page : AppCompatActivity() {
 
     // Call the network detector tool
     private val networkMonitor = networkDetectorTool(this)
@@ -31,9 +31,9 @@ class DetailsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_details)
+        setContentView(R.layout.activity_kid_main_page)
 
-        gsearchIntent = Intent(this, gSearchActivity::class.java)
+        gsearchIntent = Intent(this, kids_gSearchActivity::class.java)
 
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>DigiPack</font>");
@@ -55,7 +55,7 @@ class DetailsActivity : AppCompatActivity() {
                     true -> {
                         when (type) {
                             //changed this to only call the server once since we dont care what type
-                                //of connection is happening currently
+                            //of connection is happening currently
                             ConnectionType.Wifi, ConnectionType.Cellular  -> {
                                 clouds.setImageResource(R.drawable.sun_connection)
                                 //internet_connection.text = "Wifi Connection"
@@ -74,64 +74,25 @@ class DetailsActivity : AppCompatActivity() {
                 }
             }
         }
-    }
 
-    // When menu bar is clicked
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu, menu)
-        return true
-    }
-
-    // Function to do when items on the menu option are clicked
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.getItemId()
-
-        //case google drive button
-        if (id == R.id.googleDriveBtn) {
-            // Makes a toast mssg for the user
-            //Toast.makeText(this, "Google Drive", Toast.LENGTH_LONG).show()
-            // Go to the Google Drive page
-            when{
-                this::flintent.isInitialized -> startActivity(flintent)
-                else ->{  //google drive intent not initialized; block activity and report unavailable
-                    Toast.makeText(this, "Google Drive not available, check again later", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            return true
+        // GDrive Button
+        val googleDriveButton = findViewById<Button>(R.id.googleDriveBtn)
+        googleDriveButton.setOnClickListener{
+            startActivity(flintent)
         }
 
-        // case google class button
-        if (id == R.id.googleClassBtn) {
-            // Makes a toast mssg for the user
-            //Toast.makeText(this, "Google Classroom Page", Toast.LENGTH_LONG).show()
-            // Go to GClass page
-            when{  //google class intent not initialized; block activity and report unavailable
-                this::gclassIntent.isInitialized -> startActivity(gclassIntent)
-                else ->{
-                    Toast.makeText(this, "Google Classroom not available, check again later", Toast.LENGTH_SHORT).show()
-                }
-            }
-            return true
+        // GClass Button
+        val googleClassButton = findViewById<Button>(R.id.googleClassBtn)
+        googleClassButton.setOnClickListener{
+            startActivity(gclassIntent)
         }
 
-        //case google search button
-        if (id == R.id.googleSearchBtn) {
-            // Makes a toast mssg for the user
-            //Toast.makeText(this, "Google Search Clicked", Toast.LENGTH_LONG).show()
-            // Go to GSearch Page
-            when{
-                this::gsearchIntent.isInitialized -> startActivity(gsearchIntent)
-            }
-
-            return true
+        // GSearch Button
+        val googleSearchButton = findViewById<Button>(R.id.googleSearchBtn)
+        googleSearchButton.setOnClickListener{
+            startActivity(gsearchIntent)
         }
-
-        return super.onOptionsItemSelected(item)
     }
-
 
     //serverAuth handles initial sign-in authentication with the server.
     private fun serverAuth(){
@@ -198,7 +159,7 @@ class DetailsActivity : AppCompatActivity() {
                                 cacheManager.cacheString(classresp.toString(), getString(R.string.classList), this)
 
                                 //build gclassIntent
-                                gclassIntent = Intent(this, gClassActivity::class.java)
+                                gclassIntent = Intent(this, kids_gClassActivity::class.java)
                                 Log.i(getString(R.string.app_name), "in details act/getClassList, %s".format(gcresp.toString()))
                                 gclassIntent.putExtra("classJson", gcresp.toString())
                                 gclassIntent.putExtra("gsoData", intent.extras)
@@ -237,7 +198,7 @@ class DetailsActivity : AppCompatActivity() {
                                 val cacheManager = CacheUtility()
                                 cacheManager.cacheString(flresponse.toString(), getString(R.string.fileList), this)
 
-                                flintent = Intent(this, FileListViewActivity::class.java)
+                                flintent = Intent(this, kids_gDriveFileActivity::class.java)
                                 Log.i(getString(R.string.app_name), "in details act/getFileList, %s".format(flresponse.toString()))
                                 flintent.putExtra("fileListJson", flresponse.toString())
                                 flintent.putExtra("gsoData", intent.extras)
@@ -283,8 +244,8 @@ class DetailsActivity : AppCompatActivity() {
         {
             //notify user of service disruption
             Toast.makeText(this,
-                "No internet or cached data: Google Drive will be unavailable.",
-                Toast.LENGTH_LONG).show()
+                    "No internet or cached data: Google Drive will be unavailable.",
+                    Toast.LENGTH_LONG).show()
         }
 
         //else data available
@@ -293,7 +254,7 @@ class DetailsActivity : AppCompatActivity() {
             val fileList = JSONObject(fileData)
 
             //set call activity intent
-            flintent = Intent(this, FileListViewActivity::class.java)
+            flintent = Intent(this, kids_gDriveFileActivity::class.java)
             flintent.putExtra("fileListJson", fileList.toString())
             flintent.putExtra("gsoData", intent.extras)
 
@@ -306,30 +267,30 @@ class DetailsActivity : AppCompatActivity() {
             */
         }
 
-            /**
-             * Build Google Class intent
-             */
-            //if empty string, no data available
-            if( classData == "")
-            {
-                println("CLASS DATA IF ENTERED")
-                //notify user of service disruption
-                Toast.makeText(this,
+        /**
+         * Build Google Class intent
+         */
+        //if empty string, no data available
+        if( classData == "")
+        {
+            println("CLASS DATA IF ENTERED")
+            //notify user of service disruption
+            Toast.makeText(this,
                     "No internet or cached data: Google Class will be unavailable.",
                     Toast.LENGTH_LONG).show()
-            }
+        }
 
-            //else data available
-            else {
-                println("CLASS DATA ELSE ENTERED")
-                //assemble as json object
-                val classData = JSONObject(classData)
+        //else data available
+        else {
+            println("CLASS DATA ELSE ENTERED")
+            //assemble as json object
+            val classData = JSONObject(classData)
 
-                //set call activity intent
-                gclassIntent = Intent(this, gClassActivity::class.java)
-                gclassIntent.putExtra("classJson", classData.toString())
-                gclassIntent.putExtra("gsoData", intent.extras)
-            }
+            //set call activity intent
+            gclassIntent = Intent(this, kids_gClassActivity::class.java)
+            gclassIntent.putExtra("classJson", classData.toString())
+            gclassIntent.putExtra("gsoData", intent.extras)
+        }
     }
 
     // Network connection detector

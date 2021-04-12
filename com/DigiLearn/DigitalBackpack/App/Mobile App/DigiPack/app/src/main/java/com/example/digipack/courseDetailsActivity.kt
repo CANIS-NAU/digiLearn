@@ -65,15 +65,16 @@ class courseDetailsActivity : AppCompatActivity(){
             var courseDetail = course.courseWorkList!![position]
             var hwName = courseDetail.title.toString()
             var hwDesc = courseDetail.description.toString()
-            var hwDueDate = courseDetail.duedate.toString()
 
+            // Due date would be MM/DD/YY
+            var hwDuedateMonth = courseDetail.duedate?.month.toString()
+            var hwDuedateDay = courseDetail.duedate?.day.toString()
+            var hwDuedateYr = courseDetail.duedate?.year.toString()
 
-            // FIX THE DUE DATE ADN DESCRIPTION
-            //var hwDue = hwDueDate.
             val intent = Intent(this, popUp::class.java)
             intent.putExtra("popuptitle", hwName)
-            intent.putExtra("popuptext", hwDesc)
-            intent.putExtra("popupduedate", hwDueDate)
+            intent.putExtra("popuptext", "Description: " + hwDesc)
+            intent.putExtra("popupduedate", "Due Date: " + hwDuedateMonth + "/" + hwDuedateDay + "/" + hwDuedateYr )
             intent.putExtra("popupbtn", "Ok")
             intent.putExtra("darkstatusbar", false)
             startActivity(intent)

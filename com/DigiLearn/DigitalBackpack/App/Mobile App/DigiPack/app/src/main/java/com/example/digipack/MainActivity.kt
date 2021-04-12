@@ -23,11 +23,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
         //get the account the user signed in with
         val account = GoogleSignIn.getLastSignedInAccount(this)
 
-        //if the user already signed in
-        if(account != null )
+        if (account != null)
         {
             //extract profile information, ID token
             val googleEmail = account.email
@@ -37,8 +37,8 @@ class MainActivity : AppCompatActivity() {
             val googleIdToken = account.idToken
             val googleId = account.id
 
-            //construct and start intent for Details activity
-            val myIntent = Intent(this, DetailsActivity::class.java)
+            val myIntent = Intent(this, change_ui_activity::class.java)
+
             myIntent.putExtra("google_id", googleId)
             myIntent.putExtra("google_first_name", googleFirstName)
             myIntent.putExtra("google_last_name", googleLastName)
@@ -49,6 +49,7 @@ class MainActivity : AppCompatActivity() {
 
             this.startActivity(myIntent)
         }
+
         //else user isnt signed in
 
         //initialize google sign in object
@@ -71,7 +72,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     //sign in function for the google sign in button
     private fun signIn() {
         val userSignInIntent = mGoogleSignInClient.signInIntent
@@ -88,7 +88,8 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == RC_SIGN_IN) {
             val task =
                     GoogleSignIn.getSignedInAccountFromIntent(data)
-            handleSignInResult(task) //passes task to handleSignInResult
+                    handleSignInResult(task) //passes task to handleSignInResult
+
         }
     }
 
@@ -121,7 +122,7 @@ class MainActivity : AppCompatActivity() {
             println(googleAuthCode)
 
             // construct and launch an intent for DetailsActivity
-            val myIntent = Intent(this, DetailsActivity::class.java)
+            val myIntent = Intent(this, change_ui_activity::class.java)
             myIntent.putExtra("google_id", googleId)
             myIntent.putExtra("google_first_name", googleFirstName)
             myIntent.putExtra("google_last_name", googleLastName)
@@ -130,6 +131,7 @@ class MainActivity : AppCompatActivity() {
             myIntent.putExtra("google_auth_code", googleAuthCode)
             myIntent.putExtra("firstSignIn", true)
             this.startActivity(myIntent)
+
         } catch (e: ApiException) {
             // Checks if the sign in is unsuccessful, if not then throws an error code
             Log.e(
@@ -137,4 +139,5 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
+
 }

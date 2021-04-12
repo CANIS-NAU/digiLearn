@@ -27,9 +27,9 @@ import java.io.File
 import java.io.IOException
 
 
-const val PICK_PDF_FILE = 2
+const val PICK_PDF_FLE = 2
 
-class FileListViewActivity : AppCompatActivity() {
+class kids_gDriveFileActivity : AppCompatActivity() {
 
     var url : String = ""
     lateinit var email : String
@@ -39,7 +39,7 @@ class FileListViewActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_file_list_view)
+        setContentView(R.layout.activity_kid_file_page)
 
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>Files</font>")
@@ -114,13 +114,12 @@ class FileListViewActivity : AppCompatActivity() {
         }
     }
 
-
     // Checks if the requestCode is the same, if so then continue the sign in process
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         super.onActivityResult(requestCode, resultCode, resultData)
 
         //after the user picks a pdf file
-        if (requestCode == PICK_PDF_FILE){
+        if (requestCode == PICK_PDF_FLE){
             var uri: Uri? = null
 
             //if they successfully picked a file
@@ -139,15 +138,20 @@ class FileListViewActivity : AppCompatActivity() {
     // Read the json file and the display it on the activity layout
     fun read_json(files: ArrayList<DigiJson.DigiFile>){
         var json : String? = intent.getStringExtra("fileListJson")
-
+        println("THIS IS THE JSON")
+        println(json)
         try {
             // Read the text file
             var gsodata = intent.getBundleExtra("gsoData")
+
             //do some flips to get to the actual json object
             var jsonobj = JSONObject(json)
+
             Log.i(getString(R.string.app_name), "filelistview jsonobj: %s".format(jsonobj.toString()))
+
             // Creates an JSON array which will contain data from our Json file
             var jsonArray = JSONArray(jsonobj.getString("Files"))
+
             Log.i(getString(R.string.app_name), "filelistview jsonArray: %s".format(jsonArray.toString()))
 
             for( i in 0..jsonArray.length() - 1){
