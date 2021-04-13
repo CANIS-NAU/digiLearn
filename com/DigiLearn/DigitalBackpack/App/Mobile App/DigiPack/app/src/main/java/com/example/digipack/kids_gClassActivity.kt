@@ -21,7 +21,7 @@ import java.lang.Exception
 class kids_gClassActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_gclass)
+        setContentView(R.layout.activity_kid_glcass)
 
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>Classroom</font>")
@@ -43,6 +43,9 @@ class kids_gClassActivity : AppCompatActivity(){
     }
 
     fun write_to_ui_and_listen(guser: GUser, cl: ArrayList<DigiClass.Course>){
+        var courseDetails = Intent(this, kids_courseDetailsActivity::class.java)
+        courseDetails.putExtra("guser", guser)
+
         try{
             var classnames = ArrayList<String>()
             for( i in cl){
@@ -54,9 +57,8 @@ class kids_gClassActivity : AppCompatActivity(){
 
             course_names.onItemClickListener = AdapterView.OnItemClickListener{ parent, view, position, id ->
                 //Toast.makeText(applicationContext, "${classnames[position]} selected", Toast.LENGTH_LONG).show()
-                var courseDetails = Intent(this, kids_courseDetailsActivity::class.java)
+
                 var course = cl[position]
-                courseDetails.putExtra("guser", guser)
                 courseDetails.putExtra("course", course)
                 this.startActivity(courseDetails)
             }

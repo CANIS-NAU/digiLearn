@@ -62,7 +62,6 @@ class courseDetailsActivity : AppCompatActivity(){
             supportActionBar?.title = Html.fromHtml("<font color='#01345A'>${course.name}</font>")
         }
 
-
         // Add the course title
         val courseName = findViewById<TextView>(R.id.courseName)
         courseName?.setText(course.name)
