@@ -33,9 +33,9 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 
-const val PICK_PDF_FILE = 2
 
-class FileListViewActivity : AppCompatActivity() {
+
+class kids_gDriveFileActivity : AppCompatActivity() {
 
     var url : String = ""
     lateinit var email : String
@@ -189,14 +189,14 @@ class FileListViewActivity : AppCompatActivity() {
         var flag : Boolean = false
 
         val req = JsonObjectRequest(reqMethodCode, getFileUrl, request,
-            { resp ->
-                //do something response
-                flag = true
-            },
-            { err ->
-                //so something err
-                flag = false
-            }
+                { resp ->
+                    //do something response
+                    flag = true
+                },
+                { err ->
+                    //so something err
+                    flag = false
+                }
         )
         queue.addToRequestQueue(req)
         return flag
@@ -210,17 +210,17 @@ class FileListViewActivity : AppCompatActivity() {
         val juser = DigiUser.Jsuser(guser.firstName, guser.email, guser.userID)
         val request = JSONObject( Json.encodeToString(juser) )
         val req = JsonObjectRequest(reqMethodCode, getFileUrl, request,
-            { resp ->
-                intent.removeExtra("filelist")
-                val flist : DigiDrive.DF = Json.decodeFromString(resp.toString())
-                intent.putExtra("filelist", flist)
-                //do something with a positive response
-            },
-            { err ->
-                println("fdas")
-                Log.e(getString(R.string.app_name), "FileListViewActivity refeshList error: %s".format(err.toString()))
-                //do something with an error
-            }
+                { resp ->
+                    intent.removeExtra("filelist")
+                    val flist : DigiDrive.DF = Json.decodeFromString(resp.toString())
+                    intent.putExtra("filelist", flist)
+                    //do something with a positive response
+                },
+                { err ->
+                    println("fdas")
+                    Log.e(getString(R.string.app_name), "FileListViewActivity refeshList error: %s".format(err.toString()))
+                    //do something with an error
+                }
         )
         queue.addToRequestQueue(req)
     }

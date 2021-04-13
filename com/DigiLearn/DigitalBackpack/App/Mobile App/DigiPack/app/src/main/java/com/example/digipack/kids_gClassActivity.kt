@@ -18,7 +18,7 @@ import org.json.JSONObject
 import java.io.IOException
 import java.lang.Exception
 
-class gClassActivity : AppCompatActivity(){
+class kids_gClassActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gclass)
@@ -26,6 +26,10 @@ class gClassActivity : AppCompatActivity(){
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>Classroom</font>")
 
+        var classnames = ArrayList<String>()
+        var classids = ArrayList<String>()
+        var announcements = ArrayList<String>()
+        var coursework = ArrayList<String>()
 
         var guser = intent.getSerializableExtra("guser") as GUser
         var classlist = intent.getSerializableExtra("courselist") as DigiClass.CourseList
@@ -40,8 +44,6 @@ class gClassActivity : AppCompatActivity(){
 
     fun write_to_ui_and_listen(guser: GUser, cl: ArrayList<DigiClass.Course>){
         try{
-            var courseDetails = Intent(this, courseDetailsActivity::class.java)
-            courseDetails.putExtra("guser", guser)
             var classnames = ArrayList<String>()
             for( i in cl){
                 i.name?.let { classnames.add(it) }
@@ -52,8 +54,9 @@ class gClassActivity : AppCompatActivity(){
 
             course_names.onItemClickListener = AdapterView.OnItemClickListener{ parent, view, position, id ->
                 //Toast.makeText(applicationContext, "${classnames[position]} selected", Toast.LENGTH_LONG).show()
-
+                var courseDetails = Intent(this, kids_courseDetailsActivity::class.java)
                 var course = cl[position]
+                courseDetails.putExtra("guser", guser)
                 courseDetails.putExtra("course", course)
                 this.startActivity(courseDetails)
             }

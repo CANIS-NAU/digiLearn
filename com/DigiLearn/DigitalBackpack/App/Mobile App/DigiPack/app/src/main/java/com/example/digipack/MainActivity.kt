@@ -1,5 +1,6 @@
 package com.example.digipack
 
+import DigiJson.GUserJson.GUser
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -23,32 +24,28 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
         //get the account the user signed in with
         val account = GoogleSignIn.getLastSignedInAccount(this)
 
-        //if the user already signed in
-        if(account != null )
+        if (account != null)
         {
             //extract profile information, ID token
             val googleEmail = account.email
             val googleFirstName = account.givenName
             val googleLastName = account.familyName
-            val googleProfilePicURL = account.photoUrl.toString()
-            val googleIdToken = account.idToken
+            val authCode = account.idToken
             val googleId = account.id
 
-            //construct and start intent for Details activity
-            val myIntent = Intent(this, DetailsActivity::class.java)
-            myIntent.putExtra("google_id", googleId)
-            myIntent.putExtra("google_first_name", googleFirstName)
-            myIntent.putExtra("google_last_name", googleLastName)
-            myIntent.putExtra("google_email", googleEmail)
-            myIntent.putExtra("google_profile_pic_url", googleProfilePicURL)
-            myIntent.putExtra("google_auth_code", googleIdToken)
+            val myIntent = Intent(this, change_ui_activity::class.java)
+
+            val guser = GUser( googleId, googleFirstName, googleLastName, googleEmail, authCode )
+            myIntent.putExtra("guser", guser)
             myIntent.putExtra("firstSignIn", false)
 
             this.startActivity(myIntent)
         }
+
         //else user isnt signed in
 
         //initialize google sign in object
@@ -71,7 +68,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     //sign in function for the google sign in button
     private fun signIn() {
         val userSignInIntent = mGoogleSignInClient.signInIntent
@@ -88,7 +84,8 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == RC_SIGN_IN) {
             val task =
                     GoogleSignIn.getSignedInAccountFromIntent(data)
-            handleSignInResult(task) //passes task to handleSignInResult
+                    handleSignInResult(task) //passes task to handleSignInResult
+
         }
     }
 
@@ -111,25 +108,20 @@ class MainActivity : AppCompatActivity() {
             val googleEmail = userAccount?.email ?: ""
             Log.i("Google Email", googleEmail)
 
-            val googleProfilePicURL = userAccount?.photoUrl.toString()
-            Log.i("Google Profile Pic URL", googleProfilePicURL)
 
-            val googleIdToken = userAccount?.idToken ?: ""
-            Log.i("Google ID Token", googleIdToken)
+            val authCode = userAccount?.idToken ?: ""
+            Log.i("Google ID Token", authCode)
 
             val googleAuthCode = userAccount?.serverAuthCode ?: "" //auth code used for registration with server
             println(googleAuthCode)
 
             // construct and launch an intent for DetailsActivity
-            val myIntent = Intent(this, DetailsActivity::class.java)
-            myIntent.putExtra("google_id", googleId)
-            myIntent.putExtra("google_first_name", googleFirstName)
-            myIntent.putExtra("google_last_name", googleLastName)
-            myIntent.putExtra("google_email", googleEmail)
-            myIntent.putExtra("google_profile_pic_url", googleProfilePicURL)
-            myIntent.putExtra("google_auth_code", googleAuthCode)
+            val myIntent = Intent(this, change_ui_activity::class.java)
+            val guser = GUser( googleId, googleFirstName, googleLastName, googleEmail, authCode )
+            myIntent.putExtra("guser", guser)
             myIntent.putExtra("firstSignIn", true)
             this.startActivity(myIntent)
+
         } catch (e: ApiException) {
             // Checks if the sign in is unsuccessful, if not then throws an error code
             Log.e(
@@ -137,4 +129,5 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
+
 }

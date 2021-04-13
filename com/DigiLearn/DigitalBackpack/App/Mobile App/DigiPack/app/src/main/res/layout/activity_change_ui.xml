@@ -4,33 +4,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    tools:context=".change_ui_activity"
     android:background="@drawable/background"
-    tools:context=".DetailsActivity">
+    android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/clouds"
-        android:layout_width="619dp"
-        android:layout_height="283dp"
+    <Button
+        android:id="@+id/youngAdult_ui_bttn_"
+        android:layout_width="143dp"
+        android:layout_height="53dp"
+        android:background="@drawable/button_layout"
+        android:text="Young Adult UI"
+        android:textColor="@color/nau_blue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.35"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="0.547" />
 
     <TextView
-        android:layout_width="187dp"
-        android:layout_height="62dp"
-        android:gravity="center"
+        android:id="@+id/welcomeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="Welcome, "
         android:textColor="@color/gray_white"
-        android:textSize="36sp"
+        android:textSize="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.113" />
+        app:layout_constraintVertical_bias="0.094" />
 
     <TextView
         android:id="@+id/google_first_name_textview"
@@ -44,36 +47,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.202" />
+        app:layout_constraintVertical_bias="0.218" />
 
-    <TextView
-        android:id="@+id/mptext"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text=""
-        android:textColor="@color/nau_gold"
+    <Button
+        android:id="@+id/kid_ui_bttn"
+        android:layout_width="141dp"
+        android:layout_height="50dp"
+        android:background="@drawable/button_layout"
+        android:text="Kids UI"
+        android:textColor="@color/nau_blue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.383" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="342dp"
-        android:layout_height="182dp"
-        android:gravity="center"
-
-        android:text="The more that you read, the more things you will know, the more that you learn, the more places you'll go.
-
-                       - Dr. Suess"
-        android:textColor="@color/gray_white"
-        android:textSize="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.417" />

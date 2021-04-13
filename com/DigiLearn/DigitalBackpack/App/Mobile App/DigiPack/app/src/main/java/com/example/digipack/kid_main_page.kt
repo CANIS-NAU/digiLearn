@@ -26,7 +26,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import org.json.JSONException
 import org.json.JSONObject
 
-class DetailsActivity : AppCompatActivity() {
+class kid_main_page : AppCompatActivity() {
 
     // Call the network detector tool
     private val networkMonitor = networkDetectorTool(this)
@@ -39,7 +39,7 @@ class DetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_details)
 
-        gsearchIntent = Intent(this, gSearchActivity::class.java)
+        gsearchIntent = Intent(this, kids_gSearchActivity::class.java)
 
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>DigiPack</font>");
@@ -56,7 +56,7 @@ class DetailsActivity : AppCompatActivity() {
                     true -> {
                         when (type) {
                             //changed this to only call the server once since we dont care what type
-                                //of connection is happening currently
+                            //of connection is happening currently
                             ConnectionType.Wifi, ConnectionType.Cellular  -> {
                                 clouds.setImageResource(R.drawable.sun_connection)
                                 //internet_connection.text = "Wifi Connection"
@@ -197,7 +197,7 @@ class DetailsActivity : AppCompatActivity() {
                                 cacheManager.cacheString(classresp.toString(), getString(R.string.classList), this)
 
                                 //build gclassIntent
-                                gclassIntent = Intent(this, gClassActivity::class.java)
+                                gclassIntent = Intent(this, kids_gClassActivity::class.java)
                                 Log.i(getString(R.string.app_name), "in details act/getClassList, %s".format(gcresp.toString()))
                                 gclassIntent.putExtra("courselist", classjson)
                                 gclassIntent.putExtra("guser", guser)
@@ -236,7 +236,7 @@ class DetailsActivity : AppCompatActivity() {
                                 val filelist : DigiDrive.DF = Json.decodeFromString(flresponse.toString())
                                 cacheManager.cacheString(flresponse.toString(), getString(R.string.fileList), this)
 
-                                flintent = Intent(this, FileListViewActivity::class.java)
+                                flintent = Intent(this, kids_gDriveFileActivity::class.java)
                                 Log.i(getString(R.string.app_name), "in details act/getFileList, %s".format(flresponse.toString()))
 
                                 flintent.putExtra("filelist", filelist)
@@ -277,8 +277,8 @@ class DetailsActivity : AppCompatActivity() {
         {
             //notify user of service disruption
             Toast.makeText(this,
-                "No internet or cached data: Google Drive will be unavailable.",
-                Toast.LENGTH_LONG).show()
+                    "No internet or cached data: Google Drive will be unavailable.",
+                    Toast.LENGTH_LONG).show()
         }
 
         //else data available
@@ -287,7 +287,7 @@ class DetailsActivity : AppCompatActivity() {
             val fileList : DigiDrive.DF = Json.decodeFromString(fileData)
 
             //set call activity intent
-            flintent = Intent(this, FileListViewActivity::class.java)
+            flintent = Intent(this, kids_gDriveFileActivity::class.java)
             flintent.putExtra("filelist", fileList)
             flintent.putExtra("guser", guser)
 
@@ -300,30 +300,30 @@ class DetailsActivity : AppCompatActivity() {
             */
         }
 
-            /**
-             * Build Google Class intent
-             */
-            //if empty string, no data available
-            if( classData == "")
-            {
-                println("CLASS DATA IF ENTERED")
-                //notify user of service disruption
-                Toast.makeText(this,
+        /**
+         * Build Google Class intent
+         */
+        //if empty string, no data available
+        if( classData == "")
+        {
+            println("CLASS DATA IF ENTERED")
+            //notify user of service disruption
+            Toast.makeText(this,
                     "No internet or cached data: Google Class will be unavailable.",
                     Toast.LENGTH_LONG).show()
-            }
+        }
 
-            //else data available
-            else {
-                println("CLASS DATA ELSE ENTERED")
-                //assemble as json object
-                val classData : DigiClass.CourseList = Json.decodeFromString(classData)
+        //else data available
+        else {
+            println("CLASS DATA ELSE ENTERED")
+            //assemble as json object
+            val classData : DigiClass.CourseList = Json.decodeFromString(classData)
 
-                //set call activity intent
-                gclassIntent = Intent(this, gClassActivity::class.java)
-                gclassIntent.putExtra("courselist", classData)
-                gclassIntent.putExtra("guser", guser)
-            }
+            //set call activity intent
+            gclassIntent = Intent(this, kids_gClassActivity::class.java)
+            gclassIntent.putExtra("courselist", classData)
+            gclassIntent.putExtra("guser", guser)
+        }
     }
 
     // Network connection detector
