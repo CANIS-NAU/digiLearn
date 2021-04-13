@@ -15,10 +15,15 @@ import com.google.android.gms.common.api.Scope
 import com.google.android.gms.tasks.Task
 import kotlinx.android.synthetic.main.activity_main.*
 
+//results codes
+private const val RC_SIGN_IN = 100
+private const val EXPLICIT_SIGN_IN = 201
+private const val IMPLICIT_SIGN_IN = 202
+
+
 class MainActivity : AppCompatActivity() {
 
     lateinit var mGoogleSignInClient: GoogleSignInClient
-    private val RC_SIGN_IN = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,13 +57,13 @@ class MainActivity : AppCompatActivity() {
         val gso =
                 GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestEmail()
-                        .requestIdToken( getString(R.string.serverClientId) )
-                        .requestScopes( Scope (Scopes.DRIVE_FULL),
-                                Scope ("https://www.googleapis.com/auth/classroom.courses"),
-                                Scope ("https://www.googleapis.com/auth/classroom.coursework.me"),
-                                Scope ("https://www.googleapis.com/auth/classroom.announcements"),
-                                Scope ("https://www.googleapis.com/auth/classroom.guardianlinks.me.readonly") )
-                        .requestServerAuthCode( getString(R.string.serverClientId), true)
+                        .requestIdToken(getString(R.string.serverClientId))
+                        .requestScopes(Scope(Scopes.DRIVE_FULL),
+                                Scope("https://www.googleapis.com/auth/classroom.courses"),
+                                Scope("https://www.googleapis.com/auth/classroom.coursework.me"),
+                                Scope("https://www.googleapis.com/auth/classroom.announcements"),
+                                Scope("https://www.googleapis.com/auth/classroom.guardianlinks.me.readonly"))
+                        .requestServerAuthCode(getString(R.string.serverClientId))
                         .build()
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
@@ -66,9 +71,13 @@ class MainActivity : AppCompatActivity() {
         google_sign_in_button.setOnClickListener {
             signIn()
         }
+
+        //silent sign in operation gets new id token
+        mGoogleSignInClient.silentSignIn()
+                .addOnCompleteListener( this) { task -> handleSignInResult(task, IMPLICIT_SIGN_IN) }
     }
 
-    //sign in function for the google sign in button
+        //sign in function for the google sign in button
     private fun signIn() {
         val userSignInIntent = mGoogleSignInClient.signInIntent
         startActivityForResult(
@@ -84,20 +93,22 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == RC_SIGN_IN) {
             val task =
                     GoogleSignIn.getSignedInAccountFromIntent(data)
-                    handleSignInResult(task) //passes task to handleSignInResult
-
+            handleSignInResult(task, EXPLICIT_SIGN_IN) //passes task to handleSignInResult
         }
     }
 
     // The user is signed in successfully and will get the user's basic info
-    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
+    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>, resultCode: Int) {
         try {
+            println("handle sign in entered")
             val userAccount = completedTask.getResult(
                     ApiException::class.java
             )
+            println("user account value obtained")
+
             // Signed in successfully, extract progile information
             val googleId = userAccount?.id ?: ""
-            Log.i("Google ID",googleId)
+            Log.i("Google ID", googleId)
 
             val googleFirstName = userAccount?.givenName ?: ""
             Log.i("Google First Name", googleFirstName)
