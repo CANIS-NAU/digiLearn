@@ -30,6 +30,7 @@ import org.json.JSONObject
 class DetailsActivity : AppCompatActivity() {
 
     // Call the network detector tool
+    //hi :)
     private val networkMonitor = networkDetectorTool(this)
 
     private lateinit var flintent : Intent
