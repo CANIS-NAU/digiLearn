@@ -3,7 +3,7 @@ from REST.JSONBuilders import DigiJsonBuilder
 
 URL = "https://www.googleapis.com/customsearch/v1?"
 ENGINE_ID = "276d40ae1923ea29f"
-API_KEY = "AIzaSyCOAsr-SldNjop-SAQxb9HoY1E0KrIYDaE"
+API_KEY = "API KEY FOR DIGIPACK API"
 PARAMS = {}
 
 
