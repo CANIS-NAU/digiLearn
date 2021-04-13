@@ -50,7 +50,6 @@ class kids_gDriveFileActivity : AppCompatActivity() {
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>Files</font>")
 
-        var files = ArrayList<DigiDrive.DigiFile>()
         var queue = RequestQueueSingleton.getInstance(this.applicationContext)
         var context: Context = this
 

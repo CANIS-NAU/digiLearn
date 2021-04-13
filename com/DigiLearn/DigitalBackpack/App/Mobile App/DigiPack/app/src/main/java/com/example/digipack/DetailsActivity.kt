@@ -4,6 +4,7 @@ package com.example.digipack
 
 import DigiJson.DigiClass
 import DigiJson.DigiDrive
+import DigiJson.DigiSearch
 import DigiJson.DigiUser
 import DigiJson.GUserJson.GUser
 import android.content.Intent
@@ -17,12 +18,12 @@ import android.view.MenuItem
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
-import com.google.gson.Gson
-import kotlinx.android.synthetic.main.activity_details.*
+import kotlinx.android.synthetic.main.activity_details.clouds
+import kotlinx.android.synthetic.main.activity_details.google_first_name_textview
+import kotlinx.android.synthetic.main.activity_kid_main_page.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.encodeToJsonElement
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -37,9 +38,14 @@ class DetailsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_details)
+        val ui = intent.getBooleanExtra("uiSelect", false)
 
-        gsearchIntent = Intent(this, gSearchActivity::class.java)
+        if(ui){
+            //kids interface
+            setContentView(R.layout.activity_kid_main_page)
+        }else{
+            setContentView(R.layout.activity_details)
+        }
 
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>DigiPack</font>");
@@ -60,7 +66,7 @@ class DetailsActivity : AppCompatActivity() {
                             ConnectionType.Wifi, ConnectionType.Cellular  -> {
                                 clouds.setImageResource(R.drawable.sun_connection)
                                 //internet_connection.text = "Wifi Connection"
-                                connectToServer(guser)
+                                connectToServer(guser, ui)
                             }
                             else -> { }
                         }
@@ -72,6 +78,36 @@ class DetailsActivity : AppCompatActivity() {
                         //build activities from cache
                         buildActivitiesFromCache(guser)
                     }
+                }
+            }
+        }
+
+        // GDrive Button
+        googleDriveBtn?.setOnClickListener {
+            when{
+                this::flintent.isInitialized -> startActivity(flintent)
+                else ->{  //google drive intent not initialized; block activity and report unavailable
+                    Toast.makeText(this, "Google Drive not available, check again later", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        // GClass Button
+        googleClassBtn?.setOnClickListener{
+            when{  //google class intent not initialized; block activity and report unavailable
+                this::gclassIntent.isInitialized -> startActivity(gclassIntent)
+                else ->{
+                    Toast.makeText(this, "Google Classroom not available, check again later", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        // GSearch Button
+        googleSearchBtn?.setOnClickListener{
+            when{
+                this::gsearchIntent.isInitialized -> startActivity(gsearchIntent)
+                else ->{
+                    Toast.makeText(this, "Google Search not available, check again later", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -125,6 +161,9 @@ class DetailsActivity : AppCompatActivity() {
             // Go to GSearch Page
             when{
                 this::gsearchIntent.isInitialized -> startActivity(gsearchIntent)
+                else ->{
+                    Toast.makeText(this, "Google Search not available, check again later", Toast.LENGTH_SHORT).show()
+                }
             }
 
             return true
@@ -163,7 +202,7 @@ class DetailsActivity : AppCompatActivity() {
 
     //Retrieves and caches initial data from the server
     //including: GDrive data, GClass data
-    private fun connectToServer(guser: GUser){
+    private fun connectToServer(guser: GUser, ui: Boolean){
         //need to add something in here to check the server if theres new content and if so then
         //run all the other methods again and reinitialize the intents
         val fso = intent.getBooleanExtra("firstSignIn", true)
@@ -171,12 +210,48 @@ class DetailsActivity : AppCompatActivity() {
             serverAuth(guser)
         }
 
-        getFileList(guser)
-        getClassList(guser)
+        getFileList(guser, ui)
+        getClassList(guser, ui)
+        //getSearchList(guser, ui)
+    }
+
+    private fun getSearchList(guser: GUser, ui: Boolean){
+        when{
+            this::gsearchIntent.isInitialized -> {
+                Log.i(getString(R.string.app_name), "Details_act: searchIntent already initialized")
+            }
+            else -> {
+                val searchlisturl = "search/${guser.email}"
+                val queue = RequestQueueSingleton.getInstance(this.applicationContext)
+                val user = DigiUser.Jsuser(guser.firstName, guser.email, guser.userID)
+                val jsuserobj = JSONObject(Json.encodeToString(user))
+
+                val searchReq = JsonObjectRequest(Request.Method.GET, getString(R.string.serverUrl).plus(searchlisturl), jsuserobj,
+                        { resp ->
+                            try{
+                                val cacheManager = CacheUtility()
+                                val resultslist : DigiSearch.DigiRes = Json.decodeFromString(resp.toString())
+                                cacheManager.cacheString(resp.toString(), getString(R.string.searchList), this)
+
+                                gsearchIntent = Intent(this, gSearchActivity::class.java)
+                                gsearchIntent.putExtra("guser", guser)
+                                gsearchIntent.putExtra("resultslist", resultslist)
+                                gsearchIntent.putExtra("uiSelect", ui)
+                            }catch(e: JSONException){
+                                Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
+                            }
+                        },
+                        { err ->
+                            Log.i(getString(R.string.app_name), err.toString())
+                        }
+                )
+                queue.addToRequestQueue(searchReq)
+            }
+        }
     }
 
     //helper function for connectToServer handles acquisition of GCLass data
-    private fun getClassList(guser: GUser){
+    private fun getClassList(guser: GUser, ui: Boolean){
         when{
             this::gclassIntent.isInitialized -> {
                 Log.i(getString(R.string.app_name), "Details_act: classIntent already initialized")
@@ -201,6 +276,7 @@ class DetailsActivity : AppCompatActivity() {
                                 Log.i(getString(R.string.app_name), "in details act/getClassList, %s".format(gcresp.toString()))
                                 gclassIntent.putExtra("courselist", classjson)
                                 gclassIntent.putExtra("guser", guser)
+                                gclassIntent.putExtra("uiSelect", ui)
                             }catch(e: JSONException){
                                 Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
                             }
@@ -218,7 +294,7 @@ class DetailsActivity : AppCompatActivity() {
     }
 
     //helper function for connectToServer handles acquisition of GDrive data
-    private fun getFileList(guser: GUser) {
+    private fun getFileList(guser: GUser, ui: Boolean) {
         when{
             this::flintent.isInitialized -> {
                 Log.i(getString(R.string.app_name), "Details_act: flintent already initialized")
@@ -241,6 +317,7 @@ class DetailsActivity : AppCompatActivity() {
 
                                 flintent.putExtra("filelist", filelist)
                                 flintent.putExtra("guser", guser)
+                                flintent.putExtra("uiSelect", ui)
 
                             }catch(e: JSONException){
                                 Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
@@ -266,6 +343,7 @@ class DetailsActivity : AppCompatActivity() {
         val cacheManager = CacheUtility()
         val fileData = cacheManager.getStringFromCache( getString(R.string.fileList), this)
         val classData = cacheManager.getStringFromCache(  getString(R.string.classList), this)
+        val searchData = cacheManager.getStringFromCache(  getString(R.string.searchList), this)
 
 
         /**
@@ -300,30 +378,48 @@ class DetailsActivity : AppCompatActivity() {
             */
         }
 
-            /**
-             * Build Google Class intent
-             */
-            //if empty string, no data available
-            if( classData == "")
-            {
-                println("CLASS DATA IF ENTERED")
-                //notify user of service disruption
-                Toast.makeText(this,
-                    "No internet or cached data: Google Class will be unavailable.",
+        /**
+         * Build Google Class intent
+         */
+        //if empty string, no data available
+        if( classData == "")
+        {
+            println("CLASS DATA IF ENTERED")
+            //notify user of service disruption
+            Toast.makeText(this,
+                "No internet or cached data: Google Class will be unavailable.",
+                Toast.LENGTH_LONG).show()
+        }
+
+        //else data available
+        else {
+            println("CLASS DATA ELSE ENTERED")
+            //assemble as json object
+            val classData : DigiClass.CourseList = Json.decodeFromString(classData)
+
+            //set call activity intent
+            gclassIntent = Intent(this, gClassActivity::class.java)
+            gclassIntent.putExtra("courselist", classData)
+            gclassIntent.putExtra("guser", guser)
+        }
+
+        /**
+         * Build Google Search Intent
+         */
+        if( searchData == ""){
+            Toast.makeText(this,
+                    "No internet or cached data: Google Search will be unavailable.",
                     Toast.LENGTH_LONG).show()
-            }
+        }
+        else{
+            val searchData : DigiSearch.DigiRes = Json.decodeFromString(searchData)
 
-            //else data available
-            else {
-                println("CLASS DATA ELSE ENTERED")
-                //assemble as json object
-                val classData : DigiClass.CourseList = Json.decodeFromString(classData)
+            gsearchIntent = Intent(this, gSearchActivity::class.java)
+            gsearchIntent.putExtra("resultslist", searchData)
+            gsearchIntent.putExtra("guser", guser)
+        }
 
-                //set call activity intent
-                gclassIntent = Intent(this, gClassActivity::class.java)
-                gclassIntent.putExtra("courselist", classData)
-                gclassIntent.putExtra("guser", guser)
-            }
+
     }
 
     // Network connection detector

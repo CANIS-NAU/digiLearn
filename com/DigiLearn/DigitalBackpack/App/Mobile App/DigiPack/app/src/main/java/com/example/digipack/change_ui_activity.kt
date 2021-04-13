@@ -35,7 +35,7 @@ class change_ui_activity : AppCompatActivity(){
 
                 myIntent.putExtra("guser", guser)
                 myIntent.putExtra("firstSignIn", fso)
-                myIntent.putExtra("uiSelect", false)
+                myIntent.putExtra("uiSelect", true)
 
                 this.startActivity(myIntent)
             }
@@ -53,7 +53,7 @@ class change_ui_activity : AppCompatActivity(){
 
                 myIntent.putExtra("guser", guser)
                 myIntent.putExtra("firstSignIn", fso)
-                myIntent.putExtra("uiSelect", true)
+                myIntent.putExtra("uiSelect", false)
                 this.startActivity(myIntent)
             }
         }
