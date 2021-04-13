@@ -6,21 +6,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Html
 import android.util.Log
-
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.get
-import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_course_details.*
 import kotlinx.android.synthetic.main.activity_course_details.homeworkList
+import kotlinx.android.synthetic.main.activity_details.view.*
 import kotlinx.android.synthetic.main.activity_gclass.*
 import kotlinx.android.synthetic.main.activity_gsearch.view.*
 import kotlinx.android.synthetic.main.activity_kid_course_details.*
 import kotlinx.android.synthetic.main.activity_kid_course_details.view.*
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import java.io.IOException
 
 class kids_courseDetailsActivity : AppCompatActivity(){
@@ -38,13 +34,39 @@ class kids_courseDetailsActivity : AppCompatActivity(){
             supportActionBar?.title = Html.fromHtml("<font color='#01345A'>${course.name}</font>")
         }
 
-        // Grab the course announcement and display it under the Announcement
+        // NEED TO GET THE ANNOUNCEMENT
+        var getAnnouncement = course?.announcements
+
+        // Grab the course announcement and display it under the AnnouncementID
         val cAnnouncementText = findViewById<TextView>(R.id.class_announcement)
 
-        // NEED TO GET THE ANNOUNCEMENT
-        
-        //var getAnnouncement = course?.announcements
-        //cAnnouncementText.setText(getAnnouncement?.text)
+        // Add the list of announcements
+        val classAnnouncementList = arrayListOf<String>()
+        if (getAnnouncement.isNullOrEmpty()){
+
+            cAnnouncementText.setText("No Announcements")
+
+        } else {
+            // Put the string text in the array of list
+            for(items in course?.announcements!!){
+                try {
+                    when{
+                        items.text == null->{
+                            classAnnouncementList.add("<no announcements found>")
+                        }
+                        else-> {
+                            items.text?.let{classAnnouncementList.add(it)}
+                        }
+                    }
+                } catch (e: IOException){
+                    Log.e("DigiPack", "Class announcement error: %s".format(e.toString()))
+                }
+            }
+
+            // Then put that text in the textView
+            val firstName: String = classAnnouncementList.get(0)
+            cAnnouncementText.setText(firstName)
+        }
 
         // Add the course title
         val courseName = findViewById<TextView>(R.id.courseName)
@@ -86,7 +108,7 @@ class kids_courseDetailsActivity : AppCompatActivity(){
             val intent = Intent(this, popUp::class.java)
             intent.putExtra("popuptitle", hwName)
             intent.putExtra("popuptext", "Description: " + hwDesc)
-            intent.putExtra("popupduedate", "Due Date: " + hwDuedateMonth + "/" + hwDuedateDay + "/" + hwDuedateYr )
+            intent.putExtra("popupduedate", "Due Date: " + hwDuedateMonth + "/" + hwDuedateDay + "/" + hwDuedateYr)
             intent.putExtra("popupbtn", "Ok")
             intent.putExtra("darkstatusbar", false)
             startActivity(intent)

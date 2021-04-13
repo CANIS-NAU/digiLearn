@@ -11,9 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Html
 import android.util.Log
-import android.view.Menu
 import android.widget.Toast
-import android.view.MenuItem
+import android.widget.Button
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
@@ -37,7 +36,7 @@ class kid_main_page : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_details)
+        setContentView(R.layout.activity_kid_main_page)
 
         gsearchIntent = Intent(this, kids_gSearchActivity::class.java)
 
@@ -75,62 +74,24 @@ class kid_main_page : AppCompatActivity() {
                 }
             }
         }
-    }
 
-    // When menu bar is clicked
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu, menu)
-        return true
-    }
-
-    // Function to do when items on the menu option are clicked
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.getItemId()
-
-        //case google drive button
-        if (id == R.id.googleDriveBtn) {
-            // Makes a toast mssg for the user
-            //Toast.makeText(this, "Google Drive", Toast.LENGTH_LONG).show()
-            // Go to the Google Drive page
-            when{
-                this::flintent.isInitialized -> startActivity(flintent)
-                else ->{  //google drive intent not initialized; block activity and report unavailable
-                    Toast.makeText(this, "Google Drive not available, check again later", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            return true
+        // GDrive Button
+        val googleDriveButton = findViewById<Button>(R.id.googleDriveBtn)
+        googleDriveButton.setOnClickListener{
+            startActivity(flintent)
         }
 
-        // case google class button
-        if (id == R.id.googleClassBtn) {
-            // Makes a toast mssg for the user
-            //Toast.makeText(this, "Google Classroom Page", Toast.LENGTH_LONG).show()
-            // Go to GClass page
-            when{  //google class intent not initialized; block activity and report unavailable
-                this::gclassIntent.isInitialized -> startActivity(gclassIntent)
-                else ->{
-                    Toast.makeText(this, "Google Classroom not available, check again later", Toast.LENGTH_SHORT).show()
-                }
-            }
-            return true
+        // GClass Button
+        val googleClassButton = findViewById<Button>(R.id.googleClassBtn)
+        googleClassButton.setOnClickListener{
+            startActivity(gclassIntent)
         }
 
-        //case google search button
-        if (id == R.id.googleSearchBtn) {
-            // Makes a toast mssg for the user
-            //Toast.makeText(this, "Google Search Clicked", Toast.LENGTH_LONG).show()
-            // Go to GSearch Page
-            when{
-                this::gsearchIntent.isInitialized -> startActivity(gsearchIntent)
-            }
-
-            return true
+        // GSearch Button
+        val googleSearchButton = findViewById<Button>(R.id.googleSearchBtn)
+        googleSearchButton.setOnClickListener{
+            startActivity(gsearchIntent)
         }
-
-        return super.onOptionsItemSelected(item)
     }
 
 
