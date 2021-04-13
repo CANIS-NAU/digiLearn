@@ -10,6 +10,7 @@ class GUserJson {
         var firstName: String? = null,
         var lastName: String? = null,
         var email: String? = null,
-        var authCode: String? = null
+        var authCode: String? = null,
+        var idToken: String? = null
     ) : java.io.Serializable
 }

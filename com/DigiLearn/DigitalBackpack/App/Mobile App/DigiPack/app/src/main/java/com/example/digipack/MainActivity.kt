@@ -30,29 +30,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
-        //get the account the user signed in with
-        val account = GoogleSignIn.getLastSignedInAccount(this)
-
-        if (account != null)
-        {
-            //extract profile information, ID token
-            val googleEmail = account.email
-            val googleFirstName = account.givenName
-            val googleLastName = account.familyName
-            val authCode = account.idToken
-            val googleId = account.id
-
-            val myIntent = Intent(this, change_ui_activity::class.java)
-
-            val guser = GUser( googleId, googleFirstName, googleLastName, googleEmail, authCode )
-            myIntent.putExtra("guser", guser)
-            myIntent.putExtra("firstSignIn", false)
-
-            this.startActivity(myIntent)
-        }
-
-        //else user isnt signed in
-
         //initialize google sign in object
         val gso =
                 GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -119,18 +96,31 @@ class MainActivity : AppCompatActivity() {
             val googleEmail = userAccount?.email ?: ""
             Log.i("Google Email", googleEmail)
 
+            val idToken = userAccount?.idToken ?: ""
+            Log.i("Google ID Token", idToken)
+            println("Google idToken " + idToken)
 
-            val authCode = userAccount?.idToken ?: ""
-            Log.i("Google ID Token", authCode)
-
-            val googleAuthCode = userAccount?.serverAuthCode ?: "" //auth code used for registration with server
-            println(googleAuthCode)
+            val authCode = userAccount?.serverAuthCode ?: "" //auth code used for registration with server
+            Log.i("Google Auth Code", authCode)
 
             // construct and launch an intent for DetailsActivity
             val myIntent = Intent(this, change_ui_activity::class.java)
-            val guser = GUser( googleId, googleFirstName, googleLastName, googleEmail, authCode )
+            val guser = GUser( googleId, googleFirstName, googleLastName, googleEmail, authCode, idToken )
             myIntent.putExtra("guser", guser)
-            myIntent.putExtra("firstSignIn", true)
+
+            //check if silent sign in
+            if(resultCode == IMPLICIT_SIGN_IN)
+            {
+                //then record NOT first sign in
+                myIntent.putExtra("firstSignIn", false)
+            }
+            //else check if explicit sign in
+            else if( resultCode == EXPLICIT_SIGN_IN)
+            {
+                //then record as first sign in
+                myIntent.putExtra("firstSignIn", true)
+            }
+
             this.startActivity(myIntent)
 
         } catch (e: ApiException) {

@@ -78,13 +78,23 @@ class kid_main_page : AppCompatActivity() {
         // GDrive Button
         val googleDriveButton = findViewById<Button>(R.id.googleDriveBtn)
         googleDriveButton.setOnClickListener{
-            startActivity(flintent)
+            when{
+                this::flintent.isInitialized -> startActivity(flintent)
+                else ->{  //google drive intent not initialized; block activity and report unavailable
+                    Toast.makeText(this, "Google Drive not available, check again later", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         // GClass Button
         val googleClassButton = findViewById<Button>(R.id.googleClassBtn)
         googleClassButton.setOnClickListener{
-            startActivity(gclassIntent)
+            when {  //google class intent not initialized; block activity and report unavailable
+                this::gclassIntent.isInitialized -> startActivity(gclassIntent)
+                else -> {
+                    Toast.makeText(this, "Google Classroom not available, check again later", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         // GSearch Button
@@ -100,12 +110,14 @@ class kid_main_page : AppCompatActivity() {
         val googleEmail = guser.email
         val googleAccessToken = guser.authCode
 
+        println( googleAccessToken?:"")
         // For the debug
         //val mptv = findViewById<TextView>(R.id.mptext)
 
         val authurl = "auth/"
         val queue = RequestQueueSingleton.getInstance(this.applicationContext)
         val tok = Json.encodeToString(DigiUser.JsauthTok(googleAccessToken, googleEmail))
+        println( tok?:"")
         val jsobtok = JSONObject(tok)
 
         val request = JsonObjectRequest(Request.Method.POST, getString(R.string.serverUrl).plus(authurl), jsobtok,
@@ -143,25 +155,34 @@ class kid_main_page : AppCompatActivity() {
                 Log.i(getString(R.string.app_name), "Details_act: classIntent already initialized")
             }
             else -> {
-                val classlisturl = "gclass/${guser.email}"
+                val classlisturl = "gclass/${guser.idToken}"
                 val queue = RequestQueueSingleton.getInstance(this.applicationContext)
-                val user = DigiUser.Jsuser(guser.firstName, guser.email, guser.userID)
+                val user = DigiUser.Jsuser(guser.firstName, guser.email, guser.idToken)
                 val jsuserobj = JSONObject(Json.encodeToString(user))
+                println("juser "+ jsuserobj)
                 var gcresp = JSONObject("{Result:noACK}")
                 val gclassRequest = JsonObjectRequest(Request.Method.GET, getString(R.string.serverUrl).plus(classlisturl), jsuserobj,
                         { classresp -> gcresp = classresp
                             try{
-                                //get json response as string, pass to CacheUtility
-                                val cacheManager = CacheUtility()
-                                val classjson : DigiClass.CourseList = Json.decodeFromString(gcresp.toString())
+                                if(gcresp == JSONObject("{Result:noACK}"))
+                                {
+                                    Toast.makeText(applicationContext, "noACK for getClassList", Toast.LENGTH_SHORT).show()
+                                }
+                                else
+                                {
+                                    //get json response as string, pass to CacheUtility
+                                    val cacheManager = CacheUtility()
+                                    val classjson : DigiClass.CourseList = Json.decodeFromString(gcresp.toString())
 
-                                cacheManager.cacheString(classresp.toString(), getString(R.string.classList), this)
+                                    cacheManager.cacheString(classresp.toString(), getString(R.string.classList), this)
 
-                                //build gclassIntent
-                                gclassIntent = Intent(this, kids_gClassActivity::class.java)
-                                Log.i(getString(R.string.app_name), "in details act/getClassList, %s".format(gcresp.toString()))
-                                gclassIntent.putExtra("courselist", classjson)
-                                gclassIntent.putExtra("guser", guser)
+                                    //build gclassIntent
+                                    gclassIntent = Intent(this, kids_gClassActivity::class.java)
+                                    Log.i(getString(R.string.app_name), "in details act/getClassList, %s".format(gcresp.toString()))
+                                    gclassIntent.putExtra("courselist", classjson)
+                                    gclassIntent.putExtra("guser", guser)
+                                }
+
                             }catch(e: JSONException){
                                 Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
                             }
@@ -185,23 +206,30 @@ class kid_main_page : AppCompatActivity() {
                 Log.i(getString(R.string.app_name), "Details_act: flintent already initialized")
             }
             else -> {
-                val drivelisturl = "drive/${guser.email}"
+                val drivelisturl = "drive/${guser.idToken}"
                 val queue = RequestQueueSingleton.getInstance(this.applicationContext)
-                val user = DigiUser.Jsuser(guser.firstName, guser.email, guser.userID)
+                val user = DigiUser.Jsuser(guser.firstName, guser.email, guser.idToken)
                 val jsuserobj = JSONObject(Json.encodeToString(user))
                 var filelistResp = JSONObject("{Result:noACK}")
                 val filelistRequest = JsonObjectRequest(Request.Method.GET, getString(R.string.serverUrl).plus(drivelisturl), jsuserobj,
                         { flresponse -> filelistResp = flresponse
                             try{
-                                val cacheManager = CacheUtility()
-                                val filelist : DigiDrive.DF = Json.decodeFromString(flresponse.toString())
-                                cacheManager.cacheString(flresponse.toString(), getString(R.string.fileList), this)
+                                if(filelistResp == JSONObject("{Result:noACK}"))
+                                {
+                                    Toast.makeText(applicationContext, "noACK for getFileList", Toast.LENGTH_SHORT).show()
+                                }
+                                else
+                                {
+                                    val cacheManager = CacheUtility()
+                                    val filelist : DigiDrive.DF = Json.decodeFromString(flresponse.toString())
+                                    cacheManager.cacheString(flresponse.toString(), getString(R.string.fileList), this)
 
-                                flintent = Intent(this, kids_gDriveFileActivity::class.java)
-                                Log.i(getString(R.string.app_name), "in details act/getFileList, %s".format(flresponse.toString()))
+                                    flintent = Intent(this, kids_gDriveFileActivity::class.java)
+                                    Log.i(getString(R.string.app_name), "in details act/getFileList, %s".format(flresponse.toString()))
 
-                                flintent.putExtra("filelist", filelist)
-                                flintent.putExtra("guser", guser)
+                                    flintent.putExtra("filelist", filelist)
+                                    flintent.putExtra("guser", guser)
+                                }
 
                             }catch(e: JSONException){
                                 Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
@@ -214,7 +242,6 @@ class kid_main_page : AppCompatActivity() {
             }
         }
     }
-
 
     /**
      * When the network is unavailable, attempts to retrieve GClass, GDrive data from cache.
