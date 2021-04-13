@@ -31,7 +31,7 @@ class change_ui_activity : AppCompatActivity(){
             {
 
                 //construct and start intent for Details activity
-                val myIntent = Intent(this, kid_main_page::class.java)
+                val myIntent = Intent(this, DetailsActivity::class.java)
 
                 myIntent.putExtra("guser", guser)
                 myIntent.putExtra("firstSignIn", fso)

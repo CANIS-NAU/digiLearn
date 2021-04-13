@@ -261,19 +261,19 @@ class DetailsActivity : AppCompatActivity() {
                 val queue = RequestQueueSingleton.getInstance(this.applicationContext)
                 val user = DigiUser.Jsuser(guser.firstName, guser.email, guser.userID)
                 val jsuserobj = JSONObject(Json.encodeToString(user))
-                var gcresp = JSONObject("{Result:noACK}")
+                //var gcresp = JSONObject("{Result:noACK}")
                 val gclassRequest = JsonObjectRequest(Request.Method.GET, getString(R.string.serverUrl).plus(classlisturl), jsuserobj,
-                        { classresp -> gcresp = classresp
+                        { classresp ->
                             try{
                                 //get json response as string, pass to CacheUtility
                                 val cacheManager = CacheUtility()
-                                val classjson : DigiClass.CourseList = Json.decodeFromString(gcresp.toString())
+                                val classjson : DigiClass.CourseList = Json.decodeFromString(classresp.toString())
 
                                 cacheManager.cacheString(classresp.toString(), getString(R.string.classList), this)
 
                                 //build gclassIntent
                                 gclassIntent = Intent(this, gClassActivity::class.java)
-                                Log.i(getString(R.string.app_name), "in details act/getClassList, %s".format(gcresp.toString()))
+                                Log.i(getString(R.string.app_name), "in details act/getClassList, %s".format(classresp.toString()))
                                 gclassIntent.putExtra("courselist", classjson)
                                 gclassIntent.putExtra("guser", guser)
                                 gclassIntent.putExtra("uiSelect", ui)
@@ -304,9 +304,9 @@ class DetailsActivity : AppCompatActivity() {
                 val queue = RequestQueueSingleton.getInstance(this.applicationContext)
                 val user = DigiUser.Jsuser(guser.firstName, guser.email, guser.userID)
                 val jsuserobj = JSONObject(Json.encodeToString(user))
-                var filelistResp = JSONObject("{Result:noACK}")
+                //var filelistResp = JSONObject("{Result:noACK}")
                 val filelistRequest = JsonObjectRequest(Request.Method.GET, getString(R.string.serverUrl).plus(drivelisturl), jsuserobj,
-                        { flresponse -> filelistResp = flresponse
+                        { flresponse ->
                             try{
                                 val cacheManager = CacheUtility()
                                 val filelist : DigiDrive.DF = Json.decodeFromString(flresponse.toString())
