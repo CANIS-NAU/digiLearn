@@ -221,9 +221,9 @@ class DetailsActivity : AppCompatActivity() {
                 Log.i(getString(R.string.app_name), "Details_act: searchIntent already initialized")
             }
             else -> {
-                val searchlisturl = "search/${guser.email}"
+                val searchlisturl = "search/${guser.authCode}"
                 val queue = RequestQueueSingleton.getInstance(this.applicationContext)
-                val user = DigiUser.Jsuser(guser.firstName, guser.email, guser.userID)
+                val user = DigiUser.Jsuser(guser.firstName, guser.email, guser.authCode)
                 val jsuserobj = JSONObject(Json.encodeToString(user))
 
                 val searchReq = JsonObjectRequest(Request.Method.GET, getString(R.string.serverUrl).plus(searchlisturl), jsuserobj,
@@ -257,9 +257,9 @@ class DetailsActivity : AppCompatActivity() {
                 Log.i(getString(R.string.app_name), "Details_act: classIntent already initialized")
             }
             else -> {
-                val classlisturl = "gclass/${guser.email}"
+                val classlisturl = "gclass/${guser.authCode}"
                 val queue = RequestQueueSingleton.getInstance(this.applicationContext)
-                val user = DigiUser.Jsuser(guser.firstName, guser.email, guser.userID)
+                val user = DigiUser.Jsuser(guser.firstName, guser.email, guser.authCode)
                 val jsuserobj = JSONObject(Json.encodeToString(user))
                 //var gcresp = JSONObject("{Result:noACK}")
                 val gclassRequest = JsonObjectRequest(Request.Method.GET, getString(R.string.serverUrl).plus(classlisturl), jsuserobj,
