@@ -45,12 +45,18 @@ class FileListViewActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_file_list_view)
+        val ui = intent.getBooleanExtra("ui", false)
+
+        if(ui){
+            setContentView(R.layout.activity_kid_file_page)
+        }else{
+            setContentView(R.layout.activity_file_list_view)
+        }
+
 
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>Files</font>")
 
-        var files = ArrayList<DigiDrive.DigiFile>()
         var queue = RequestQueueSingleton.getInstance(this.applicationContext)
         var context: Context = this
 
@@ -182,7 +188,7 @@ class FileListViewActivity : AppCompatActivity() {
 
 
         val reqMethodCode = Request.Method.GET
-        val getFileUrl = getString(R.string.serverUrl).plus("sd/${guser.email}/${fileid}")
+        val getFileUrl = getString(R.string.serverUrl).plus("sd/${guser.authCode}/${fileid}")
         val juser = DigiUser.Jsuser(guser.firstName, guser.email, guser.userID)
         val request = JSONObject( Json.encodeToString(juser) )
 
@@ -200,29 +206,6 @@ class FileListViewActivity : AppCompatActivity() {
         )
         queue.addToRequestQueue(req)
         return flag
-    }
-
-    // Refresh the page
-    fun refreshList(guser: GUser, queue: RequestQueueSingleton, googleEmail: String?, googleFirstName: String?, googleId: String?){
-        val reqMethodCode = Request.Method.GET
-        val getFileUrl = getString(R.string.serverUrl).plus("user/").plus(googleEmail)
-
-        val juser = DigiUser.Jsuser(guser.firstName, guser.email, guser.userID)
-        val request = JSONObject( Json.encodeToString(juser) )
-        val req = JsonObjectRequest(reqMethodCode, getFileUrl, request,
-            { resp ->
-                intent.removeExtra("filelist")
-                val flist : DigiDrive.DF = Json.decodeFromString(resp.toString())
-                intent.putExtra("filelist", flist)
-                //do something with a positive response
-            },
-            { err ->
-                println("fdas")
-                Log.e(getString(R.string.app_name), "FileListViewActivity refeshList error: %s".format(err.toString()))
-                //do something with an error
-            }
-        )
-        queue.addToRequestQueue(req)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {

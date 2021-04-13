@@ -27,12 +27,57 @@ class courseDetailsActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_course_details)
+
+        val ui = intent.getBooleanExtra("ui", false)
+        if(ui){
+            setContentView(R.layout.activity_kid_course_details)
+        }else{
+            setContentView(R.layout.activity_course_details)
+        }
 
         //unpack intent to get course data
         var course = intent.getSerializableExtra("course") as DigiClass.Course
         var guser = intent.getSerializableExtra("guser") as GUser
         Log.i(getString(R.string.app_name), course.toString())
+
+        // Change title
+        if (course != null) {
+            supportActionBar?.title = Html.fromHtml("<font color='#01345A'>${course.name}</font>")
+        }
+
+        // NEED TO GET THE ANNOUNCEMENT
+        var annoucements = course.announcements
+
+        // Grab the course announcement and display it under the AnnouncementID
+        val cAnnouncementText = findViewById<TextView?>(R.id.class_announcement)
+
+        val classAnnouncementList = arrayListOf<String>()
+        if (annoucements.isNullOrEmpty()){
+
+            cAnnouncementText.setText("No Announcements")
+
+        } else {
+            // Put the string text in the array of list
+            for(items in course?.announcements!!){
+                try {
+                    when{
+                        items.text == null->{
+                            classAnnouncementList.add("<no announcements found>")
+                        }
+                        else-> {
+                            items.text?.let{classAnnouncementList.add(it)}
+                        }
+                    }
+                } catch (e: IOException){
+                    Log.e("DigiPack", "Class announcement error: %s".format(e.toString()))
+                }
+            }
+
+            // Then put that text in the textView
+            val firstName: String = classAnnouncementList[0]
+            cAnnouncementText?.text = firstName
+        }
+
 
         // Calls the network detector class
         networkMonitor.result = { isAvailable, type ->
@@ -55,11 +100,6 @@ class courseDetailsActivity : AppCompatActivity(){
                     }
                 }
             }
-        }
-
-        // Change title
-        if (course != null) {
-            supportActionBar?.title = Html.fromHtml("<font color='#01345A'>${course.name}</font>")
         }
 
         // Add the course title
