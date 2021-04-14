@@ -59,6 +59,7 @@ class kid_main_page : AppCompatActivity() {
                             ConnectionType.Wifi, ConnectionType.Cellular  -> {
                                 clouds.setImageResource(R.drawable.sun_connection)
                                 //internet_connection.text = "Wifi Connection"
+                                buildActivitiesFromCache(guser)
                                 connectToServer(guser)
                             }
                             else -> { }
@@ -256,17 +257,16 @@ class kid_main_page : AppCompatActivity() {
         val classData = cacheManager.getStringFromCache(  getString(R.string.classList), this)
 
 
-        /**
-         * Build Google Drive intent
-         */
-
+        // Build Google Drive intent
         //if empty string, no data available
         if( fileData == "")
         {
             //notify user of service disruption
+                /*
             Toast.makeText(this,
                     "No internet or cached data: Google Drive will be unavailable.",
                     Toast.LENGTH_LONG).show()
+                 */
         }
 
         //else data available
@@ -288,17 +288,18 @@ class kid_main_page : AppCompatActivity() {
             */
         }
 
-        /**
-         * Build Google Class intent
-         */
+        //Build Google Class intent
         //if empty string, no data available
         if( classData == "")
         {
             println("CLASS DATA IF ENTERED")
             //notify user of service disruption
+            /*
             Toast.makeText(this,
                     "No internet or cached data: Google Class will be unavailable.",
                     Toast.LENGTH_LONG).show()
+
+             */
         }
 
         //else data available
