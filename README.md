@@ -3,7 +3,6 @@ The Digital Backpack or DigiPack is an app that will allow a fluid transition be
 
 ## Team Members:
 Caitlin Abuel, 
-Grace Shirey, 
 Israel Bermudes, 
 Kristine Hermosado, 
 Sebastian Kastrul 
