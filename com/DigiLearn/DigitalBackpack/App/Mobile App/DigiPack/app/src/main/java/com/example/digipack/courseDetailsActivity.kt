@@ -27,8 +27,9 @@ class courseDetailsActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         val ui = intent.getBooleanExtra("ui", false)
+
+        // Determines what UI to show to  the user
         if(ui){
             setContentView(R.layout.activity_kid_course_details)
         }else{
@@ -101,10 +102,6 @@ class courseDetailsActivity : AppCompatActivity(){
                 }
             }
         }
-
-        // Add the course title
-        val courseName = findViewById<TextView>(R.id.courseName)
-        courseName?.setText(course.name)
 
         // Add the list of assignments
         var classHomework = ArrayList<String>()
