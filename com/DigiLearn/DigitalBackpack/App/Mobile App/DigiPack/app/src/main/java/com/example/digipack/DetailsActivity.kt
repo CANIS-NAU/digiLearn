@@ -1,7 +1,6 @@
  package com.example.digipack
 
 
-
 import DigiJson.DigiClass
 import DigiJson.DigiDrive
 import DigiJson.DigiSearch
@@ -18,7 +17,6 @@ import android.view.MenuItem
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
-import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.android.synthetic.main.activity_details.clouds
 import kotlinx.android.synthetic.main.activity_details.google_first_name_textview
@@ -26,10 +24,10 @@ import kotlinx.android.synthetic.main.activity_kid_main_page.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.encodeToJsonElement
 import org.json.JSONException
 import org.json.JSONObject
 
+ 
 class DetailsActivity : AppCompatActivity() {
 
     // Call the network detector tool
@@ -38,6 +36,8 @@ class DetailsActivity : AppCompatActivity() {
     private lateinit var flintent : Intent
     private lateinit var gclassIntent : Intent
     private lateinit var gsearchIntent : Intent
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -206,6 +206,7 @@ class DetailsActivity : AppCompatActivity() {
     private fun connectToServer(guser: GUser, ui: Boolean){
         //need to add something in here to check the server if theres new content and if so then
         //run all the other methods again and reinitialize the intents
+        println("Connect to server entered")
         val fso = intent.getBooleanExtra("firstSignIn", true)
         if(fso){
             serverAuth(guser)
@@ -370,9 +371,12 @@ class DetailsActivity : AppCompatActivity() {
         if( fileData == "")
         {
             //notify user of service disruption
-            Toast.makeText(this,
+            /*
+                Toast.makeText(this,
                 "No internet or cached data: Google Drive will be unavailable.",
                 Toast.LENGTH_LONG).show()
+             */
+
         }
 
         //else data available
@@ -394,7 +398,6 @@ class DetailsActivity : AppCompatActivity() {
             }
             */
         }
-
         // Build Google Class intent
         //if empty string, no data available
         if( classData == "")
