@@ -31,17 +31,6 @@
         <activity android:name=".change_ui_activity"></activity>
 
 
-        <!-- Kids Activity Declarations -->
-        <activity android:name=".kid_main_page"></activity>
-        <activity android:name=".kids_gDriveFileActivity"
-                  android:theme="@style/Theme.AppCompat.Light"></activity>
-        <activity android:name=".kids_gClassActivity"
-                  android:theme="@style/Theme.AppCompat.Light"></activity>
-        <activity android:name=".kids_gSearchActivity"
-                  android:theme="@style/Theme.AppCompat.Light"></activity>
-        <activity android:name=".kids_courseDetailsActivity"
-            android:theme="@style/Theme.AppCompat.Light"></activity>
-
         <activity android:name=".MainActivity"
             android:noHistory="true"> <!--Keeps the Google Sign In page off of the activity stack-->
             <intent-filter>
