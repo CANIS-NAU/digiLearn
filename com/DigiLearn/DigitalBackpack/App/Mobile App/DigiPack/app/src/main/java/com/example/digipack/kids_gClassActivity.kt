@@ -18,20 +18,18 @@ import org.json.JSONObject
 import java.io.IOException
 import java.lang.Exception
 
-class gClassActivity : AppCompatActivity(){
+class kids_gClassActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val ui = intent.getBooleanExtra("ui", false)
-        if(ui){
-            setContentView(R.layout.activity_kid_glcass)
-        }else{
-            setContentView(R.layout.activity_gclass)
-        }
+        setContentView(R.layout.activity_kid_glcass)
 
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>Classroom</font>")
 
+        var classnames = ArrayList<String>()
+        var classids = ArrayList<String>()
+        var announcements = ArrayList<String>()
+        var coursework = ArrayList<String>()
 
         var guser = intent.getSerializableExtra("guser") as GUser
         var classlist = intent.getSerializableExtra("courselist") as DigiClass.CourseList
@@ -40,14 +38,15 @@ class gClassActivity : AppCompatActivity(){
 
         var courselist = classlist.Courses
         if(courselist != null){
-            write_to_ui_and_listen(guser, ui, courselist)
+            write_to_ui_and_listen(guser, courselist)
         }
     }
 
-    fun write_to_ui_and_listen(guser: GUser, ui: Boolean ,cl: ArrayList<DigiClass.Course>){
+    fun write_to_ui_and_listen(guser: GUser, cl: ArrayList<DigiClass.Course>){
+        var courseDetails = Intent(this, kids_courseDetailsActivity::class.java)
+        courseDetails.putExtra("guser", guser)
+
         try{
-            var courseDetails = Intent(this, courseDetailsActivity::class.java)
-            courseDetails.putExtra("guser", guser)
             var classnames = ArrayList<String>()
             for( i in cl){
                 i.name?.let { classnames.add(it) }
@@ -61,7 +60,6 @@ class gClassActivity : AppCompatActivity(){
 
                 var course = cl[position]
                 courseDetails.putExtra("course", course)
-                courseDetails.putExtra("ui", ui)
                 this.startActivity(courseDetails)
             }
         }catch(e: IOException) {

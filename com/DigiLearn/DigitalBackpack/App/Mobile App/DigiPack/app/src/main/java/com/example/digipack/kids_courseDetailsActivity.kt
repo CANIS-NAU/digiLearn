@@ -1,43 +1,32 @@
 package com.example.digipack
 
 import DigiJson.DigiClass
-import DigiJson.GUserJson.GUser
+import DigiJson.GUserJson
 import android.content.Intent
 import android.os.Bundle
 import android.text.Html
 import android.util.Log
-
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_course_details.*
-import kotlinx.android.synthetic.main.activity_details.*
+import kotlinx.android.synthetic.main.activity_course_details.homeworkList
+import kotlinx.android.synthetic.main.activity_details.view.*
 import kotlinx.android.synthetic.main.activity_gclass.*
-import kotlinx.android.synthetic.main.activity_gclass.clouds
 import kotlinx.android.synthetic.main.activity_gsearch.view.*
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
+import kotlinx.android.synthetic.main.activity_kid_course_details.*
+import kotlinx.android.synthetic.main.activity_kid_course_details.view.*
 import java.io.IOException
 
-class courseDetailsActivity : AppCompatActivity(){
-
-    // Call the network detector tool
-    private val networkMonitor = networkDetectorTool(this)
-
+class kids_courseDetailsActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val ui = intent.getBooleanExtra("ui", false)
-        if(ui){
-            setContentView(R.layout.activity_kid_course_details)
-        }else{
-            setContentView(R.layout.activity_course_details)
-        }
+        setContentView(R.layout.activity_kid_course_details)
 
         //unpack intent to get course data
         var course = intent.getSerializableExtra("course") as DigiClass.Course
-        var guser = intent.getSerializableExtra("guser") as GUser
+        var guser = intent.getSerializableExtra("guser") as GUserJson.GUser
         Log.i(getString(R.string.app_name), course.toString())
 
         // Change title
@@ -46,13 +35,14 @@ class courseDetailsActivity : AppCompatActivity(){
         }
 
         // NEED TO GET THE ANNOUNCEMENT
-        var annoucements = course.announcements
+        var getAnnouncement = course?.announcements
 
         // Grab the course announcement and display it under the AnnouncementID
-        val cAnnouncementText = findViewById<TextView?>(R.id.class_announcement)
+        val cAnnouncementText = findViewById<TextView>(R.id.class_announcement)
 
+        // Add the list of announcements
         val classAnnouncementList = arrayListOf<String>()
-        if (annoucements.isNullOrEmpty()){
+        if (getAnnouncement.isNullOrEmpty()){
 
             cAnnouncementText.setText("No Announcements")
 
@@ -74,32 +64,8 @@ class courseDetailsActivity : AppCompatActivity(){
             }
 
             // Then put that text in the textView
-            val firstName: String = classAnnouncementList[0]
-            cAnnouncementText?.text = firstName
-        }
-
-
-        // Calls the network detector class
-        networkMonitor.result = { isAvailable, type ->
-            runOnUiThread {
-                when (isAvailable) {
-                    true -> {
-                        when (type) {
-                            //changed this to only call the server once since we dont care what type
-                            //of connection is happening currently
-                            ConnectionType.Wifi, ConnectionType.Cellular  -> {
-                                clouds.setImageResource(R.drawable.sun_connection)
-                            }
-                            else -> { }
-                        }
-                    }
-                    false -> {
-                        clouds.setImageResource(R.drawable.networkclouds)
-                        //internet_connection.text = "No Connection"
-
-                    }
-                }
-            }
+            val firstName: String = classAnnouncementList.get(0)
+            cAnnouncementText.setText(firstName)
         }
 
         // Add the course title
@@ -142,25 +108,12 @@ class courseDetailsActivity : AppCompatActivity(){
             val intent = Intent(this, popUp::class.java)
             intent.putExtra("popuptitle", hwName)
             intent.putExtra("popuptext", "Description: " + hwDesc)
-            intent.putExtra("popupduedate", "Due Date: " + hwDuedateMonth + "/" + hwDuedateDay + "/" + hwDuedateYr )
+            intent.putExtra("popupduedate", "Due Date: " + hwDuedateMonth + "/" + hwDuedateDay + "/" + hwDuedateYr)
             intent.putExtra("popupbtn", "Ok")
             intent.putExtra("darkstatusbar", false)
             startActivity(intent)
         }
-    }
 
-    // Network connection detector
-    override fun onResume() {
-        super.onResume()
-        networkMonitor.register()
-    }
-
-    // Network connection detector
-    override fun onStop() {
-        super.onStop()
-        networkMonitor.unregister()
     }
 }
-
-
 
