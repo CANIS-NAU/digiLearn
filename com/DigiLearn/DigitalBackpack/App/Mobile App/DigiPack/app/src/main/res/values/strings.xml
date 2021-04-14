@@ -13,6 +13,7 @@
         <!--File name strings-->
         <string name="fileList">fileList.json</string>
         <string name="classList">classList.json</string>
+    <string name="searchList">searchList.json</string>
 
 
     <!--Integers-->

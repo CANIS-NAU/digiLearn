@@ -21,7 +21,14 @@ import java.lang.Exception
 class gClassActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_gclass)
+
+        val ui = intent.getBooleanExtra("uiSelect", false)
+
+        if(ui){
+            setContentView(R.layout.activity_kid_glcass)
+        }else{
+            setContentView(R.layout.activity_gclass)
+        }
 
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>Classroom</font>")
@@ -34,14 +41,15 @@ class gClassActivity : AppCompatActivity(){
 
         var courselist = classlist.Courses
         if(courselist != null){
-            write_to_ui_and_listen(guser, courselist)
+            write_to_ui_and_listen(guser, courselist, ui)
         }
     }
 
-    fun write_to_ui_and_listen(guser: GUser, cl: ArrayList<DigiClass.Course>){
+    fun write_to_ui_and_listen(guser: GUser, cl: ArrayList<DigiClass.Course>, ui : Boolean){
         try{
             var courseDetails = Intent(this, courseDetailsActivity::class.java)
             courseDetails.putExtra("guser", guser)
+            courseDetails.putExtra("uiSelect", ui)
             var classnames = ArrayList<String>()
             for( i in cl){
                 i.name?.let { classnames.add(it) }

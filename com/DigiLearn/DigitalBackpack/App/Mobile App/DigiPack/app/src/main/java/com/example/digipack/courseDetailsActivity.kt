@@ -27,7 +27,14 @@ class courseDetailsActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_course_details)
+
+        val ui = intent.getBooleanExtra("uiSelect", false)
+        if(ui){
+            setContentView(R.layout.activity_kid_course_details)
+        }else{
+            setContentView(R.layout.activity_course_details)
+        }
+
 
         //unpack intent to get course data
         var course = intent.getSerializableExtra("course") as DigiClass.Course

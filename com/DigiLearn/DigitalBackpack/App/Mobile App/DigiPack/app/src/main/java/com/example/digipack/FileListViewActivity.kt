@@ -38,19 +38,24 @@ const val PICK_PDF_FILE = 2
 class FileListViewActivity : AppCompatActivity() {
 
     var url : String = ""
-    lateinit var email : String
 
     // Call the network detector tool
     private val networkMonitor = networkDetectorTool(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_file_list_view)
+        val ui = intent.getBooleanExtra("uiSelect", false)
+
+        if(ui){
+            //kids interface
+            setContentView(R.layout.activity_kid_file_page)
+        }else{
+            setContentView(R.layout.activity_file_list_view)
+        }
 
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>Files</font>")
 
-        var files = ArrayList<DigiDrive.DigiFile>()
         var queue = RequestQueueSingleton.getInstance(this.applicationContext)
         var context: Context = this
 
