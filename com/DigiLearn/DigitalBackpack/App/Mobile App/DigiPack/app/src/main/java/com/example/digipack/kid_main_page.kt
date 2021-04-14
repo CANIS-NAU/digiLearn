@@ -59,7 +59,7 @@ class kid_main_page : AppCompatActivity() {
                             ConnectionType.Wifi, ConnectionType.Cellular  -> {
                                 clouds.setImageResource(R.drawable.sun_connection)
                                 //internet_connection.text = "Wifi Connection"
-                                buildActivitiesFromCache(guser)
+                                //buildActivitiesFromCache(guser)
                                 connectToServer(guser)
                             }
                             else -> { }

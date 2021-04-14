@@ -60,7 +60,7 @@ class DetailsActivity : AppCompatActivity() {
                             ConnectionType.Wifi, ConnectionType.Cellular  -> {
                                 clouds.setImageResource(R.drawable.sun_connection)
                                 //internet_connection.text = "Wifi Connection"
-                                buildActivitiesFromCache(guser)
+                                //buildActivitiesFromCache(guser)
                                 connectToServer(guser)
                             }
                             else -> { }
@@ -169,6 +169,7 @@ class DetailsActivity : AppCompatActivity() {
     private fun connectToServer(guser: GUser){
         //need to add something in here to check the server if theres new content and if so then
         //run all the other methods again and reinitialize the intents
+        println("Connect to server entered")
         val fso = intent.getBooleanExtra("firstSignIn", true)
         if(fso){
             serverAuth(guser)
