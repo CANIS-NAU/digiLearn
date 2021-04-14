@@ -45,7 +45,7 @@ class kids_gDriveFileActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_kid_file_page)
+
 
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>Files</font>")

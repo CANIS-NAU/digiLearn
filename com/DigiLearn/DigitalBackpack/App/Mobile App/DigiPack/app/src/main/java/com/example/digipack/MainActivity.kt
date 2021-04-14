@@ -159,18 +159,7 @@ class MainActivity : AppCompatActivity() {
             val guser = GUser( googleId, googleFirstName, googleLastName, googleEmail, authCode, idToken )
             myIntent.putExtra("guser", guser)
 
-            //check if silent sign in
-            if(resultCode == IMPLICIT_SIGN_IN)
-            {
-                //then record NOT first sign in
-                myIntent.putExtra("firstSignIn", false)
-            }
-            //else check if explicit sign in
-            else if( resultCode == EXPLICIT_SIGN_IN)
-            {
-                //then record as first sign in
-                myIntent.putExtra("firstSignIn", true)
-            }
+            myIntent.putExtra("firstSignIn", resultCode == EXPLICIT_SIGN_IN)
 
             this.startActivity(myIntent)
 
