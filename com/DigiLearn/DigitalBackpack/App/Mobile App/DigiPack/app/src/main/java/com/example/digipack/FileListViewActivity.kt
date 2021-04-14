@@ -28,6 +28,7 @@ import java.io.IOException
 import DigiJson.DigiDrive
 import DigiJson.DigiUser
 import DigiJson.GUserJson.GUser
+import android.graphics.Color
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -168,6 +169,7 @@ class FileListViewActivity : AppCompatActivity() {
 
             json_info.adapter = adapterView
 
+
             // Creates an onclick listener when the user clicks on the driveID that would be referenced to driveID
             json_info.onItemClickListener = AdapterView.OnItemClickListener{ parent, view, position, id->
                 //position is the index of the list item that corresponds to the button clicked
@@ -188,7 +190,7 @@ class FileListViewActivity : AppCompatActivity() {
 
 
         val reqMethodCode = Request.Method.GET
-        val getFileUrl = getString(R.string.serverUrl).plus("sd/${guser.authCode}/${fileid}")
+        val getFileUrl = getString(R.string.serverUrl).plus("sd/${guser.idToken}/${fileid}")
         val juser = DigiUser.Jsuser(guser.firstName, guser.email, guser.userID)
         val request = JSONObject( Json.encodeToString(juser) )
 

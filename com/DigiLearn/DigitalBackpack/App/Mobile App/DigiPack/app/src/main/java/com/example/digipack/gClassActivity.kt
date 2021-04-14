@@ -22,6 +22,7 @@ class gClassActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Determines what UI to show to the user
         val ui = intent.getBooleanExtra("ui", false)
         if(ui){
             setContentView(R.layout.activity_kid_glcass)
@@ -31,7 +32,6 @@ class gClassActivity : AppCompatActivity(){
 
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>Classroom</font>")
-
 
         var guser = intent.getSerializableExtra("guser") as GUser
         var classlist = intent.getSerializableExtra("courselist") as DigiClass.CourseList

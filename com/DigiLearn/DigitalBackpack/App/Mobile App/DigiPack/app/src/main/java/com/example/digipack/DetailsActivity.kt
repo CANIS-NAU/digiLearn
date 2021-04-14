@@ -43,6 +43,7 @@ class DetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val ui = intent.getBooleanExtra("ui", false)
 
+        // Determines what UI to show to the user
         if(ui){
             setContentView(R.layout.activity_kid_main_page)
         }else{
