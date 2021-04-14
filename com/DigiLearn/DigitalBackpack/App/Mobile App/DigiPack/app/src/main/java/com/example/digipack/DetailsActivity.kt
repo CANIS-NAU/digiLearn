@@ -1,5 +1,4 @@
-package com.example.digipack
-
+ package com.example.digipack
 
 
 import DigiJson.DigiClass
@@ -21,12 +20,14 @@ import com.android.volley.toolbox.JsonObjectRequest
 import kotlinx.android.synthetic.main.activity_details.clouds
 import kotlinx.android.synthetic.main.activity_details.google_first_name_textview
 import kotlinx.android.synthetic.main.activity_kid_main_page.*
+import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.json.JSONException
 import org.json.JSONObject
 
+ 
 class DetailsActivity : AppCompatActivity() {
 
     // Call the network detector tool
@@ -36,6 +37,8 @@ class DetailsActivity : AppCompatActivity() {
     private lateinit var flintent : Intent
     private lateinit var gclassIntent : Intent
     private lateinit var gsearchIntent : Intent
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -179,12 +182,14 @@ class DetailsActivity : AppCompatActivity() {
         val googleEmail = guser.email
         val googleAccessToken = guser.authCode
 
+        println( googleAccessToken?:"")
         // For the debug
         //val mptv = findViewById<TextView>(R.id.mptext)
 
         val authurl = "auth/"
         val queue = RequestQueueSingleton.getInstance(this.applicationContext)
         val tok = Json.encodeToString(DigiUser.JsauthTok(googleAccessToken, googleEmail))
+        println( tok?:"")
         val jsobtok = JSONObject(tok)
 
         val request = JsonObjectRequest(Request.Method.POST, getString(R.string.serverUrl).plus(authurl), jsobtok,
@@ -206,6 +211,7 @@ class DetailsActivity : AppCompatActivity() {
     private fun connectToServer(guser: GUser, ui: Boolean){
         //need to add something in here to check the server if theres new content and if so then
         //run all the other methods again and reinitialize the intents
+        println("Connect to server entered")
         val fso = intent.getBooleanExtra("firstSignIn", true)
         if(fso){
             serverAuth(guser)
@@ -258,26 +264,35 @@ class DetailsActivity : AppCompatActivity() {
                 Log.i(getString(R.string.app_name), "Details_act: classIntent already initialized")
             }
             else -> {
-                val classlisturl = "gclass/${guser.authCode}"
+                val classlisturl = "gclass/${guser.idToken}"
                 val queue = RequestQueueSingleton.getInstance(this.applicationContext)
-                val user = DigiUser.Jsuser(guser.firstName, guser.email, guser.authCode)
+                val user = DigiUser.Jsuser(guser.firstName, guser.email, guser.idToken)
                 val jsuserobj = JSONObject(Json.encodeToString(user))
-                //var gcresp = JSONObject("{Result:noACK}")
+                println("juser "+ jsuserobj)
+                var gcresp = JSONObject("{Result:noACK}")
+              
                 val gclassRequest = JsonObjectRequest(Request.Method.GET, getString(R.string.serverUrl).plus(classlisturl), jsuserobj,
                         { classresp ->
                             try{
-                                //get json response as string, pass to CacheUtility
-                                val cacheManager = CacheUtility()
-                                val classjson : DigiClass.CourseList = Json.decodeFromString(classresp.toString())
+                                if(gcresp == JSONObject("{Result:noACK}"))
+                                {
+                                    Toast.makeText(applicationContext, "noACK for getClassList", Toast.LENGTH_SHORT).show()
+                                }
+                                else
+                                {
+                                    //get json response as string, pass to CacheUtility
+                                    val cacheManager = CacheUtility()
+                                    val classjson : DigiClass.CourseList = Json.decodeFromString(gcresp.toString())
 
-                                cacheManager.cacheString(classresp.toString(), getString(R.string.classList), this)
+                                    cacheManager.cacheString(classresp.toString(), getString(R.string.classList), this)
 
-                                //build gclassIntent
-                                gclassIntent = Intent(this, gClassActivity::class.java)
-                                Log.i(getString(R.string.app_name), "in details act/getClassList, %s".format(classresp.toString()))
-                                gclassIntent.putExtra("courselist", classjson)
-                                gclassIntent.putExtra("guser", guser)
-                                gclassIntent.putExtra("uiSelect", ui)
+                                    //build gclassIntent
+                                    gclassIntent = Intent(this, gClassActivity::class.java)
+                                    Log.i(getString(R.string.app_name), "in details act/getClassList, %s".format(gcresp.toString()))
+                                    gclassIntent.putExtra("courselist", classjson)
+                                    gclassIntent.putExtra("guser", guser)
+                                    gclassIntent.putExtra("uiSelect", ui)
+                                }
                             }catch(e: JSONException){
                                 Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
                             }
@@ -301,24 +316,31 @@ class DetailsActivity : AppCompatActivity() {
                 Log.i(getString(R.string.app_name), "Details_act: flintent already initialized")
             }
             else -> {
-                val drivelisturl = "drive/${guser.email}"
+                val drivelisturl = "drive/${guser.idToken}"
                 val queue = RequestQueueSingleton.getInstance(this.applicationContext)
-                val user = DigiUser.Jsuser(guser.firstName, guser.email, guser.userID)
+                val user = DigiUser.Jsuser(guser.firstName, guser.email, guser.idToken)
                 val jsuserobj = JSONObject(Json.encodeToString(user))
                 //var filelistResp = JSONObject("{Result:noACK}")
                 val filelistRequest = JsonObjectRequest(Request.Method.GET, getString(R.string.serverUrl).plus(drivelisturl), jsuserobj,
                         { flresponse ->
                             try{
-                                val cacheManager = CacheUtility()
-                                val filelist : DigiDrive.DF = Json.decodeFromString(flresponse.toString())
-                                cacheManager.cacheString(flresponse.toString(), getString(R.string.fileList), this)
+                                if(filelistResp == JSONObject("{Result:noACK}"))
+                                {
+                                    Toast.makeText(applicationContext, "noACK for getFileList", Toast.LENGTH_SHORT).show()
+                                }
+                                else
+                                {
+                                    val cacheManager = CacheUtility()
+                                    val filelist : DigiDrive.DF = Json.decodeFromString(flresponse.toString())
+                                    cacheManager.cacheString(flresponse.toString(), getString(R.string.fileList), this)
 
-                                flintent = Intent(this, FileListViewActivity::class.java)
-                                Log.i(getString(R.string.app_name), "in details act/getFileList, %s".format(flresponse.toString()))
+                                    flintent = Intent(this, FileListViewActivity::class.java)
+                                    Log.i(getString(R.string.app_name), "in details act/getFileList, %s".format(flresponse.toString()))
 
-                                flintent.putExtra("filelist", filelist)
-                                flintent.putExtra("guser", guser)
-                                flintent.putExtra("uiSelect", ui)
+                                    flintent.putExtra("filelist", filelist)
+                                    flintent.putExtra("guser", guser)
+                                    flintent.putExtra("uiSelect", ui)
+                                }
 
                             }catch(e: JSONException){
                                 Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
@@ -347,17 +369,16 @@ class DetailsActivity : AppCompatActivity() {
         val searchData = cacheManager.getStringFromCache(  getString(R.string.searchList), this)
 
 
-        /**
-         * Build Google Drive intent
-         */
-
+        //Build Google Drive intent
         //if empty string, no data available
         if( fileData == "")
         {
             //notify user of service disruption
             Toast.makeText(this,
-                "No internet or cached data: Google Drive will be unavailable.",
-                Toast.LENGTH_LONG).show()
+            "No internet or cached data: Google Drive will be unavailable.",
+            Toast.LENGTH_LONG).show()
+            
+
         }
 
         //else data available
@@ -378,7 +399,6 @@ class DetailsActivity : AppCompatActivity() {
             }
             */
         }
-
         /**
          * Build Google Class intent
          */
@@ -419,8 +439,6 @@ class DetailsActivity : AppCompatActivity() {
             gsearchIntent.putExtra("resultslist", searchData)
             gsearchIntent.putExtra("guser", guser)
         }
-
-
     }
 
     // Network connection detector
