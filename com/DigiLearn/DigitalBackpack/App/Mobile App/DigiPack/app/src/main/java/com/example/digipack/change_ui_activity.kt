@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import kotlinx.android.synthetic.main.activity_details.*
 
 class change_ui_activity : AppCompatActivity(){
@@ -15,6 +16,7 @@ class change_ui_activity : AppCompatActivity(){
 
         val guser = intent.getSerializableExtra("guser") as GUser
         val fso = intent.getBooleanExtra("firstSignIn", true)
+        val account = GoogleSignIn.getLastSignedInAccount(this)
         google_first_name_textview.text = guser.firstName
 
         // Looking for the file button connection
@@ -23,40 +25,22 @@ class change_ui_activity : AppCompatActivity(){
 
 
         kidUIBttn.setOnClickListener{
-            //get the account the user signed in with
-            val account = GoogleSignIn.getLastSignedInAccount(this)
-
-            //if the user already signed in
-            if(account != null )
-            {
-
-                //construct and start intent for Details activity
-                val myIntent = Intent(this, kid_main_page::class.java)
-
-                myIntent.putExtra("guser", guser)
-                myIntent.putExtra("firstSignIn", fso)
-                myIntent.putExtra("uiSelect", false)
-
-                this.startActivity(myIntent)
-            }
+            onclick(guser, true, fso)
         }
 
         youngAdultBttn.setOnClickListener{
-            //get the account the user signed in with
-            val account = GoogleSignIn.getLastSignedInAccount(this)
-
-            //if the user already signed in
-            if(account != null )
-            {
-                //construct and start intent for Details activity
-                val myIntent = Intent(this, DetailsActivity::class.java)
-
-                myIntent.putExtra("guser", guser)
-                myIntent.putExtra("firstSignIn", fso)
-                myIntent.putExtra("uiSelect", true)
-                this.startActivity(myIntent)
-            }
+            onclick(guser, false, fso)
         }
+    }
 
+    private fun onclick(guser: GUser, ui: Boolean, fso: Boolean){
+        //construct and start intent for Details activity
+        val myIntent = Intent(this, DetailsActivity::class.java)
+
+        myIntent.putExtra("guser", guser)
+        myIntent.putExtra("firstSignIn", fso)
+        myIntent.putExtra("ui", ui)
+
+        this.startActivity(myIntent)
     }
 }

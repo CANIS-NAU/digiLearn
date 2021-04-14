@@ -21,11 +21,17 @@ import java.lang.Exception
 class gClassActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_gclass)
+
+        // Determines what UI to show to the user
+        val ui = intent.getBooleanExtra("ui", false)
+        if(ui){
+            setContentView(R.layout.activity_kid_glcass)
+        }else{
+            setContentView(R.layout.activity_gclass)
+        }
 
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>Classroom</font>")
-
 
         var guser = intent.getSerializableExtra("guser") as GUser
         var classlist = intent.getSerializableExtra("courselist") as DigiClass.CourseList
@@ -34,11 +40,11 @@ class gClassActivity : AppCompatActivity(){
 
         var courselist = classlist.Courses
         if(courselist != null){
-            write_to_ui_and_listen(guser, courselist)
+            write_to_ui_and_listen(guser, ui, courselist)
         }
     }
 
-    fun write_to_ui_and_listen(guser: GUser, cl: ArrayList<DigiClass.Course>){
+    fun write_to_ui_and_listen(guser: GUser, ui: Boolean ,cl: ArrayList<DigiClass.Course>){
         try{
             var courseDetails = Intent(this, courseDetailsActivity::class.java)
             courseDetails.putExtra("guser", guser)
@@ -55,6 +61,7 @@ class gClassActivity : AppCompatActivity(){
 
                 var course = cl[position]
                 courseDetails.putExtra("course", course)
+                courseDetails.putExtra("ui", ui)
                 this.startActivity(courseDetails)
             }
         }catch(e: IOException) {

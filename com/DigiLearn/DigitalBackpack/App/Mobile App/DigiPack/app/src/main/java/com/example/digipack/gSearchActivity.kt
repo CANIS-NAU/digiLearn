@@ -7,7 +7,14 @@ import androidx.appcompat.app.AppCompatActivity
 class gSearchActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_gsearch)
+        val ui = intent.getBooleanExtra("ui", false)
+
+        // Determines what UI to show to the user
+        if(ui){
+            setContentView(R.layout.activity_kid_glcass)
+        }else{
+            setContentView(R.layout.activity_gclass)
+        }
 
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>Search</font>")

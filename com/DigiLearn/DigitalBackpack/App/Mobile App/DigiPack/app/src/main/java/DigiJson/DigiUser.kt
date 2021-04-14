@@ -11,8 +11,8 @@ class DigiUser {
         var userName: String? = null,
         @SerializedName("googleEmail")
         var email: String? = null,
-        @SerializedName("googleId")
-        var gid: String? = null
+        @SerializedName("googleIdTok")
+        var idToken: String? = null
     ) : java.io.Serializable
 
     @Serializable
