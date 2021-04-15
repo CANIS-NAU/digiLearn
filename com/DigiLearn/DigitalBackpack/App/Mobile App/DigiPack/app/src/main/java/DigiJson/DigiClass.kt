@@ -58,10 +58,10 @@ class DigiClass {
         var worktype: String? = null,
         //this one idk ill have to check my code
             @SerializedName("details")
-        var details: String? = null,
-            var assigneemode: String? = null,
-            var students: ArrayList<String>?,
-            var maxPoints: Int? = null
+        var details: multchoice? = null,
+        var assigneemode: String? = null,
+        var students: ArrayList<String>?,
+        var maxPoints: Int? = null
     ) : java.io.Serializable
 
     @Serializable
@@ -98,5 +98,10 @@ class DigiClass {
         var hours: Int? = null,
         @SerializedName("minutes")
         var minutes: Int? = null
+    ) : java.io.Serializable
+
+    @Serializable
+    data class multchoice(
+            var choices: ArrayList<String>?
     ) : java.io.Serializable
 }

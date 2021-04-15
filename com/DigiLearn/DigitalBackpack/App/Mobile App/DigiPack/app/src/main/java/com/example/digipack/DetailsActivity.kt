@@ -240,7 +240,7 @@ class DetailsActivity : AppCompatActivity() {
                                 }else{
                                     //get json response as string, pass to CacheUtility
                                     val cacheManager = CacheUtility()
-                                    val searchJson : DigiSearch.DigiRes = Json.decodeFromString(gsresp.toString())
+                                    val searchJson : DigiSearch.DigiRes = Json{isLenient = true}.decodeFromString(gsresp.toString())
 
                                     cacheManager.cacheString(gsresp.toString(), getString(R.string.searchList), this)
                                     gsearchIntent = Intent(this, gSearchActivity::class.java)
@@ -283,7 +283,7 @@ class DetailsActivity : AppCompatActivity() {
                                 {
                                     //get json response as string, pass to CacheUtility
                                     val cacheManager = CacheUtility()
-                                    val classjson : DigiClass.CourseList = Json.decodeFromString(gcresp.toString())
+                                    val classjson : DigiClass.CourseList = Json{isLenient = true}.decodeFromString(gcresp.toString())
 
                                     cacheManager.cacheString(classresp.toString(), getString(R.string.classList), this)
 
@@ -332,7 +332,7 @@ class DetailsActivity : AppCompatActivity() {
                                 else
                                 {
                                     val cacheManager = CacheUtility()
-                                    val filelist : DigiDrive.DF = Json.decodeFromString(flresponse.toString())
+                                    val filelist : DigiDrive.DF = Json{isLenient = true}.decodeFromString(flresponse.toString())
                                     cacheManager.cacheString(flresponse.toString(), getString(R.string.fileList), this)
 
                                     flintent = Intent(this, FileListViewActivity::class.java)
@@ -382,7 +382,7 @@ class DetailsActivity : AppCompatActivity() {
         //else data available
         else {
             //assemble as json object
-            val fileList : DigiDrive.DF = Json.decodeFromString(fileData)
+            val fileList : DigiDrive.DF = Json{isLenient = true}.decodeFromString(fileData)
 
             //set call activity intent
             flintent = Intent(this, FileListViewActivity::class.java)
@@ -414,7 +414,7 @@ class DetailsActivity : AppCompatActivity() {
         else {
             println("CLASS DATA ELSE ENTERED")
             //assemble as json object
-            val classData : DigiClass.CourseList = Json.decodeFromString(classData)
+            val classData : DigiClass.CourseList = Json{isLenient = true}.decodeFromString(classData)
 
             //set call activity intent
             gclassIntent = Intent(this, gClassActivity::class.java)
@@ -429,7 +429,7 @@ class DetailsActivity : AppCompatActivity() {
                     Toast.LENGTH_LONG).show()
         }
         else{
-            val searchData : DigiSearch.DigiRes = Json.decodeFromString(searchData)
+            val searchData : DigiSearch.DigiRes = Json{isLenient = true}.decodeFromString(searchData)
             gsearchIntent = Intent(this, gSearchActivity::class.java)
             gsearchIntent.putExtra("courselist", searchData)
             gsearchIntent.putExtra("guser", guser)
