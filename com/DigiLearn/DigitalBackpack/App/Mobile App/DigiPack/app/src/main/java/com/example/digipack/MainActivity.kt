@@ -23,109 +23,42 @@ private const val IMPLICIT_SIGN_IN = 202
 
 class MainActivity : AppCompatActivity() {
 
-    private val networkMonitor = networkDetectorTool(this)
     lateinit var mGoogleSignInClient: GoogleSignInClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Calls the network detector class
-        networkMonitor.result = { isAvailable, type ->
-            runOnUiThread {
-                when (isAvailable) {
-                    true -> {
-                        when (type) {
 
-                            ConnectionType.Wifi, ConnectionType.Cellular -> {
-                                //case internet available
-                                //initialize google sign in object
-                                val gso =
-                                    GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                                        .requestEmail()
-                                        .requestIdToken(getString(R.string.serverClientId))
-                                        .requestScopes(
-                                            Scope(Scopes.DRIVE_FULL),
-                                            Scope("https://www.googleapis.com/auth/classroom.courses"),
-                                            Scope("https://www.googleapis.com/auth/classroom.coursework.me"),
-                                            Scope("https://www.googleapis.com/auth/classroom.announcements"),
-                                            Scope("https://www.googleapis.com/auth/classroom.guardianlinks.me.readonly")
-                                        )
-                                        .requestServerAuthCode(getString(R.string.serverClientId))
-                                        .build()
+        //initialize google sign in object
+        val gso =
+                GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestEmail()
+                        .requestIdToken(getString(R.string.serverClientId))
+                        .requestScopes(Scope(Scopes.DRIVE_FULL),
+                                Scope("https://www.googleapis.com/auth/classroom.courses"),
+                                Scope("https://www.googleapis.com/auth/classroom.coursework.me"),
+                                Scope("https://www.googleapis.com/auth/classroom.announcements"),
+                                Scope("https://www.googleapis.com/auth/classroom.guardianlinks.me.readonly"))
+                        .requestServerAuthCode(getString(R.string.serverClientId))
+                        .build()
 
-                                mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
 
-                                google_sign_in_button.setOnClickListener {
-                                    signIn()
-                                }
-
-                                //silent sign in operation gets new id token
-                                mGoogleSignInClient.silentSignIn()
-                                    .addOnCompleteListener(this) { task ->
-                                        handleSignInResult(
-                                            task,
-                                            IMPLICIT_SIGN_IN
-                                        )
-                                    }
-
-                            }
-                            else -> {
-                            }
-                        }
-                    }
-                    false -> {
-                        //case no internet
-                            //get latest signing
-                            val userAccount = GoogleSignIn.getLastSignedInAccount(this)
-                        // Signed in successfully, extract progile information
-                        val googleId = userAccount?.id ?: ""
-                        Log.i("Google ID", googleId)
-
-                        val googleFirstName = userAccount?.givenName ?: ""
-                        Log.i("Google First Name", googleFirstName)
-
-                        val googleLastName = userAccount?.familyName ?: ""
-                        Log.i("Google Last Name", googleLastName)
-
-                        val googleEmail = userAccount?.email ?: ""
-                        Log.i("Google Email", googleEmail)
-
-                        val idToken = userAccount?.idToken ?: ""
-                        Log.i("Google ID Token", idToken)
-                        println("Google idToken " + idToken)
-
-                        val authCode = userAccount?.serverAuthCode ?: "" //auth code used for registration with server
-                        Log.i("Google Auth Code", authCode)
-
-                        // construct and launch an intent for DetailsActivity
-                        val myIntent = Intent(this, change_ui_activity::class.java)
-                        val guser = GUser(
-                            googleId,
-                            googleFirstName,
-                            googleLastName,
-                            googleEmail,
-                            authCode,
-                            idToken
-                        )
-                        myIntent.putExtra("guser", guser)
-
-                        myIntent.putExtra("firstSignIn", false)
-
-                        this.startActivity(myIntent)
-
-                    }
-                }
-            }
+        google_sign_in_button.setOnClickListener {
+            signIn()
         }
-    }
 
+        //silent sign in operation gets new id token
+        mGoogleSignInClient.silentSignIn()
+                .addOnCompleteListener( this) { task -> handleSignInResult(task, IMPLICIT_SIGN_IN) }
+    }
 
         //sign in function for the google sign in button
     private fun signIn() {
         val userSignInIntent = mGoogleSignInClient.signInIntent
         startActivityForResult(
-            userSignInIntent, RC_SIGN_IN //Passes result to onActivityResult
+                userSignInIntent, RC_SIGN_IN //Passes result to onActivityResult
         )
     }
 
@@ -146,7 +79,7 @@ class MainActivity : AppCompatActivity() {
         try {
             println("handle sign in entered")
             val userAccount = completedTask.getResult(
-                ApiException::class.java
+                    ApiException::class.java
             )
             println("user account value obtained")
 
@@ -172,14 +105,7 @@ class MainActivity : AppCompatActivity() {
 
             // construct and launch an intent for DetailsActivity
             val myIntent = Intent(this, change_ui_activity::class.java)
-            val guser = GUser(
-                googleId,
-                googleFirstName,
-                googleLastName,
-                googleEmail,
-                authCode,
-                idToken
-            )
+            val guser = GUser( googleId, googleFirstName, googleLastName, googleEmail, authCode, idToken )
             myIntent.putExtra("guser", guser)
 
             myIntent.putExtra("firstSignIn", resultCode == EXPLICIT_SIGN_IN)
@@ -189,20 +115,9 @@ class MainActivity : AppCompatActivity() {
         } catch (e: ApiException) {
             // Checks if the sign in is unsuccessful, if not then throws an error code
             Log.e(
-                "failed code=", e.statusCode.toString()
+                    "failed code=", e.statusCode.toString()
             )
         }
     }
 
-    // Network connection detector
-    override fun onResume() {
-        super.onResume()
-        networkMonitor.register()
-    }
-
-    // Network connection detector
-    override fun onStop() {
-        super.onStop()
-        networkMonitor.unregister()
-    }
 }

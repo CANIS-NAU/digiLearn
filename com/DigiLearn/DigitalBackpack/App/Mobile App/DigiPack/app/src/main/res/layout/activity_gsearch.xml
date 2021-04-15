@@ -9,17 +9,31 @@
     tools:context=".gSearchActivity">
 
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="242dp"
-        android:layout_height="66dp"
-        android:gravity="center"
-        android:text="Under construction :("
-        android:textColor="@color/gray_white"
+    <Button
+        android:id="@+id/doSearch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Search"
+        android:background="@drawable/button_layout"
+        android:textColor="@color/nau_blue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.452" />
+        app:layout_constraintVertical_bias="0.273" />
+
+    <Button
+        android:id="@+id/searchHistory"
+        android:layout_width="155dp"
+        android:layout_height="56dp"
+        android:background="@drawable/button_layout"
+        android:text="Search History"
+        android:textColor="@color/nau_blue"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.458" />
 </androidx.constraintlayout.widget.ConstraintLayout>

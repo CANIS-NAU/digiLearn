@@ -29,6 +29,8 @@
                   android:theme="@style/Theme.AppCompat.Light"></activity>
         <activity android:name=".popUp"></activity>
         <activity android:name=".change_ui_activity"></activity>
+        <activity android:name=".searchHistoryActivity"></activity>
+        <activity android:name=".searchQueActivity"></activity>
 
 
         <activity android:name=".MainActivity"

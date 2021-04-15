@@ -38,6 +38,7 @@ class DetailsActivity : AppCompatActivity() {
     private lateinit var flintent : Intent
     private lateinit var gclassIntent : Intent
     private lateinit var gsearchIntent : Intent
+    private lateinit var gsearchNextPage: Intent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +50,9 @@ class DetailsActivity : AppCompatActivity() {
         }else{
             setContentView(R.layout.activity_details)
         }
+
+        // Search page
+        gsearchNextPage = Intent(this, gSearchActivity::class.java)
 
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>DigiPack</font>");
@@ -108,7 +112,7 @@ class DetailsActivity : AppCompatActivity() {
         // GSearch Button
         googleSearchBtn?.setOnClickListener{
             when{
-                this::gsearchIntent.isInitialized -> startActivity(gsearchIntent)
+                this::gsearchNextPage.isInitialized -> startActivity(gsearchNextPage)
                 else ->{
                     Toast.makeText(this, "Google Search not available, check again later", Toast.LENGTH_SHORT).show()
                 }
@@ -163,7 +167,7 @@ class DetailsActivity : AppCompatActivity() {
             //Toast.makeText(this, "Google Search Clicked", Toast.LENGTH_LONG).show()
             // Go to GSearch Page
             when{
-                this::gsearchIntent.isInitialized -> startActivity(gsearchIntent)
+                this::gsearchNextPage.isInitialized -> startActivity(gsearchNextPage)
             }
 
             return true
@@ -171,7 +175,6 @@ class DetailsActivity : AppCompatActivity() {
 
         return super.onOptionsItemSelected(item)
     }
-
 
     //serverAuth handles initial sign-in authentication with the server.
     private fun serverAuth(guser: GUser){
@@ -214,7 +217,7 @@ class DetailsActivity : AppCompatActivity() {
 
         getFileList(guser, ui)
         getClassList(guser, ui)
-        //getSearchList(guser)
+        //getSearchList(guser, ui)
     }
 
     private fun getSearchList(guser: GUser, ui: Boolean){
