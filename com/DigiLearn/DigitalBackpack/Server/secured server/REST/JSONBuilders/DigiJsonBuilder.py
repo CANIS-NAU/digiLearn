@@ -181,3 +181,12 @@ def create_session( sessionid, sessionsignal, sessionstart, newrequests, newsinc
             "newrequests": newrequests,
             "newsincelast": newsincelast}
 
+
+def create_modifiers( whitesite, blacksite, whiteterms, blackterms, topic):
+    return {
+        "whitesite": whitesite,
+        "blacksite": blacksite,
+        "whiteterms": whiteterms,
+        "blackterms": blackterms,
+        "topic": topic
+    }

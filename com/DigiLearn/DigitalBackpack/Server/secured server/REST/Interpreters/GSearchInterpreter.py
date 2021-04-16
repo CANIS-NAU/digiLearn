@@ -7,8 +7,10 @@ API_KEY = "API KEY FOR DIGIPACK API"
 PARAMS = {}
 
 
-def make_request(query):
+def make_request(query, modifiers):
+
     resultsarr = []
+    query = append_modifiers(query, modifiers)
     # build query url
     u = URL + "key=" + API_KEY + "&cx=" + ENGINE_ID + "&q=" + query
     # make request
@@ -32,11 +34,31 @@ def make_request(query):
     return resultsarr
 
 
-def submit_queries(queries):
+def submit_queries(queries, modifiers):
     resultsArr = []
 
     for query in queries:
-        r = make_request(query)
+        r = make_request(query, modifiers)
         results = DigiJsonBuilder.create_results(query, False, len(r), r)
         resultsArr.append(results)
     return resultsArr
+
+
+def append_modifiers(query, modifiers):
+    minsite = " -site:"
+    bs = modifiers["blacksite"]
+    bt = modifiers["blackterms"]
+
+    bsstr = ""
+    for site in bs:
+        bsstr = bsstr + minsite + site
+    print(bsstr)
+
+    btstr = ""
+    for term in bt:
+        btstr = btstr + ' -"' + term + '"'
+    print(btstr)
+
+    newquery = query + bsstr + btstr
+
+    return newquery

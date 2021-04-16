@@ -1,6 +1,7 @@
 import json
 from REST.Interfaces.GoogleInterface import create_service
 from REST.JSONBuilders import DigiJsonBuilder
+from REST.JSONBuilders import GDriveJsonBuilder
 
 _API_NAME = 'classroom'
 _API_VERSION = 'v1'
@@ -96,6 +97,30 @@ def get_materials(user_auth, user_email, course_id, coursework_id, ser=None):
     cw = service.courses().courseWork().get(courseId=course_id, id=coursework_id).execute()
     matlist = _get_materials_from_json(cw)
     return matlist
+
+def submit_assignment(user_auth, user_email, course_id, submission, coursework_id, ser=None):
+    # assumes submission is json object from DigiJsonBuilder.create_file()
+    service = create_service(user_auth, _API_NAME, _API_VERSION, _SCOPES, user_email=user_email) if ser == None else ser
+    # user_email is their ID
+
+    # as user fins the student submission object
+    usl = service.courseWork().studentSubmissions().list(courseId=course_id, courseWorkId=coursework_id, userId='me').execute()
+    us = usl['studentSubmissions'][0]
+    subid = us['id']
+
+    # as user attach submission
+    attach = GDriveJsonBuilder.add_file_attachment(submission['driveID'])
+    umod = service.courseWork().studentSubmissions().modifyAttachments(
+        courseId=course_id, courseWorkId=coursework_id, id=subid, body=attach
+    ).execute()
+
+    # if attachment was successful (we just assume this cause digilearn babyy)
+    # submit assignment
+    sub = service.courseWork().studentSubmissions().turnIn( courseId=course_id, courseWorkId=coursework_id,
+                                                            id=subid).execute()
+    return sub
+
+
 
 
 def _get_materials_from_json(mat):
