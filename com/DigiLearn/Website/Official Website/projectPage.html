@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+
+.logo-image{
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-top: -6px;
+}
+</style>
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>DigiLearn: Project</title>
+  <link rel="shortcut icon" type="image/x-icon" href="digiPackLogoWhite.png" />
+  <!-- Bootstrap core CSS -->
+  <link href="pages_vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <div class="logo-image">
+     <img src="digiLearnLogo.jpg" class="img-fluid">
+        </div>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item ">
+            <a class="nav-link" href="index.html">Home
+            </a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="projectPage.html">Project</a>
+              <span class="sr-only">(current)</span>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="technologyPage.html">Technology</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="schedulePage.html">Schedule</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  
+  <!-- Header -->
+  <header class="bg-primary py-5 mb-5">
+    <div class="container h-100">
+      <div class="row h-100 align-items-center">
+        <div class="col-lg-12">
+          <h1 class="display-4 text-white mt-5 mb-2"> The Digital Backpack</h1>
+          <p class="lead mb-5 text-white-50">
+              The Digital Backpack repository can be found  
+              <a href="https://github.com/Krstne/digiLearn" style="color: white">here.
+              </a><br>
+              The initial concept for this project was provided by our sponsor
+               <a href="Vigil-Hayes_DigiPack.pdf" style="color: white">here.</a>
+              
+          </p>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  
+  <!-- Page Content -->
+  
+      <div class="container">
+      <div class="row">
+      <div class="col-md-6 mb-5">
+        <h2>Easy Access to Crucial Materials</h2>
+              At the heart of the Digital Backpack is an innovation on network 
+              architecture; the DigiPack provides an opportunistic Content Delivery
+              Network, or oCDN, for educational materials. This oCDN, made possible
+              by the DigiPack proxy server, provides easy-access to essential
+              scholastic materials.
+              <br><br>
+              The DigiPack relies on Google's API to provide access to materials
+              stored on a student's Google Drive, assignments found in Google
+              Classroom, and even materials from the wider web through Google
+              Search. As such, signing up the the Digital Backpack is as easy as
+              signing in with your Google account.
+              <br><br>
+              Once signed in, active internet is no longer required for the DigiPack
+              to function. Whenever a connection is available, the DigiPack will 
+              automatically contact the proxy server to download the latest materials
+              which are then cached locally for offline use.
+      </div>
+      <div class="col-md-3 mb-5">
+          
+          <img src="signIn.jpg" class="img-fluid" alt='App Sign in'>
+      </div>      
+      <div class="col-md-3 mb-5">
+          <img src="mainPage.jpg" class="img-fluid" alt='App main page'>
+      </div>
+    </div>
+          
+          
+    <br><br><br>
+    <div class="row">
+        <div class="col-md-3 mb-5">
+          
+          <img src="coursePage.jpg" class="img-fluid" alt='App course page'>
+      </div>      
+      <div class="col-md-3 mb-5">
+          <img src="drivePage.jpg" class="img-fluid" alt='App drive page'>
+      </div>
+      <div class="col-md-6 mb-5">
+        <h2>Tools to Keep Connected</h2>
+              The DigiPack provides a suite of tools for engaging with remote 
+              education easily. Even while offline, students can engage with 
+              educational materials and even submit assignments or perform internet
+              research. As soon as internet is available, all of these tasks will
+              be automatically completed.
+              <br><br>
+              The Google Classroom interface keeps students up-to-date on important
+              information from all of their classes. The DigiPack automatically keeps
+              up-to-date with announcements, assignments, and due dates. From here,
+              students can submit their coursework worry-free.
+              <br><br>
+              The Google Drive interface makes it easy to keep files organized. 
+              Students can request documents for download, make changes locally,
+              and rely on the DigiPack to push those changes back to the internet
+              when possible.
+              <br><br>
+              The Google Search interface allows students to gather more resources.
+              A simple Google Search returns results which can be viewed offline
+              at the student's convenience.
+      </div>
+      
+    </div>
+    
+    <br><br><br>
+    <div class="row">
+      <div class="col-md-7 mb-5">
+        <h2>Requirements</h2>
+                The Digital Backpack required many developments to become a whole.
+              First and foremost a Linux-based proxy server that integrates with Google Classroom API’s
+              and Google Search. It also manages necessary Oath credentials that are required for a
+              user’s “account/identity” to access Google Classroom services and provides a REST API.
+              Along with that, the Digital Backpack also requires a mobile app that automatically uploads
+              assignments, posts, and queries as well as download new content when the mobile device establishes
+              Internet connectivity. The mobile app should also display content delivered from the DigiPack
+              proxy server when the user is offline.
+              <br><br>
+              This high-level description of the purpose of the Digital Backpack served
+              as the basis through which we continued the requirements-gathering process.
+              From here, we developed a series of user stories that illustrated the needs
+              of various user-types and how the Digital Backpack would satisfy those needs.
+              Those user stories were then further refined into the domain-level
+              requirements to the right.
+              <br><br>
+              These domain-level requirements where then further defined with more
+              granular functional and performance requirements. For a complete overview
+              of the requirements specifications for this project, please refer to our
+              Requirements Specification document.
+      </div>
+      <div class="col-md-5 mb-5">
+        <h2>Domain-Level</h2>
+            <ol >
+                  <li>The Digital Backpack will aid remote education.</li>
+                  <li>The Digital Backpack will provide seamless transitions 
+                      between online and offline functionality.</li>
+                  <li>The Digital Backpack will utilize oCDN functionality in order
+                      to facilitate asynchronous connections and provide a delay-tolerant network. </li>
+                  <li>The Digital Backpack will support three types of end users:
+                      students, teachers, and parents.</li>
+                  <li>The Digital Backpack will be highly accessible in both design
+                      and device requirements in order to accommodate a wide range of users.</li>
+                  <li>The Digital Backpack will securely handle all sensitive 
+                      personal and scholastic user data to prevent unauthorized access.</li>
+              </ol>
+        These requirements became the foundation for the DigiPack app for Android
+        and on the web.
+      </div>
+    </div>
+</div>
+      
+    
+
+    <!-- Footer -->
+  <footer class="py-5 bg-dark">
+    <div class="container">
+      <p class="m-0 text-center text-white">Copyright &copy; DigiLearn 2021</p>
+    </div>
+      
+  <!-- Bootstrap core JavaScript -->
+  <script src="pages_vendor/jquery/jquery.slim.min.js"></script>
+  <script src="pages_vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
