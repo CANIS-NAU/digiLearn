@@ -10,10 +10,10 @@
     <string name="serverUrl">https://digipackweb.com:8000/</string>
     <string name="downloadNotificationChannel">download_notification_channel</string>
     <string name="downloadNotificationChannelDescription">download_notif_chan_desc</string>
-        <!--File name strings-->
-        <string name="fileList">fileList.json</string>
-        <string name="classList">classList.json</string>
-        <string name="searchList">searchList.json</string>
+    <!--File name strings-->
+    <string name="fileList">fileList.json</string>
+    <string name="classList">classList.json</string>
+    <string name="searchList">searchList.json</string>
 
 
     <!--Integers-->

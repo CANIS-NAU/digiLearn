@@ -36,16 +36,16 @@ class UploadUtility(activity: Activity) {
      *                    gmail - gmail address from the client; used for if <-- must be made to ID token later.
      */
 
-    fun uploadFile(sourceFilePath: String, uploadedFileName: String? = null, gmail: String) {
-        uploadFile(File(sourceFilePath), uploadedFileName, gmail)
+    fun uploadFile(sourceFilePath: String, uploadedFileName: String? = null, idTok: String) {
+        uploadFile(File(sourceFilePath), uploadedFileName, idTok)
     }
 
-    fun uploadFile(sourceFileUri: Uri, uploadedFileName: String? = null, gmail: String) {
+    fun uploadFile(sourceFileUri: Uri, uploadedFileName: String? = null, idTok: String) {
         val pathFromUri = URIPathHelper().getPath(activity,sourceFileUri)
-        uploadFile(File(pathFromUri), uploadedFileName, gmail)
+        uploadFile(File(pathFromUri), uploadedFileName, idTok)
     }
 
-    fun uploadFile(sourceFile: File, uploadedFileName: String? = null, gmail: String) {
+    fun uploadFile(sourceFile: File, uploadedFileName: String? = null, idTok: String) {
         Thread {
             //get the file type
             val mimeType = getMimeType(sourceFile);
@@ -70,7 +70,7 @@ class UploadUtility(activity: Activity) {
                                 //file to be uploaded
                                 .addFormDataPart("uploaded_file", fileName,sourceFile.asRequestBody(mimeType.toMediaTypeOrNull()))
                                 .addFormDataPart("file_name", fileName ) // fileName
-                                .addFormDataPart("gmail", gmail)  //gmail for ID
+                                .addFormDataPart("idTok", idTok)  //gmail for ID
                                 .build()
 
                 val request: Request = Request.Builder().url(serverURL).post(requestBody).build()

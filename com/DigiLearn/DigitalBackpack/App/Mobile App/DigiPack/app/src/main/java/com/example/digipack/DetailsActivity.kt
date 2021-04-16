@@ -15,6 +15,7 @@ import android.util.Log
 import android.view.Menu
 import android.widget.Toast
 import android.view.MenuItem
+import android.widget.Button
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
@@ -61,6 +62,9 @@ class DetailsActivity : AppCompatActivity() {
 
         google_first_name_textview.text = guser.firstName
         //google_email_textview.text = googleEmail
+
+
+
 
         // Calls the network detector class
         networkMonitor.result = { isAvailable, type ->
