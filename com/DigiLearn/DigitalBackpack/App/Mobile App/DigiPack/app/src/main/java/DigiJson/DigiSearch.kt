@@ -25,4 +25,9 @@ class DigiSearch {
             var mimetype : String? = null,
             var fileformat : String? = null
     ) : java.io.Serializable
+
+    @Serializable
+    data class QueryList(
+            var queries: ArrayList<String>
+    )
 }
