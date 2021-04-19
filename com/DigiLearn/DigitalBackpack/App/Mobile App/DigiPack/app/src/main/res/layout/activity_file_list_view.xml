@@ -10,36 +10,50 @@
 
     <Button
         android:id="@+id/openFileButton"
-        android:layout_width="wrap_content"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="128dp"
-        android:layout_marginEnd="128dp"
-        android:layout_marginBottom="56dp"
+        android:layout_marginStart="72dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="167dp"
+        android:layout_toEndOf="@+id/uploadFileButton"
         android:background="@drawable/button_layout"
         android:text="Download Folder"
         android:textColor="@color/nau_blue" />
 
+    <Button
+        android:id="@+id/uploadFileButton"
+        android:layout_width="115dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="57dp"
+        android:layout_marginBottom="167dp"
+        android:background="@drawable/button_layout"
+        android:text="Submit Files"
+        android:textColor="@color/nau_blue" />
+
     <ListView
         android:id="@+id/json_info"
-        android:layout_width="415dp"
-        android:layout_height="550dp"
+        android:layout_width="match_parent"
+        android:layout_height="436dp"
+        android:layout_above="@+id/uploadFileButton"
         android:layout_alignParentTop="true"
         android:layout_marginTop="2dp"
+        android:layout_marginBottom="213dp"
         android:choiceMode="singleChoice"
         android:listSelector="@color/nau_gold" />
 
     <ImageView
-        android:layout_width="match_parent"
         android:id="@+id/clouds"
+        android:layout_width="match_parent"
         android:layout_height="142dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="0dp"
         android:layout_marginEnd="0dp"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="1dp" />
 
 </RelativeLayout>

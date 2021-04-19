@@ -15,6 +15,10 @@ enum class ConnectionType {
     Wifi, Cellular
 }
 
+/**
+ * The networkDetectorTool determines if the user's phone has wifi or mobile connection.
+ * It has two different kind of way of checking the internet connection.
+ */
 class networkDetectorTool(context: Context) {
 
     private var networkContext = context
@@ -23,9 +27,13 @@ class networkDetectorTool(context: Context) {
 
     @Suppress("DEPRECATION")
     fun register() {
+
+        // Version 1, Using the networkCallback for Android 9 and up
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val connectivityManager = networkContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             if (connectivityManager.activeNetwork == null) {
+
+                // There is no connection
                 result(false,null)
             }
 
@@ -70,7 +78,6 @@ class networkDetectorTool(context: Context) {
     @Suppress("DEPRECATION")
     private val networkChangeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-
             val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val activeNetworkInfo = connectivityManager.activeNetworkInfo
             // Get Type of Connection

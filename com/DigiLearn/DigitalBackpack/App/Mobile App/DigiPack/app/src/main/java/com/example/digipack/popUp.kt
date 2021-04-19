@@ -67,7 +67,7 @@ class popUp : AppCompatActivity(){
 
         // Fade animation for the background of Popup Window
         val alpha = 100 //between 0-255
-        val alphaColor = ColorUtils.setAlphaComponent(Color.parseColor("#3E8BBE"), alpha)
+        val alphaColor = ColorUtils.setAlphaComponent(Color.parseColor("#000000"), alpha)
         val colorAnimation = ValueAnimator.ofObject(ArgbEvaluator(), Color.TRANSPARENT, alphaColor)
         colorAnimation.duration = 500 // milliseconds
         colorAnimation.addUpdateListener { animator ->

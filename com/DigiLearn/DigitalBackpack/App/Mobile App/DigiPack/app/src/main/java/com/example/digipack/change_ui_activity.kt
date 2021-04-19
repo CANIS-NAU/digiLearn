@@ -6,9 +6,12 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import kotlinx.android.synthetic.main.activity_details.*
 
+
+/**
+ * Change_ui_activity determines what ui to show to the users.
+ */
 class change_ui_activity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +36,17 @@ class change_ui_activity : AppCompatActivity(){
         }
     }
 
+
+    /**
+     * Function Name: onClick
+     * Algorithm: Takes the user info, and ui boolean. It determines the next page activity and
+     * also output the intents
+     *
+     * Arguments:
+     *     ui - Boolean betwween the UIs
+     *     guser - Json Object
+     *     fso - ?
+     */
     private fun onclick(guser: GUser, ui: Boolean, fso: Boolean){
         //construct and start intent for Details activity
         val myIntent = Intent(this, DetailsActivity::class.java)

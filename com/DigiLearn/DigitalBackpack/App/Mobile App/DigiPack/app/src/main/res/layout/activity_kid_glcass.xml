@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/files_page_background_kids"
-    tools:context=".kids_gClassActivity">
+    tools:context=".gClassActivity">
 
     <ListView
         android:id="@+id/course_names"
