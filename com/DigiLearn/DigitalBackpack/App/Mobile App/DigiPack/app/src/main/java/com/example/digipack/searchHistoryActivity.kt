@@ -30,9 +30,6 @@ class searchHistoryActivity : AppCompatActivity(){
         //unpack expected intent variables
         var res : DigiSearch.DigiRes? = intent.getSerializableExtra("searchlist") as DigiSearch.DigiRes?
         populateHistory(res?.resultslist)
-
-
-
     }
 
     private fun populateHistory(searchlist: ArrayList<DigiSearch.Results>?){
