@@ -10,6 +10,8 @@
     <string name="serverUrl">https://digipackweb.com:8000/</string>
     <string name="downloadNotificationChannel">download_notification_channel</string>
     <string name="downloadNotificationChannelDescription">download_notif_chan_desc</string>
+    <string name="nosearchhistory">No Search History To Show</string>
+    <string name="noresults">Results: 0</string>
     <!--File name strings-->
     <string name="fileList">fileList.json</string>
     <string name="classList">classList.json</string>
