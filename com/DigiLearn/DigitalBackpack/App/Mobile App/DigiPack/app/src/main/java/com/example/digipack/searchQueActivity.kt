@@ -70,8 +70,11 @@ class searchQueActivity : AppCompatActivity() {
                 newQueryList = QueryList(ArrayList<String>())
             }
         }
-        //add the new query to the list
-        newQueryList.queries.add(query)
+        //if the submitted query is not in the queries list
+        if(!(query in newQueryList.queries)){
+            //add the new query to the list
+            newQueryList.queries.add(query)
+        }
     }
 
     //when the activity is closed cache the query list if the user has submitted new queries

@@ -269,6 +269,8 @@ class DetailsActivity : AppCompatActivity() {
                                    if(gsresp == JSONObject("{Result:noACK}")){
                                        Toast.makeText(applicationContext, "noACK for getSearchList", Toast.LENGTH_SHORT).show()
                                    }else{
+                                       //clear old queries from json
+                                       cacheManager.cacheString("", getString(R.string.newQueriesList), this)
                                        //parse json into object
                                        var newres : DigiSearch.DigiRes = Json.decodeFromString(gsresp.toString())
                                        Log.i(getString(R.string.app_name), "detailsact/getsearchlist successful response ELSE: ${newres.toString()}")

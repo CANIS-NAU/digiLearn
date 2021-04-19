@@ -5,8 +5,11 @@ import android.os.Bundle
 import android.text.Html
 import android.util.Log
 import android.widget.ExpandableListAdapter
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_search_history.*
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.IOException
 
 class searchHistoryActivity : AppCompatActivity(){
@@ -55,5 +58,17 @@ class searchHistoryActivity : AppCompatActivity(){
         }
     }
 
+    private fun removeQuery(position: Int, searchlist: ArrayList<DigiSearch.Results>?){
+        if(searchlist == null){
+            Toast.makeText(this, "Nothing to Remove", Toast.LENGTH_SHORT).show()
+        }else{
+            //remove from local array
+            val removed = searchlist.removeAt(position)
+            Toast.makeText(this, "Removed ${removed.query} results", Toast.LENGTH_SHORT).show()
+            //cache updated array
+            val tocache = Json.encodeToString(DigiSearch.DigiRes(searchlist))
+            CacheUtility().cacheString(tocache, getString(R.string.queryResultsList), this)
+        }
+    }
 
 }
