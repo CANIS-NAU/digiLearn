@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 
@@ -79,7 +80,9 @@ class searchQueActivity : AppCompatActivity() {
 
         if(newquery){
             val cacheManager = CacheUtility()
-            cacheManager.cacheString(getString(R.string.newQueriesList), newQueryList.toString(), this)
+            //because we attempt to load old queries that dont have reposnes in newQuery(), we dont need to worry
+            //about overwriting them here
+            cacheManager.cacheString(Json.encodeToString(newQueryList), getString(R.string.newQueriesList),this)
         }
     }
 }

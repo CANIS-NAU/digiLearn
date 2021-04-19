@@ -1,5 +1,6 @@
 package com.example.digipack
 
+import DigiJson.DigiSearch
 import android.content.Intent
 import android.os.Bundle
 import android.text.Html
@@ -29,7 +30,11 @@ class gSearchActivity : AppCompatActivity(){
         // Create intent
         theSearchPage = Intent(this, searchQueActivity::class.java)
         theSearchHistoryPage = Intent(this, searchHistoryActivity::class.java)
+        val searchlist = intent.getSerializableExtra("resultslist") as DigiSearch.DigiRes
+        theSearchHistoryPage.putExtra("resultslist", searchlist)
 
+        theSearchHistoryPage.putExtra("ui", ui)
+        theSearchPage.putExtra("ui", ui)
 
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>Search</font>")

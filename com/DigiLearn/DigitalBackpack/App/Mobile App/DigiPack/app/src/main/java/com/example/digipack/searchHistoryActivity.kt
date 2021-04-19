@@ -28,8 +28,8 @@ class searchHistoryActivity : AppCompatActivity(){
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>Search History</font>")
 
         //unpack expected intent variables
-        var res : DigiSearch.DigiRes? = intent.getSerializableExtra("searchlist") as DigiSearch.DigiRes?
-        populateHistory(res?.resultslist)
+        var res : DigiSearch.DigiRes = intent.getSerializableExtra("resultslist") as DigiSearch.DigiRes
+        populateHistory(res.resultslist)
     }
 
     private fun populateHistory(searchlist: ArrayList<DigiSearch.Results>?){
@@ -37,6 +37,7 @@ class searchHistoryActivity : AppCompatActivity(){
         if( searchlist == null){
             viewtitle.text = getString(R.string.nosearchhistory)
         }else{
+            viewtitle.text = "Search Results"
             //else populate the search history
             try{
                 //create string array of queries
@@ -44,8 +45,7 @@ class searchHistoryActivity : AppCompatActivity(){
                 for( i in searchlist ){
                     i.query?.let { queries.add(it) }
                 }
-                //create child list objects and add them to the expandable list
-
+                //here we create the list of queries and their results below them.
 
 
             }catch(e: IOException) {

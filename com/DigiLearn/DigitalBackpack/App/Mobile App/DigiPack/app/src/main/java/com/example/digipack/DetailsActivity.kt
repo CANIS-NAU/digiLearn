@@ -39,7 +39,6 @@ class DetailsActivity : AppCompatActivity() {
     private lateinit var flintent : Intent
     private lateinit var gclassIntent : Intent
     private lateinit var gsearchIntent : Intent
-    private lateinit var gsearchNextPage: Intent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,9 +50,6 @@ class DetailsActivity : AppCompatActivity() {
         }else{
             setContentView(R.layout.activity_details)
         }
-
-        // Search page
-        gsearchNextPage = Intent(this, gSearchActivity::class.java)
 
         // Change title
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>DigiPack</font>");
@@ -116,7 +112,7 @@ class DetailsActivity : AppCompatActivity() {
         // GSearch Button
         googleSearchBtn?.setOnClickListener{
             when{
-                this::gsearchNextPage.isInitialized -> startActivity(gsearchNextPage)
+                this::gsearchIntent.isInitialized -> startActivity(gsearchIntent)
                 else ->{
                     Toast.makeText(this, "Google Search not available, check again later", Toast.LENGTH_SHORT).show()
                 }
@@ -171,7 +167,7 @@ class DetailsActivity : AppCompatActivity() {
             //Toast.makeText(this, "Google Search Clicked", Toast.LENGTH_LONG).show()
             // Go to GSearch Page
             when{
-                this::gsearchNextPage.isInitialized -> startActivity(gsearchNextPage)
+                this::gsearchIntent.isInitialized -> startActivity(gsearchIntent)
             }
 
             return true
@@ -224,85 +220,94 @@ class DetailsActivity : AppCompatActivity() {
         getSearchList(guser, ui)
     }
 
-    private fun getSearchList(guser: GUser, ui: Boolean){
-        when{
-            this::gsearchIntent.isInitialized ->{
-                Log.i(getString(R.string.app_name), "Details_act: searchIntent already initialized")
-            }
-            else -> {
-                val searchlisturl = "search/" //${guser.idToken}
-                val queue = RequestQueueSingleton.getInstance(this.applicationContext)
+   private fun getSearchList(guser: GUser, ui: Boolean){
+       when {
+           this::gsearchIntent.isInitialized -> {
+               Log.i(getString(R.string.app_name), "Details_act: searchIntent already initialized")
+           }
+           else -> {
+               //initialize intent
+               gsearchIntent = Intent(this, gSearchActivity::class.java)
+               gsearchIntent.putExtra("guser", guser)
+               gsearchIntent.putExtra("ui", ui)
 
-                // get new queries from cache
-                val cacheManager = CacheUtility()
-                val querystr = cacheManager.getStringFromCache(getString(R.string.newQueriesList), this)
-                val l = ArrayList<String>()
-                l.add("asdf")
-                l.add("please work i beg you")
-                l.add("goats")
-                val ql = DigiSearch.QueryList(l)
-                val queryobj = JSONObject(Json.encodeToString(ql))
-                /**
-                = if(querystr == ""){
-                                    JSONObject("{}")
-                                }else{
-                                    JSONObject(querystr)
-                                }
-                **/
-                //initialize intent
-                gsearchIntent = Intent(this, gSearchActivity::class.java)
-                gsearchIntent.putExtra("guser", guser)
-                gsearchIntent.putExtra("ui", ui)
+               //get any new queries from cache
+               val cacheManager = CacheUtility()
+               val newqueriesstr = cacheManager.getStringFromCache(getString(R.string.newQueriesList), this)
 
-                if(querystr == "") {
-                    Log.i(getString(R.string.app_name), "no new queries to ask for")
-                }
-                var gsresp = JSONObject("{Result:noACK}")
+               //if no new queries, build results list from cache
+               if( newqueriesstr == "" ){
+                   Log.i(getString(R.string.app_name), "detailsact/getsearchlist: no new queries")
+                   val rliststr = cacheManager.getStringFromCache(getString(R.string.queryResultsList), this)
+                   //if there are no old results to display to the user
+                   if( rliststr == ""){
+                       Log.i(getString(R.string.app_name), "detailsact/getsearchlist: NO old results available to show user")
+                   }else{
+                       //else there are old results to display to the user pass them to the gsearch intent
+                       Log.i(getString(R.string.app_name), "detailsact/getsearchlist: old results available to show user")
+                       val resultslist : DigiSearch.DigiRes = Json.decodeFromString(rliststr)
+                       gsearchIntent.putExtra("resultslist", resultslist)
+                   }
 
-                val gsearchrequest = JsonObjectRequest( Request.Method.POST, getString(R.string.serverUrl).plus(searchlisturl), queryobj,
-                        { searchresp -> gsresp = searchresp
-                            try{
-                                Log.i(getString(R.string.app_name), gsresp.toString())
-                                if(gsresp == JSONObject("{Result:noACK}")){
-                                    Toast.makeText(applicationContext, "noACK for getSearchList", Toast.LENGTH_SHORT).show()
-                                }else{
-                                    //get json response as string, pass to CacheUtility
+               }else{
+                   Log.i(getString(R.string.app_name), "detailsact/getsearchlist: new queries to request")
+                   //else, request results for new queries
+                       //can assume that there are new queries if we get here
 
-                                    var searchJson : DigiSearch.DigiRes = Json{isLenient = true}.decodeFromString(gsresp.toString())
-                                    //get old results if there are any
-                                    val oldresults = cacheManager.getStringFromCache(getString(R.string.queryResultsList), this)
+                   //initialize request flow
+                   val searchurl = "search/"
+                   val queue = RequestQueueSingleton.getInstance(this.applicationContext)
 
-                                    if( oldresults == ""){
-                                        //if no previous queries cache the new ones
-                                        cacheManager.cacheString(gsresp.toString(), getString(R.string.queryResultsList), this)
-                                    }else{
-                                        //if previous queries add them to the old results list and cache
-                                        var oldr : DigiSearch.DigiRes = Json.decodeFromString(oldresults)
+                   val queryobj = JSONObject(newqueriesstr)
+                   var gsresp = JSONObject("{Result:noACK}")
 
-                                        for(i in searchJson.resultslist!!){
-                                            oldr.resultslist?.add(i)
-                                        }
-                                        //cache old+new results and pass along the new results
-                                        cacheManager.cacheString(oldr.toString(), getString(R.string.queryResultsList), this)
-                                        searchJson = oldr
+                   val gsearchrequest = JsonObjectRequest( Request.Method.POST, getString(R.string.serverUrl).plus(searchurl), queryobj,
+                           { resp ->
+                               gsresp = resp
+                               try{
+                                   //if response is null bascially
+                                   if(gsresp == JSONObject("{Result:noACK}")){
+                                       Toast.makeText(applicationContext, "noACK for getSearchList", Toast.LENGTH_SHORT).show()
+                                   }else{
+                                       //parse json into object
+                                       var newres : DigiSearch.DigiRes = Json.decodeFromString(gsresp.toString())
+                                       Log.i(getString(R.string.app_name), "detailsact/getsearchlist successful response ELSE: ${newres.toString()}")
 
-                                        //remove all queries from new query list cause we now have results for all previous queries
-                                        cacheManager.cacheString("", getString(R.string.newQueriesList), this)
-                                    }
-                                    //add search list to
-                                    gsearchIntent.putExtra("searchlist", searchJson)
+                                       //get old results if any
+                                       val rliststr = cacheManager.getStringFromCache(getString(R.string.queryResultsList), this)
 
-                                }
-                            }catch(e: JSONException){
-                                Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
-                            }
-                        },
-                        { err -> Log.i(getString(R.string.app_name), err.toString()) }
-                )
-                queue.addToRequestQueue(gsearchrequest)
-            }
-        }
-    }
+                                       if(rliststr == ""){
+                                           //pass along new responses
+                                           val newresstr = Json.encodeToString(newres)
+                                           cacheManager.cacheString(newresstr, getString(R.string.queryResultsList), this)
+                                           //pass complete results list to the intent
+                                           gsearchIntent.putExtra("resultslist", newres)
+                                           Log.i(getString(R.string.app_name), "detailsact/getsearchlist only new responses, added to intent")
+                                       }else{
+                                           //else if there are old results, add new results list to old results
+                                           var allres : DigiSearch.DigiRes = Json.decodeFromString(rliststr)
+                                           //jesus this is a gross call
+                                           //adds all the new results to the old results list
+                                           newres.resultslist?.let { allres.resultslist?.addAll(it) }
+                                           val newresstr = Json.encodeToString(allres)
+                                           cacheManager.cacheString(newresstr, getString(R.string.queryResultsList), this)
+                                           //pass complete results list to the intent
+                                           gsearchIntent.putExtra("resultslist", allres)
+                                           Log.i(getString(R.string.app_name), "detailsact/getsearchlist old and new responses combined, added to intent")
+                                       }
+                                   }
+                               }catch(e: JSONException){
+                                   Log.e(getString(R.string.app_name), "JSON key error: %s".format(e))
+                               }
+
+                           },
+                           { err -> Log.i(getString(R.string.app_name), err.toString()) })
+                   //do request
+                   queue.addToRequestQueue(gsearchrequest)
+               }
+           }
+       }
+   }
 
     //helper function for connectToServer handles acquisition of GCLass data
     private fun getClassList(guser: GUser, ui : Boolean){
@@ -476,7 +481,7 @@ class DetailsActivity : AppCompatActivity() {
         else{
             val searchData : DigiSearch.DigiRes = Json{isLenient = true}.decodeFromString(searchData)
             gsearchIntent = Intent(this, gSearchActivity::class.java)
-            gsearchIntent.putExtra("courselist", searchData)
+            gsearchIntent.putExtra("resultslist", searchData)
             gsearchIntent.putExtra("guser", guser)
             gsearchIntent.putExtra("ui", ui)
         }
