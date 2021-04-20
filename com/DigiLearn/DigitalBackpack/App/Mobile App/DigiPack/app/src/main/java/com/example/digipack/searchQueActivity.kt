@@ -71,7 +71,7 @@ class searchQueActivity : AppCompatActivity() {
             }
         }
         //if the submitted query is not in the queries list
-        if(!(query in newQueryList.queries)){
+        if(query !in newQueryList.queries && query != ""){
             //add the new query to the list
             newQueryList.queries.add(query)
         }
