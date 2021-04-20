@@ -28,8 +28,17 @@ class URIPathHelper {
 
             } else if (isDownloadsDocument(uri)) {
                 val id = DocumentsContract.getDocumentId(uri)
-                val contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), java.lang.Long.valueOf(id))
-                return getDataColumn(context, contentUri, null, null)
+                var contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), java.lang.Long.valueOf(id))
+                var columnData = getDataColumn(context, contentUri, null, null)
+
+                if( columnData == null )
+                {
+                    //try again with different prefix
+                    contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/my_downloads"), java.lang.Long.valueOf(id))
+                    columnData = getDataColumn(context, contentUri, null, null)
+                }
+
+                return columnData
             } else if (isMediaDocument(uri)) {
                 val docId = DocumentsContract.getDocumentId(uri)
                 val split = docId.split(":".toRegex()).toTypedArray()
@@ -68,7 +77,11 @@ class URIPathHelper {
                 val column_index: Int = cursor.getColumnIndexOrThrow(column)
                 return cursor.getString(column_index)
             }
-        } finally {
+        }
+        catch (e: IllegalArgumentException){
+            //pass
+        }
+        finally {
             if (cursor != null) cursor.close()
         }
         return null
