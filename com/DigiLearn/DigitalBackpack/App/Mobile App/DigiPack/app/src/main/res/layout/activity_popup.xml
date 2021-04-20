@@ -119,7 +119,7 @@
                     app:layout_constraintStart_toStartOf="parent" />
 
                 <Button
-                    android:id="@+id/upload_button_here_sebastian"
+                    android:id="@+id/submitButton"
                     style="?android:attr/borderlessButtonStyle"
                     android:layout_width="105dp"
                     android:layout_height="37dp"

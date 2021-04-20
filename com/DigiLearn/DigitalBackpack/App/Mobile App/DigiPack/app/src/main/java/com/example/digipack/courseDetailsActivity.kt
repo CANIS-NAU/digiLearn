@@ -130,6 +130,8 @@ class courseDetailsActivity : AppCompatActivity(){
             var courseDetail = course.coursework!![position]
             var hwName = courseDetail.title.toString()
             var hwDesc = courseDetail.description.toString()
+            var courseworkId = courseDetail.courseworkID.toString()
+            var courseId = course.courseID
 
             // Due date would be MM/DD/YY
             var hwDuedateMonth = courseDetail.duedate?.month.toString()
@@ -142,6 +144,8 @@ class courseDetailsActivity : AppCompatActivity(){
             intent.putExtra("popupduedate", "Due Date: " + hwDuedateMonth + "/" + hwDuedateDay + "/" + hwDuedateYr )
             intent.putExtra("popupbtn", "Ok")
             intent.putExtra("darkstatusbar", false)
+            intent.putExtra("courseworkId", courseworkId)
+            intent.putExtra("courseId", courseId)
             startActivity(intent)
         }
     }

@@ -1,20 +1,31 @@
 package com.example.digipack
 
+import DigiJson.GUserJson
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.DocumentsContract
 import android.text.Html
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.DecelerateInterpolator
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.ColorUtils
+import androidx.documentfile.provider.DocumentFile
 import kotlinx.android.synthetic.main.activity_popup.*
+import java.io.File
+
+private val SUBMIT_FILE = 4
 
 class popUp : AppCompatActivity(){
     private var popupTitle = ""
@@ -22,11 +33,14 @@ class popUp : AppCompatActivity(){
     private var popupdueDate = ""
     private var popupButton = ""
     private var darkStatusBar = false
+    private var courseworkId = ""
+    private var courseId = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         overridePendingTransition(0,0)
         setContentView(R.layout.activity_popup)
+        var context: Context = this
 
         // Get the data
         val bundle = intent.extras
@@ -35,7 +49,8 @@ class popUp : AppCompatActivity(){
         popupdueDate = bundle?.getString("popupduedate", "Text") ?: ""
         popupButton = bundle?.getString("popupbtn", "Button") ?: ""
         darkStatusBar = bundle?.getBoolean("darkstatusbar", false) ?: false
-
+        courseworkId = bundle?.getString("courseworkId", courseworkId) ?: ""
+        courseId = bundle?.getString("courseId", courseId) ?: ""
 
         // Set the data
         popup_window_title.text = popupTitle
@@ -88,6 +103,35 @@ class popUp : AppCompatActivity(){
             onBackPressed()
         }
 
+        //set up the submit button
+        var submitButton = findViewById<Button>(R.id.submitButton)
+        submitButton.setOnClickListener {
+            // Construct intent that allows user to pick a file
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                //here I attempt to build a starting URI so the file viewer will open in a specific directory
+                //but the uri appears to be coming out malformed idk
+                val builder = Uri.Builder()
+                val dir = File(Environment.getExternalStorageDirectory().toString() + "/Download/DigiPackDocuments/")
+                dir.mkdirs()
+
+                builder.appendEncodedPath( (Uri.fromFile( dir ) ).toString()
+                )
+                val uri = builder.build()
+                val file = DocumentFile.fromSingleUri(context, uri)
+                println("openFileButton says uri is : " + uri )
+
+                // Specify openable pdfs for the intent)
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "application/pdf"
+
+                // Optionally, specify a URI for the file that should appear in the
+                // system file picker when it loads.
+                putExtra(DocumentsContract.EXTRA_INITIAL_URI, dir)
+            }
+            //once they pick a file, call onActivityResult with PICK_PDF_FILE code
+            startActivityForResult(intent, SUBMIT_FILE)
+        }
+
     }
 
     private fun setWindowFlag(activity: Activity, on: Boolean) {
@@ -126,5 +170,28 @@ class popUp : AppCompatActivity(){
             }
         })
         colorAnimation.start()
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
+        super.onActivityResult(requestCode, resultCode, resultData)
+
+
+        if(requestCode == SUBMIT_FILE)
+        {
+            var uri: Uri? = null
+
+            if( resultData != null){
+                uri = resultData.data
+
+                //get idTok
+                val guser = intent.getSerializableExtra("guser") as GUserJson.GUser
+                val idTok = guser.idToken
+
+                //pass everything to the upload utility
+                val uu = UploadUtility(this)
+                uu.uploadFile(uri!!, null, idTok!!)
+            }
+        }
     }
 }
