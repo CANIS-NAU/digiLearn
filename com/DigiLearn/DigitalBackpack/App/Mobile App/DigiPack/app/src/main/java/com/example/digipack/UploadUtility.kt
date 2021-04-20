@@ -12,9 +12,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import android.content.ContentResolver
-
-
-
+import java.io.IOException
 
 
 /**
@@ -84,15 +82,24 @@ class UploadUtility(activity: Activity) {
                 val request: Request = Request.Builder().url(serverURL).post(requestBody).build()
                 showToast(request.toString())
 
-                val response: Response = client.newCall(request).execute()
+                val response: Unit = client.newCall(request).enqueue( object: Callback {
 
-                if (response.isSuccessful) {
-                    Log.d("File upload", "success, path: $serverUploadDirectoryPath$fileName")
-                    showToast("File uploaded successfully at $serverUploadDirectoryPath$fileName")
-                } else {
-                    Log.e("File upload", "failed")
-                    showToast("File uploading failed")
-                }
+                    override fun onFailure(call: Call, e: IOException){
+                        Log.e("File upload", "failed")
+                        showToast("File uploading failed")
+                    }
+
+                    override fun onResponse(call: Call, response: Response){
+                        response.use{
+                            if (response.isSuccessful) {
+                                Log.d("File upload", "success, path: $serverUploadDirectoryPath$fileName")
+                                showToast("File uploaded successfully at $serverUploadDirectoryPath$fileName")
+                            }else{
+                                throw IOException("Unexpected code: $response")
+                            }
+                        }
+                    }
+                })
             }
             //in case that upload failed, print file upload failed log, toast failure,
             catch (ex: Exception) {
