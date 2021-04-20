@@ -190,7 +190,7 @@ class popUp : AppCompatActivity(){
 
                 //pass everything to the upload utility
                 val uu = UploadUtility(this)
-                uu.uploadFile(uri!!, null, idTok!!)
+                uu.submitFile(uri!!, null, idTok!!, courseId, courseworkId)
             }
         }
     }

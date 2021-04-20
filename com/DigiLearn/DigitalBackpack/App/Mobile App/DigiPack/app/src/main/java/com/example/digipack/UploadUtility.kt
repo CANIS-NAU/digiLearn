@@ -107,16 +107,16 @@ class UploadUtility(activity: Activity) {
 
 
 
-    fun submitFile(sourceFilePath: String, uploadedFileName: String? = null, idTok: String) {
-        uploadFile(File(sourceFilePath), uploadedFileName, idTok)
+    fun submitFile(sourceFilePath: String, uploadedFileName: String? = null, idTok: String, courseId: String, courseworkId: String) {
+        submitFile(File(sourceFilePath), uploadedFileName, idTok, courseId, courseworkId)
     }
 
-    fun submitFile(sourceFileUri: Uri, uploadedFileName: String? = null, idTok: String) {
+    fun submitFile(sourceFileUri: Uri, uploadedFileName: String? = null, idTok: String, courseId: String, courseworkId: String) {
         val pathFromUri = URIPathHelper().getPath(activity, sourceFileUri)
-        uploadFile(File(pathFromUri), uploadedFileName, idTok)
+        submitFile(File(pathFromUri), uploadedFileName, idTok, courseId, courseworkId)
     }
 
-    fun submitFile(sourceFile: File, uploadedFileName: String? = null, idTok: String) {
+    fun submitFile(sourceFile: File, uploadedFileName: String? = null, idTok: String, courseId: String, courseworkId: String) {
         Thread {
 
             //use the specified name; if none specified, use the file's name.
@@ -143,7 +143,9 @@ class UploadUtility(activity: Activity) {
                         //file to be uploaded
                         .addFormDataPart("uploaded_file", fileName, sourceFile.asRequestBody(mimeType.toMediaTypeOrNull()))
                         .addFormDataPart("file_name", fileName) // fileName
-                        .addFormDataPart("idTok", idTok)  //gmail for ID
+                        .addFormDataPart("idTok", idTok)  //idTok for auth
+                        .addFormDataPart("courseId", courseId)
+                        .addFormDataPart("courseworkId", courseworkId)
                         .build()
 
                 val request: Request = Request.Builder().url(serverSubmitUrl).post(requestBody).build()

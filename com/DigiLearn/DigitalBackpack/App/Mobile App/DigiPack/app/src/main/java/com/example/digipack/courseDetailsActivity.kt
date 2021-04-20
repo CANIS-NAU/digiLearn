@@ -146,6 +146,7 @@ class courseDetailsActivity : AppCompatActivity(){
             intent.putExtra("darkstatusbar", false)
             intent.putExtra("courseworkId", courseworkId)
             intent.putExtra("courseId", courseId)
+            intent.putExtra("guser", guser)
             startActivity(intent)
         }
     }
