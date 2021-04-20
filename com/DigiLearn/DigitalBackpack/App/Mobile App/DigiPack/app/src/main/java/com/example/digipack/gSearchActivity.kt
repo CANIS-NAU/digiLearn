@@ -30,7 +30,7 @@ class gSearchActivity : AppCompatActivity(){
         // Create intent
         theSearchPage = Intent(this, searchQueActivity::class.java)
         theSearchHistoryPage = Intent(this, searchHistoryActivity::class.java)
-        val searchlist = intent.getSerializableExtra("resultslist") as DigiSearch.DigiRes
+        val searchlist = intent.getSerializableExtra("resultslist") as DigiSearch.DigiRes?
         theSearchHistoryPage.putExtra("resultslist", searchlist)
 
         theSearchHistoryPage.putExtra("ui", ui)

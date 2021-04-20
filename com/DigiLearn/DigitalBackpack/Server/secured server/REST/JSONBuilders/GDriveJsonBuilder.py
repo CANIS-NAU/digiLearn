@@ -14,7 +14,7 @@ def createfilejson(fileobj):
 
 def add_file_attachment(fileid):
     return {
-            'addAttachments':[
+            'addAttachments': [
                 {
                     'driveFile': {
                         'id': fileid

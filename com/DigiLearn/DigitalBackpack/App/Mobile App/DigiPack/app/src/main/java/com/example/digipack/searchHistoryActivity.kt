@@ -31,8 +31,8 @@ class searchHistoryActivity : AppCompatActivity(){
         supportActionBar?.title = Html.fromHtml("<font color='#01345A'>Search History</font>")
 
         //unpack expected intent variables
-        var res : DigiSearch.DigiRes = intent.getSerializableExtra("resultslist") as DigiSearch.DigiRes
-        populateHistory(res.resultslist)
+        var res : DigiSearch.DigiRes? = intent.getSerializableExtra("resultslist") as DigiSearch.DigiRes?
+        populateHistory(res?.resultslist)
     }
 
     private fun populateHistory(searchlist: ArrayList<DigiSearch.Results>?){
