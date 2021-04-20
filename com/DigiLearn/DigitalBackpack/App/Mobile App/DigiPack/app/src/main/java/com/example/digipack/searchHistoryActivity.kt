@@ -1,6 +1,7 @@
 package com.example.digipack
 
 import DigiJson.DigiSearch
+import android.content.Intent
 import android.os.Bundle
 import android.text.Html
 import android.util.Log
@@ -42,6 +43,9 @@ class searchHistoryActivity : AppCompatActivity(){
             viewtitle.text = "Search Results"
             //else populate the search history
             try{
+                // For the demo
+                var searchResult = Intent(this, searchResultActivity::class.java)
+
                 //create string array of queries
                 var queries = ArrayList<String>()
                 for( i in searchlist ){
@@ -50,16 +54,18 @@ class searchHistoryActivity : AppCompatActivity(){
                 }
 
                 //here we create the list of queries and their results below them.
-                var searchResult = ArrayAdapter(this,android.R.layout.simple_expandable_list_item_1, queries)
-                searchHistoryList.adapter = searchResult
+                var searchResultList = ArrayAdapter(this,android.R.layout.simple_expandable_list_item_1, queries)
+
+                searchHistoryList.adapter = searchResultList
 
                 searchHistoryList.onItemClickListener = AdapterView.OnItemClickListener{parent, view, position, id ->
-                    var names = searchlist[position]
+                    var userSearchResult = searchlist[position]
                     println("=====================================")
 
+                    searchResult.putExtra("results", userSearchResult)
+                    this.startActivity(searchResult)
 
                 }
-
 
             }catch(e: IOException) {
                 //handle errors eventually

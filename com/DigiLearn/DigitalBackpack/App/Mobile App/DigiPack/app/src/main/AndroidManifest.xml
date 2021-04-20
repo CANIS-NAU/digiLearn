@@ -35,6 +35,7 @@
         <activity android:name=".change_ui_activity" />
         <activity android:name=".searchHistoryActivity" />
         <activity android:name=".searchQueActivity" />
+        <activity android:name=".searchResultActivity"/>
         <activity
             android:name=".MainActivity"
             android:noHistory="true"> <!-- Keeps the Google Sign In page off of the activity stack -->
