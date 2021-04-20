@@ -21,7 +21,7 @@ class gSearchActivity : AppCompatActivity(){
 
         // Determines what UI to show to the user
         if(ui){
-            setContentView(R.layout.activity_kid_gsearch)
+            setContentView(R.layout.activity_gsearch)
         }else{
             setContentView(R.layout.activity_gsearch)
         }

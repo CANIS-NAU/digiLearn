@@ -74,12 +74,12 @@ class UploadUtility(activity: Activity) {
             try {
                 //build the request
                 val requestBody: RequestBody =
-                        MultipartBody.Builder().setType(MultipartBody.FORM)
-                                //file to be uploaded
-                                .addFormDataPart("uploaded_file", fileName, sourceFile.asRequestBody(mimeType.toMediaTypeOrNull()))
-                                .addFormDataPart("file_name", fileName) // fileName
-                                .addFormDataPart("idTok", idTok)  //gmail for ID
-                                .build()
+                    MultipartBody.Builder().setType(MultipartBody.FORM)
+                        //file to be uploaded
+                        .addFormDataPart("uploaded_file", fileName, sourceFile.asRequestBody(mimeType.toMediaTypeOrNull()))
+                        .addFormDataPart("file_name", fileName) // fileName
+                        .addFormDataPart("idTok", idTok)  //gmail for ID
+                        .build()
 
                 val request: Request = Request.Builder().url(serverURL).post(requestBody).build()
                 showToast(request.toString())
@@ -175,8 +175,8 @@ class UploadUtility(activity: Activity) {
 
     fun File.getMimeType(fallback: String = "image/*"): String {
         return MimeTypeMap.getFileExtensionFromUrl(toString())
-                ?.run { MimeTypeMap.getSingleton().getMimeTypeFromExtension(toLowerCase()) }
-                ?: fallback // You might set it to */*
+            ?.run { MimeTypeMap.getSingleton().getMimeTypeFromExtension(toLowerCase()) }
+            ?: fallback // You might set it to */*
     }
 
 

@@ -163,6 +163,3 @@ class courseDetailsActivity : AppCompatActivity(){
         networkMonitor.unregister()
     }
 }
-
-
-
