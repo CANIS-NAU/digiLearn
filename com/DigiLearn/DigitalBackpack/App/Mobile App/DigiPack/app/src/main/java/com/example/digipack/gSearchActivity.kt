@@ -14,7 +14,6 @@ class gSearchActivity : AppCompatActivity(){
     private lateinit var theSearchHistoryPage : Intent
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val ui = intent.getBooleanExtra("ui", false)

@@ -1,26 +1,19 @@
 package com.example.digipack
 
-import DigiJson.DigiClass
-import DigiJson.GUserJson.GUser
+import DigiJson.DigiSearch
 import android.content.Intent
 import android.os.Bundle
 import android.text.Html
 import android.util.Log
-
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_course_details.*
-import kotlinx.android.synthetic.main.activity_details.*
-import kotlinx.android.synthetic.main.activity_gclass.*
 import kotlinx.android.synthetic.main.activity_gclass.clouds
-import kotlinx.android.synthetic.main.activity_gsearch.view.*
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
+import kotlinx.android.synthetic.main.activity_search_history_details.*
 import java.io.IOException
 
-class courseDetailsActivity : AppCompatActivity(){
+class searchResultActivity : AppCompatActivity(){
 
     // Call the network detector tool
     private val networkMonitor = networkDetectorTool(this)
@@ -33,50 +26,52 @@ class courseDetailsActivity : AppCompatActivity(){
         if(ui){
             setContentView(R.layout.activity_kid_course_details)
         }else{
-            setContentView(R.layout.activity_course_details)
+            setContentView(R.layout.activity_search_history_details)
         }
 
         //unpack intent to get course data
-        var course = intent.getSerializableExtra("course") as DigiClass.Course
-        var guser = intent.getSerializableExtra("guser") as GUser
-        Log.i(getString(R.string.app_name), course.toString())
+        var results = intent.getSerializableExtra("results") as DigiSearch.Results
+        //var guser = intent.getSerializableExtra("guser") as GUser
+        Log.i(getString(R.string.app_name), results.toString())
 
         // Change title
-        if (course != null) {
-            supportActionBar?.title = Html.fromHtml("<font color='#01345A'>${course.name}</font>")
+        if (results != null) {
+            supportActionBar?.title = Html.fromHtml("<font color='#01345A'>${results.query}</font>")
         }
 
-        // NEED TO GET THE ANNOUNCEMENT
-        var annoucements = course.announcements
+        // NEED TO GET THE LIST OF RESULTS
+        var listOfSearchResults = results.results
 
-        // Grab the course announcement and display it under the AnnouncementID
-        val cAnnouncementText = findViewById<TextView?>(R.id.class_announcement)
+        // Grab the search results and display it under the searchHistoryName
+        val searchHistory_Name = findViewById<TextView?>(R.id.searchHistoryName)
 
-        val classAnnouncementList = arrayListOf<String>()
-        if (annoucements.isNullOrEmpty()){
+        val searchTitleList = arrayListOf<String>()
 
-            cAnnouncementText.setText("No Announcements")
+        if (listOfSearchResults.isNullOrEmpty()){
+
+            searchHistory_Name.setText("No Search Results")
 
         } else {
+
             // Put the string text in the array of list
-            for(items in course?.announcements!!){
+            for(items in results?.results!!){
                 try {
                     when{
-                        items.text == null->{
-                            classAnnouncementList.add("<no announcements found>")
+                        items.title == null->{
+                            searchTitleList.add("<no announcements found>")
                         }
                         else-> {
-                            items.text?.let{classAnnouncementList.add(it)}
+                            items.title?.let{searchTitleList.add(it)}
                         }
                     }
                 } catch (e: IOException){
-                    Log.e("DigiPack", "Class announcement error: %s".format(e.toString()))
+                    Log.e("DigiPack", "Search result error: %s".format(e.toString()))
                 }
             }
 
             // Then put that text in the textView
-            val firstName: String = classAnnouncementList[0]
-            cAnnouncementText?.text = firstName
+            val firstName: String = searchTitleList[0]
+            searchHistory_Name?.text = firstName
         }
 
 
@@ -103,10 +98,10 @@ class courseDetailsActivity : AppCompatActivity(){
             }
         }
 
-        // Add the list of assignments
+        // Add the list of results
         var classHomework = ArrayList<String>()
 
-        for(items in course.coursework!!){
+        for(items in results.results!!){
             try{
                 when{
                     items.title == null->{
@@ -122,27 +117,23 @@ class courseDetailsActivity : AppCompatActivity(){
         }
 
         var adapterView = ArrayAdapter(this, android.R.layout.simple_list_item_1, classHomework)
-        homeworkList.adapter = adapterView
+        resultDescriptions.adapter = adapterView
 
-        var courseDetail = course.coursework
-
-        homeworkList.onItemClickListener = AdapterView.OnItemClickListener{ parent, view, position, id->
-            var courseDetail = course.coursework!![position]
-            var hwName = courseDetail.title.toString()
-            var hwDesc = courseDetail.description.toString()
-
-            // Due date would be MM/DD/YY
-            var hwDuedateMonth = courseDetail.duedate?.month.toString()
-            var hwDuedateDay = courseDetail.duedate?.day.toString()
-            var hwDuedateYr = courseDetail.duedate?.year.toString()
+        resultDescriptions.onItemClickListener = AdapterView.OnItemClickListener{ parent, view, position, id->
+            var courseDetail = results.results!![position]
+            var resultName = courseDetail.title.toString()
+            var resultSnippet = courseDetail.snippet.toString()
+            var resultLink = courseDetail.link.toString()
 
             val intent = Intent(this, popUp::class.java)
-            intent.putExtra("popuptitle", hwName)
-            intent.putExtra("popuptext", "Description: " + hwDesc)
-            intent.putExtra("popupduedate", "Due Date: " + hwDuedateMonth + "/" + hwDuedateDay + "/" + hwDuedateYr )
-            intent.putExtra("popupbtn", "Ok")
-            intent.putExtra("darkstatusbar", false)
+            intent.putExtra("popupVersion", true)
+            intent.putExtra("popuptitle", resultName)
+            intent.putExtra("popuptext", "Description: " + resultSnippet)
+            intent.putExtra("popupduedate", "Link: " + resultLink )
+
+
             startActivity(intent)
+
         }
     }
 

@@ -35,7 +35,6 @@ import kotlinx.serialization.json.Json
 
 
 const val PICK_PDF_FILE = 2
-const val OPEN_PDF_FILE = 3
 
 class FileListViewActivity : AppCompatActivity() {
 
@@ -105,36 +104,6 @@ class FileListViewActivity : AppCompatActivity() {
             startActivityForResult(intent, PICK_PDF_FILE)
         }
 
-
-        val uploadFileButton = findViewById<Button>(R.id.uploadFileButton)
-        uploadFileButton.setOnClickListener {
-            // Construct intent that allows user to pick a file
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                //here I attempt to build a starting URI so the file viewer will open in a specific directory
-                //but the uri appears to be coming out malformed idk
-                val builder = Uri.Builder()
-                val dir = File(Environment.getExternalStorageDirectory().toString() + "/Download/DigiPackDocuments/")
-                dir.mkdirs()
-
-                builder.appendEncodedPath( (Uri.fromFile( dir ) ).toString()
-                )
-                val uri = builder.build()
-                val file = DocumentFile.fromSingleUri(context, uri)
-                println("openFileButton says uri is : " + uri )
-
-                // Specify openable pdfs for the intent)
-                addCategory(Intent.CATEGORY_OPENABLE)
-                type = "application/pdf"
-
-                // Optionally, specify a URI for the file that should appear in the
-                // system file picker when it loads.
-                putExtra(DocumentsContract.EXTRA_INITIAL_URI, dir)
-            }
-            //once they pick a file, call onActivityResult with PICK_PDF_FILE code
-            startActivityForResult(intent, OPEN_PDF_FILE)
-        }
-
-
         // Calls the network detector class
         networkMonitor.result = { isAvailable, type ->
             runOnUiThread {
@@ -177,23 +146,6 @@ class FileListViewActivity : AppCompatActivity() {
                 intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or
                         Intent.FLAG_ACTIVITY_NO_HISTORY)
                 startActivity(intent)
-            }
-        }
-
-        if(requestCode == OPEN_PDF_FILE)
-        {
-            var uri: Uri? = null
-
-            if( resultData != null){
-                uri = resultData.data
-
-                //get idTok
-                val guser = intent.getSerializableExtra("guser") as GUser
-                val idTok = guser.idToken
-
-                //pass everything to the upload utility
-                val uu = UploadUtility(this)
-                uu.uploadFile(uri!!, null, idTok!!)
             }
         }
     }
