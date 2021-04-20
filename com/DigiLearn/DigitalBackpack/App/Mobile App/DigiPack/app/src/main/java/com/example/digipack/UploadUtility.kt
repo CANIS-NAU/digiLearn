@@ -158,15 +158,24 @@ class UploadUtility(activity: Activity) {
                 val request: Request = Request.Builder().url(serverSubmitUrl).post(requestBody).build()
                 showToast(request.toString())
 
-                val response: Response = client.newCall(request).execute()
+                val response: Unit = client.newCall(request).enqueue( object: Callback {
 
-                if (response.isSuccessful) {
-                    Log.d("File upload", "success, path: $serverSubmitDirectoryPath$fileName")
-                    showToast("File uploaded successfully at $serverSubmitDirectoryPath$fileName")
-                } else {
-                    Log.e("File upload", "failed")
-                    showToast("File uploading failed")
-                }
+                    override fun onFailure(call: Call, e: IOException){
+                        Log.e("File upload", "failed")
+                        showToast("File uploading failed")
+                    }
+
+                    override fun onResponse(call: Call, response: Response){
+                        response.use{
+                            if (response.isSuccessful) {
+                                Log.d("File upload", "success, path: $serverUploadDirectoryPath$fileName")
+                                showToast("File uploaded successfully at $serverUploadDirectoryPath$fileName")
+                            }else{
+                                throw IOException("Unexpected code: $response")
+                            }
+                        }
+                    }
+                })
             }
             //in case that upload failed, print file upload failed log, toast failure,
             catch (ex: Exception) {
