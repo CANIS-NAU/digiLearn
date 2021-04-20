@@ -4,8 +4,7 @@ import DigiJson.DigiSearch
 import android.os.Bundle
 import android.text.Html
 import android.util.Log
-import android.widget.ExpandableListAdapter
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_search_history.*
 import kotlinx.serialization.encodeToString
@@ -47,8 +46,19 @@ class searchHistoryActivity : AppCompatActivity(){
                 var queries = ArrayList<String>()
                 for( i in searchlist ){
                     i.query?.let { queries.add(it) }
+                    print(i.results)
                 }
+
                 //here we create the list of queries and their results below them.
+                var searchResult = ArrayAdapter(this,android.R.layout.simple_expandable_list_item_1, queries)
+                searchHistoryList.adapter = searchResult
+
+                searchHistoryList.onItemClickListener = AdapterView.OnItemClickListener{parent, view, position, id ->
+                    var names = searchlist[position]
+                    println("=====================================")
+
+
+                }
 
 
             }catch(e: IOException) {
