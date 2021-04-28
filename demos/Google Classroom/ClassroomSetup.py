@@ -133,7 +133,7 @@ x = {'courseId': '316126885315',
      'text': 'Welcome to Language Arts!', 'state': 'PUBLISHED',
      'alternateLink': 'https://classroom.google.com/c/MzE2MTI2ODg1MzE1/p/MzE2MTMxMTM2MjU5',
      'creationTime': '2021-04-15T05:20:02.050Z', 'updateTime': '2021-04-15T05:20:02.044Z',
-     'assigneeMode': 'ALL_STUDENTS', 'creatorUserId': '116556582771903928955'
+     'assigneeMode': 'ALL_STUDENTS', 'creatorUserId': '<project owner ID>'
  }
 
 
@@ -166,8 +166,8 @@ print(str(usl))
 x={'studentSubmissions': [
     {'courseId': '316143603555',
      'courseWorkId': '316147105855',
-     'id': 'Cg4Ih6flsYQJEL-A2N6ZCQ',
-     'userId': '103418527055797809426',
+     'id': 'Cg4Ih6flsYQJEL-A2N6ZCQ', # submission ID
+     'userId': '<users google ID>',
      'creationTime': '2021-04-15T06:38:15.884Z',
      'updateTime': '2021-04-15T06:38:13.301Z',
      'state': 'CREATED',
