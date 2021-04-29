@@ -25,18 +25,3 @@ Python is a high-level object-oriented programming language, and the primary lan
 Django is an open-source web framework written in Python. It helps secure and maintain websites as it reduces the amount of work for web development. Django comes with many features "out of the box", but is still highly customizable making it ideal for this project. 
 
   *Version: Django 3.1.6*
-
-##### Channels
-Channels is an augment for Django which allows for handling of Websocket protocols as well as HTTP. This gives asynchronous support for tasks, which is a crucial mechanism for the Digital Backpack project.
-
-  *Version: Channels 3.0.3*
-
-##### Celery
-Celery is an asynchronous task queue manager for Python.
-
-  *Version: Celery 5.0.5*
-
-##### RabbitMQ
-RabbitMQ is a message broker necessary for the Celery task queue.
-
-  *Version: RabbitMQ 3.8.2*
