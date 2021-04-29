@@ -1,162 +1,638 @@
 {% load static %}
-{% load socialaccount %}
-
-<!doctype html>
+<!DOCTYPE html>
 <html>
-    {% load pwa %}
-    {% progressive_web_app_meta %}
-  <head>
-    <meta charset="utf-8">
-    <!-- this is the temp stylesheet example <link href="{% static 'styles/styles.css' %}" rel="stylesheet"> -->
+<head>
+    <link href="{% static 'styles/mainpage.css' %}" rel="stylesheet">
     <link rel="icon" href="{% static 'icons/favicon.png' %}" type="image/x-icon">
     <link rel="manifest" href="{% static 'manifest.json' %}">
-    <title>Digipack Demo</title>
-	<style>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
+    </script>
+    {% load pwa %}
+    {% progressive_web_app_meta %}
+</head>
 
-		body, html {height: 100%;}
+<body>
+    <p hidden id='token'>{{token}}</p>
+    <div class="header">
+        <a href="/"><img src="{% static 'icons/logo.png' %}" alt="Digipack Logo"></a>
 
-		.wrapper {box-sizing: border-box; height: 100%; overflow: auto; }
+        <li>
+            <ul><i id="lastUpdated"> </i></ul>
+            <ul> Connection Status: <strong id="networkStatus"> </strong> </ul>
+        </li>
+    </div>
+    <div class="nav">
+        <a href="">Settings</a>
+    </div>
 
-
-		a {text-decoration: none; color: #333; border-bottom: 3px solid #0068FF;}
-		a:hover {color: #0068FF}
-		p {font-weight: 200; font-size: 30px;}
-
-		.name {font-family: Montserrat; font-size: 45px; text-transform: uppercase; font-weight: 900; padding: 12px; border: 4px solid #0068FF; color: #0068FF; display: inline-block; position: absolute; margin-bottom: 60px; top: 60px; left: 90px;}
-
-		.container {margin: 0 auto; width: 700px; padding: 120px 12px 50px; overflow: auto;}
-		article {padding: 60px;}
-
-		hr {border-bottom: 3px solid #0068FF;}
-
-		.meta {text-transform: uppercase; font-family: Arial, Courier New, Source Sans Pro, sans-serif; font-size: 10px; letter-spacing: .15em;}
-		.meta a:hover {color: #333;}
-
-		.inline-list {list-style: none; margin: 0; padding: 0;}
-		.inline-list li {display: inline-block;}
-
-    ul {
-      list-style-type: none;
-    }
-
-    li {
-      font-size: 24px;
-      margin: 15px 0;
-    }
-
-	</style>
-  </head>
-  <body>
-
-    <div class="wrapper">
     <div class="container">
-      <header>
-        <h1 class="name">DigiPack</h1>
-      </header>
-      <article>
-        <p>Submit a Google Drive Request, {{ user.username }} </p>
-      </article>
+        <div id="links">
+            <li>
+                <ul><a href="#" onClick="getAssignments()">My Assignments</a></ul>
+                <ul><a href="#" onClick="displayContent('gsearch')">New Search</a></ul>
+                <ul><a href="#" onClick="displayContent('drivefiles')">My Files</a></ul>
+            </li>
+        </div>
 
-      <!-- DIV FOR DRIVE FILE LIST -->
-      <div id="drivefiles"></div>
-      <div id="test"></div>
+        <div id="content">
+            <h1 id="contentTitle"> Welcome! </h1>
+            <div class="items">
+                <div id="quote">
+                    <q>The more that you read, the more things you will know, the more that you learn, the more places
+                        you'll go.</q>
+                    <p>- Dr. Suess</p>
+                </div>
+                <div id="drivefiles" hidden> </div>
+                <div id="classdata" hidden> </div>
+                <div id="resultsdiv"></div>
+                <div id="gsearch" hidden> <input type="search" id="gs-input" aria-label="Make a new query"> <button
+                        id="gs-submit" onClick="">Search</button> <br>Past Searches:
+                    <div id="searchid"></div>
+                </div>
+            </div>
 
-      <!--TEXT BOX-->
-      <!-- <textarea id="file-list" cols="100" rows="20"></textarea> <br> <br> <br> -->
+        </div>
+    </div>
 
-      <script>
+    <script>
+        const digiurl = 'https://digipackweb.com:8000';
+        var id_token = document.getElementById('token').innerHTML;
 
-          //make socket check routing for which consumer is utilized
-          const comSocket = new WebSocket(
-              'ws://'
-              + window.location.host
-              + '/ws/digipack/'
-          );
+        // create urls for initializing gclass and gdrives
+        classInit = digiurl + '/gclass/' + id_token;
+        driveInit = digiurl + '/drive/' + id_token;
 
-          // function sends file ID to the server to be processed
-          function sendFileID(fileid){
-            comSocket.send(JSON.stringify({
-              'fileid' : fileid
-            }));
-            
-          }
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('{% url "sw.js" %}', { scope: '/' }).then(function (reg) {
+                // registration worked
+                console.log('Registration succeeded. Scope is ' + reg.scope);
+            }).catch(function (error) {
+                // registration failed
+                console.log('Registration failed with ' + error);
+            });
+        }
 
-          function testClick(input){ alert("Hello world" + input) };
-          function testClick2(){
-            testClick("Goodbye World")
-          }
-          
+        // Check network status & get date/time
+        var ifConnected = window.navigator.onLine;
+        if (ifConnected) {
+            document.getElementById("networkStatus").innerHTML = "Online";
+            var currentdate = new Date();
+            var datetime = "Last Updated: "
+                + (currentdate.getMonth() + 1) + "/"
+                + currentdate.getDate() + "/"
+                + currentdate.getFullYear() + " @ "
+                + currentdate.getHours() + ":"
+                + currentdate.getMinutes() + ":"
+                + currentdate.getSeconds();
+            document.getElementById("lastUpdated").innerHTML = datetime;
+        } else {
+            document.getElementById("networkStatus").innerHTML = "Offline";
+        }
+        // Check again every 1 seconds & update date/time
+        setInterval(function () {
+            var ifConnected = window.navigator.onLine;
+            if (ifConnected) {
+                document.getElementById("networkStatus").innerHTML = "Online";
+                var currentdate = new Date();
+                var datetime = "Last Updated: "
+                    + (currentdate.getMonth() + 1) + "/"
+                    + currentdate.getDate() + "/"
+                    + currentdate.getFullYear() + " @ "
+                    + currentdate.getHours() + ":"
+                    + currentdate.getMinutes() + ":"
+                    + currentdate.getSeconds();
+                document.getElementById("lastUpdated").innerHTML = datetime;
 
-          //print messages to the chat log
-          comSocket.onmessage = function(e) { // TODO: rename obj and plaindata
-
-            // take in JSON data
-            var obj = JSON.parse(e.data);
-
-            // create a json object of the filedata field
-            var filedata = JSON.parse(obj.filedata)
-
-            // creates an array of keys, which are filenames
-            const filenames = Object.keys(filedata)
-            
-            // initialize HTML string to inject later
-            var html = 'Here are your files:';
-            
-            // create an innerHTML element for each file name
-            filenames.forEach(function (filename)
-            {
-              // add filename to a list, fileID is sent to the server on click
-              //html += '<li><a href="#" onClick="(function(filename){ return function(){ testClick(filedata[filename]);};})(filename);">' + filename + '</a><li>';
-
-              html += '<li><a href="#" onClick="testClick2()">' + filename + '</a><li>';
-              
-              // var button = document.createElement("button");
-              // var textnode = document.createTextNode(filename)
-              // button.appendChild(textnode)
-              // //button.innerText = filename;
-
-              // button.onclick(function(filename){
-              //   return function(){
-              //     testClick(filedata[filename]);
-              //   }
-              // })(filename);
-              
-              // document.getElementById("drivefiles").appendChild(button);
-
-            })
-
-            // wrap in an unordered list
-            html = '<ul>' + html + '</ul>';
-
-            document.getElementById("drivefiles").innerHTML = html 
-
-
-
-            // this just prints the stuff
-            // const plaindata = JSON.parse(e.data);
-            // document.querySelector('#file-list').value += (plaindata.filedata + '\n');
-
-            
-        };
-  
-          comSocket.onclose = function(e) {
-              console.error('Chat socket closed unexpectedly');
-          };
-          
-          
-          if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('{% url "sw.js" %}', { scope: '/' }).then(function(reg) {
-                    // registration worked
-                    console.log('Registration succeeded. Scope is ' + reg.scope);
-                }).catch(function(error) {
-                    // registration failed
-                    console.log('Registration failed with ' + error);
-                });
+            } else {
+                document.getElementById("networkStatus").innerHTML = "Offline";
             }
 
-      </script>
+        }, 1000);
 
-  </div>
-  </div>
-  </body>
+        /**
+         * Function: displayContent
+         * 
+         * Description: hides and unhides div elemets for different content tabs
+         */
+        function displayContent(tag) {
+            if (tag == 'drivefiles') {
+                document.getElementById("quote").hidden = true;
+                document.getElementById("classdata").hidden = true;
+                document.getElementById("drivefiles").hidden = false;
+                document.getElementById("gsearch").hidden = true;
+                document.getElementById("searchid").hidden = true;
+                document.getElementById("resultsdiv").hidden = true;
+                document.getElementById("contentTitle").innerHTML = "My Files"
+            }
+            if (tag == 'classdata') {
+                document.getElementById("quote").hidden = true;
+                document.getElementById("classdata").hidden = false;
+                document.getElementById("drivefiles").hidden = true;
+                document.getElementById("gsearch").hidden = true;
+                document.getElementById("searchid").hidden = true;
+                document.getElementById("resultsdiv").hidden = true;
+                document.getElementById("contentTitle").innerHTML = "My Assignments";
+            }
+            if (tag == 'gsearch') {
+                document.getElementById("quote").hidden = true;
+                document.getElementById("classdata").hidden = true;
+                document.getElementById("drivefiles").hidden = true;
+                document.getElementById("gsearch").hidden = false;
+                document.getElementById("searchid").hidden = false;
+                document.getElementById("resultsdiv").hidden = true;
+                document.getElementById("contentTitle").innerHTML = "New Search";
+            }
+            if (tag == 'results') {
+                document.getElementById("quote").hidden = true;
+                document.getElementById("classdata").hidden = true;
+                document.getElementById("drivefiles").hidden = true;
+                document.getElementById("gsearch").hidden = true;
+                document.getElementById("searchid").hidden = true;
+                document.getElementById("resultsdiv").hidden = false;
+                document.getElementById("contentTitle").innerHTML = "Search Results";
+            }
+
+        }
+
+        function getAssignments() {
+            var networkDataReceived = false;
+
+            // fetch fresh data
+            var networkUpdate = fetch(classInit).then(function (response) {
+                return response.json();
+            }).then(function (data) {
+                networkDataReceived = true;
+                displayAssignments(data);
+            });
+
+            // fetch cached data
+            caches.match(classInit).then(function (response) {
+                if (!response) throw Error("No data");
+                return response.json();
+            }).then(function (data) {
+                // don't overwrite newer network data
+                if (!networkDataReceived) {
+                    displayAssignments(data);
+                }
+            }).catch(function () {
+                // we didn't get cached data, the network is our last hope:
+                return networkUpdate;
+            });
+        }
+
+        function displayAssignments(data) {
+            // get courses from data
+            var courses = data.Courses;
+
+            // initialize HTML string to inject later
+            var html = '';
+            html += '<th>Class</th>';
+            html += '<th>Assignment</th>';
+            html += '<th>Due Date</th>';
+            html += '<th>Points</th>';
+            //html += '<th>Status</th>';
+
+            // wrap in a tr tag
+            html = '<tr>' + html + '</tr>'
+
+            // create table 
+            for (i = 0; i < courses.length; i++) {
+                for (j = 0; j < courses[i].coursework.length; j++) {
+
+                    info = '\'' + courses[i].coursework[j].title + '\', \'' + courses[i].coursework[j].maxPoints + '\', \'' + getDueDate(courses[i].coursework[j].duedate) + '\', \'' + courses[i].coursework[j].description + '\'';
+
+                    // Class
+                    html += '<td>' + courses[i].name + '</td>';
+                    // Assignment
+                    html += '<td><a href=\"#\" onClick=\"showDetails(' + info + ')\">' + courses[i].coursework[j].title + '</a></td>';
+                    // Due Date
+                    html += '<td>' + getDueDate(courses[i].coursework[j].duedate) + '</td>';
+                    // Points
+                    html += '<td>' + courses[i].coursework[j].maxPoints + '</td>';
+                    // Status
+                    //html += '<td>' + '[TODO]' + '</td>';
+
+                    // wrap in a tr tag
+                    html = '<tr>' + html + '</tr>'
+
+                }
+            }
+
+            // wrap in a table element
+            html = '<table id="assignments">' + html + '</table>';
+
+            document.getElementById("classdata").innerHTML = html;
+
+            //TODO: delete this
+            document.getElementById("contentTitle").innerHTML = "My Assignments";
+
+            //TEMPORARY ////////////////////////////////////////////////////////////////////////////////////
+            displayContent('classdata');
+        }
+
+        function getDueDate(duedate) {
+            if (duedate != null) {
+                date = duedate.month + '/' + duedate.day + '/' + duedate.year;
+                return date;
+            }
+            return 'None';
+        }
+
+        function showDetails(title, points, due, description) {
+
+            info = points + ' Points | Due: ' + due + '<br><br>' + description;
+
+            html = '';
+            html += '<th>' + title + '</th>';
+            html += '<tr><td>' + info + '</tr></td>';
+
+            // wrap in a table element
+            html = '<table width=100%>' + html + '</table>';
+
+            // wrap in a div
+            html = '<div id=\"assignment\">' + html + '</div>'
+
+
+            // Create turn in area
+
+            turnin = '';
+            turnin = '<div id=\"buttons\"><h2> Your Work </h2>'
+            turnin += '<form action="/file/upload/" method="post" enctype="multipart/form-data">{% csrf_token %}';
+            turnin += '<input type="file" id="file_name">+ Add or create';
+            turnin += '<input id="idTok" value=\"' + id_token + '\" hidden>';
+            turnin += '<button class="button submit"> Turn In </button></div>';
+
+            // wrap in a div
+            turnin = '<div id=\"turnIn\">' + turnin + '</div>';
+
+
+            html += turnin;
+
+            document.getElementById("classdata").innerHTML = html;
+        }
+
+    </script>
+
+
+    <script>
+
+        function displayResults(resultsarr) {
+            // clear div of previous results
+            document.getElementById("resultsdiv").innerHTML = '';
+
+            for (i = 0; i < resultsarr.length; i++) {
+                var title = resultsarr[i].title;
+                var link = resultsarr[i].link;
+                var displaylink = resultsarr[i].displaylink;
+                var snippet = resultsarr[i].snippet;
+
+                // create list node to wrap elemets
+                var node = document.createElement("LI");
+                // create link node for result link
+                var lnode = document.createElement("a");
+                // set link text to webpage title
+                lnode.textContent = title;
+                // add reference to link
+                lnode.setAttribute('href', link);
+                // create text nodes for display link and short description
+                var dnode = document.createTextNode(displaylink);
+                var snode = document.createTextNode(snippet);
+                var emptyline = document.createElement("p");
+
+                node.setAttribute("class", "resultsclass");
+                node.appendChild(lnode);
+
+                var br = document.createElement('br');
+
+                document.getElementById("resultsdiv").appendChild(br);
+                document.getElementById("resultsdiv").appendChild(dnode);
+                document.getElementById("resultsdiv").appendChild(node);
+                document.getElementById("resultsdiv").appendChild(snode);
+                document.getElementById("resultsdiv").appendChild(br);
+                document.getElementById("resultsdiv").appendChild(br);
+                document.getElementById("resultsdiv").appendChild(emptyline);
+                document.getElementById("resultsdiv").appendChild(br);
+
+
+            }
+
+            displayContent('results');
+
+        }
+
+        /**
+         * IndexedDB Initialization
+         * 
+         * Create an IndexedDB for browser storage.
+         */
+        (function () {
+
+            //check for support
+            if (!('indexedDB' in window)) {
+                console.log('This browser doesn\'t support IndexedDB');
+                return;
+            }
+
+            // open a new database
+            var db;
+            var request = window.indexedDB.open("digipwadb");
+
+            // handle errors
+            request.onerror = function (event) {
+                console.log("Something went wrong with IndexedDB");
+            };
+
+            // create object stores if they do not already exist
+            request.onupgradeneeded = function (event) {
+                var db = event.target.result;
+                // create an object store for google drive file data
+                if (!db.objectStoreNames.contains('gdrivestore')) {
+                    console.log('Making a new object store for gdrive');
+                    var gdrivestore = db.createObjectStore('gdrive', { keyPath: 'fileid' });
+                    gdrivestore.createIndex('filename', 'filename', { unique: false });
+                }
+
+                // create an object store for google classroom data
+                if (!db.objectStoreNames.contains('gclassstore')) {
+                    console.log('Making a new object store for gclassstore');
+                    var gclassstore = db.createObjectStore('gclassstore', { keyPath: 'id', autoIncrement: true });
+                }
+
+                // create an object store for google search data
+                if (!db.objectStoreNames.contains('gsearchstore')) {
+                    console.log('Making a new object store for gsearchstore');
+                    var gsearchstore = db.createObjectStore('gsearchstore', { autoIncrement: true });
+                    gsearchstore.createIndex('mysearch', 'mysearch', { unique: false });
+                }
+
+                // create an object store for google results data
+                if (!db.objectStoreNames.contains('gsearchresults')) {
+                    console.log('making a new object store for gsearchresults');
+                    var gresultsstore = db.createObjectStore('gsearchresults', { autoIncrement: true });
+                    gresultsstore.createIndex('results', 'results', { unique: false });
+                    gresultsstore.createIndex('query', 'query', { unique: false });
+                }
+
+            };
+
+            // if db successfully opens, fetch data to store
+            request.onsuccess = function (event) {
+                console.log('running onsuccess');
+                db = event.target.result;
+
+                // fetches google drive files
+                addFiles();
+
+                // takes in new searches from user
+                newSearch();
+
+                // displays search results check every 5 seconds
+                setInterval(function () {
+                    getSearchResults();
+                }, 5000);
+
+                // displays searches
+                displaySearches();
+            }
+
+            /**
+             * Function: addResults
+             * 
+             * Description: Adds results from Google Search to database
+             */
+            function addResults(data) {
+                // begin db transaction and open object store
+                var resultstransaction = db.transaction(["gsearchresults"], "readwrite");
+                var objectStore = resultstransaction.objectStore("gsearchresults");
+
+                // unpack the results list from json
+                results = data.resultslist
+
+                // iterate through results array and store in database
+                for (i = 0; i < results.length; i++) {
+                    storerequest = objectStore.add(results[i])
+                    storerequest.onsuccess = function (event) {
+                        console.log('gsearchresults successfully stored: ' + JSON.stringify(results[i]))
+                    };
+                }
+            }
+
+            /**
+             * Function: addFiles
+             * 
+             * Description: Adds files retrieved from Google Drive to database
+             */
+            function addFiles() {
+                var networkDataReceived = false;
+                // fetch fresh data
+                var networkUpdate = fetch(driveInit).then(function (response) {
+                    return response.json();
+                }).then(function (data) {
+                    networkDataReceived = true;
+
+                    // create transaction for google drive storage
+                    var drivetransaction = db.transaction(["gdrive"], "readwrite");
+                    var objectStore = drivetransaction.objectStore("gdrive");
+
+                    // unpack file data from json
+                    var filedata = data.Files;
+
+                    // iterate and store each file in the database
+                    filedata.forEach(function (file) {
+                        console.log('gdrive storing: ' + JSON.stringify(file))
+                        var storerequest = objectStore.add(file);
+                        storerequest.onsuccess = function (event) {
+                            console.log('gdrive successfully stored: ' + JSON.stringify(file))
+                        };
+                    });
+
+                    // start a db transaction to retrieve data from object store
+                    db.transaction("gdrive").objectStore("gdrive").getAll().onsuccess = function (event) {
+                        filedata = event.target.result
+                        // initialize HTML string to inject later
+                        var html = '';
+
+                        // create html elements for each file
+                        for (i = 0; i < filedata.length; i++) {
+                            url = digiurl + '/pwa/' + id_token + '/' + filedata[i].fileid + '/' + filedata[i].fileName + '/';
+                            html += '<li><a href="' + url + '">' + filedata[i].fileName + '</a></li>';
+                        }
+                        // add file list to drive files div
+                        document.getElementById("drivefiles").innerHTML = html
+                    };
+
+                });
+
+            }
+
+            /**
+             * Function: newSearch
+             * 
+             * Description: Takes in user input from the search bar and stores the search
+             *              in local database. If the user is offline, the pending queries
+             *              will stay in the database until they are able to be served.
+             */
+            function newSearch() {
+                // focus on search box when submit is clicked or enter is pressed
+                document.querySelector('#gs-input').focus();
+                document.querySelector('#gs-input').onkeyup = function (e) {
+                    if (e.keyCode === 13) {  // enter, return
+                        document.querySelector('#gs-submit').click();
+                    }
+                };
+
+                // get the search input and do something with it
+                document.querySelector('#gs-submit').onclick = function (e) {
+                    const messageInputDom = document.querySelector('#gs-input');
+                    const message = messageInputDom.value;
+
+                    var searchtransaction = db.transaction(["gsearchstore"], "readwrite");
+                    var objectStore = searchtransaction.objectStore("gsearchstore");
+
+                    // store the user entered search
+                    console.log("gsearch storing: " + message)
+                    var storerequest = objectStore.add({ mysearch: message });
+                    storerequest.onsuccess = function (event) {
+                        console.log('gsearch successfully stored: ' + message)
+                    }
+
+                    // clear the search bar after submitting
+                    messageInputDom.value = '';
+                    // update the search list
+                    displaySearches()
+                }
+            }
+
+            /**
+             * Function: getSearchResults
+             * 
+             * Description: Checks for an Internet connection and sends a POST request
+             *              to retrieve search results from pending queries.
+             */
+            function getSearchResults() {
+                // variable to check for connectivity
+                var ifConnected = window.navigator.onLine;
+                if (ifConnected) {
+                    // start transaction to retrieve pending queries from the database
+                    db.transaction("gsearchstore").objectStore("gsearchstore").getAll().onsuccess = function (event) {
+                        data = event.target.result;
+
+                        // add queries to an array
+                        queryarr = [];
+                        for (keys in data) {
+                            var queries = data[keys];
+                            queryarr.push(queries['mysearch'])
+                        }
+
+                        if (queryarr.length != 0) {
+                            console.log("queries awaiting results")
+
+                            //make a post request
+                            $.ajax({
+                                type: 'POST',
+                                url: 'https://digipackweb.com:8000/search/',
+
+                                // Always include an `X-Requested-With` header in every AJAX request,
+                                // to protect against CSRF attacks.
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                contentType: 'application/json; charset=utf-8',
+                                dataType: "json",
+                                success: function (result, status, jqXHR) {
+                                    // Handle or verify the server response.
+                                    var resultsdata = result
+
+                                    // delete query from gsearch store
+                                    var resultstransaction = db.transaction(['gsearchstore'], 'readwrite');
+                                    var objectStoreD = resultstransaction.objectStore("gsearchstore");
+                                    for (keys in data) {
+                                        console.log("gsearch deleting: " + data[keys]['mysearch'])
+                                        var objectStoreRequest = objectStoreD.clear()
+                                        objectStoreRequest.onsuccess = function (event) {
+                                            console.log(" successfully deleted.");
+                                        };
+                                        objectStoreRequest.onerror = function (event) {
+                                            console.log(" did not delete.");
+                                        };
+                                    }
+
+                                    // put results in returned queries store
+                                    addResults(resultsdata);
+
+                                    // display the searches
+                                    displaySearches();
+
+                                },
+
+                                processData: false,
+                                data: JSON.stringify({ "queries": queryarr })
+                            });
+
+
+                        }
+
+
+                    }
+
+
+                }
+            }
+
+            /**
+             * Function: displaySearches
+             * 
+             * Description: Gets pending queries and returned queries from their respective
+             *              databases and displays the results. Pending queries are greyed
+             *              out. Returned queries are clickable links that pull up the results of that query
+             */
+            function displaySearches() {
+                document.getElementById("searchid").innerHTML = '';
+
+                // get the searches from the database and display them as in progress searches
+                db.transaction("gsearchresults").objectStore("gsearchresults").getAll().onsuccess = function (event) {
+                    results = event.target.result;
+                    //console.log("results from display: " + JSON.stringify(results));
+
+                    // create html elements for each file
+                    for (i = 0; i < results.length; i++) {
+                        var node = document.createElement("LI");
+                        var link = document.createElement("a");
+                        link.textContent = (JSON.stringify(results[i].query)).replace('"', '').replace('"', '');
+                        link.setAttribute('href', "#");
+                        onclicklink = 'displayResults(' + JSON.stringify(results[i].results) + ')';
+                        link.setAttribute('onClick', onclicklink);
+                        node.appendChild(link);
+                        node.setAttribute("id", "resultid")
+
+                        document.getElementById("searchid").appendChild(node);
+                    }
+                }
+
+                // get the searches from the database and display them as in progress searches
+                db.transaction("gsearchstore").objectStore("gsearchstore").getAll().onsuccess = function (event) {
+                    queries = event.target.result;
+                    //console.log("queries: " + queries);
+
+                    // create html elements for each file
+                    for (i = 0; i < queries.length; i++) {
+                        var node = document.createElement("LI");
+                        var textnode = document.createTextNode(queries[i].mysearch);
+                        node.appendChild(textnode);
+                        node.setAttribute("title", "Waiting for results...")
+                        node.setAttribute("id", "inprogresssearch")
+                        document.getElementById("searchid").appendChild(node);
+                    }
+                }
+
+            }
+
+        })();
+
+    </script>
+
+
+</body>
+
 </html>
