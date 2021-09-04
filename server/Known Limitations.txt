@@ -1,0 +1,48 @@
+==============================================
+Known Limitations of the DigiPack Proxy Server
+==============================================
+
+
+Login Flow
+``````````
+The current DigiPack web app login flow works as follows:
+ 1. The user must manually navigate to the login page.
+ 2. The user logs in.
+ 3. The user must manually navigate to the index / console page.
+
+This login flow is sufficient for testing but is insufficient for
+production. The following two solutions would work:
+ 1. Redirection. Redirect users to the login page when not logged in,
+    and back to the console when they are logged in.
+ 2. One page. The login screen could be introduced as a modal that masks
+    the DigiPack console until the user logs in. 
+    
+Both of these options would rely on the detection of the user's Id Token,
+which is stored in a variable after login and used to connect to the digipack
+server.
+
+
+Queued Tasks
+````````````
+In some cases, queued tasks (such as search requests, download requests, and
+assignment submissions) are not executed. This occurs only when there are
+multiple tasks in a single queue (e.g., multiple download requests). It is
+possible that this is caused by the action being launched in too rapid 
+succession when internet is available
+ 
+ 
+Data Logging
+````````````
+Search requests are not currently logged in the accessLog. This is because
+search requests do not currently take and authenticate the user's idToken.
+The Search request flow must be patched to take in the user's idToken, as
+most other requests already do. Then, logging this request is trivial.
+ 
+ 
+Automated API testing
+`````````````````````
+When an API test fails, this is not currently recorded. In an ideal case,
+a failed api test would call a subprocess that record the failure to the 
+appropriate GitHub project task board.
+
+
