@@ -1,0 +1,142 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="{% static 'styles/mainpage.css' %}" rel="stylesheet">
+    <link rel="icon" href="{% static 'icons/favicon.png' %}" type="image/x-icon">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
+    </script>
+    <script src="{% static 'javascript/consoledisplayfunctions.js' %}"></script>
+    <script src="{% static 'javascript/indexdb.js' %}"></script>
+    {% load pwa %}
+    {% progressive_web_app_meta %}
+</head>
+
+<body>
+    <p id='token' hidden>{{token}}</p>
+    <div class="header">
+        <a href="/"><img src="{% static 'icons/logo.png' %}" alt="Digipack Logo"></a>
+
+        <li>
+            <ul><i id="lastUpdated"> </i></ul>
+            <ul> Connection Status: <strong id="networkStatus"> </strong> </ul>
+        </li>
+    </div>
+    <div class="nav">
+        <a href="">Settings</a>
+    </div>
+
+    <div class="container">
+        <div id="links">
+            <li>
+                <ul><a href="#" onClick="displayContent('classdata')">My Assignments</a></ul>
+                <ul><a href="#" onClick="displayContent('gsearch')">New Search</a></ul>
+                <ul><a href="#" onClick="displayContent('drivefiles')">My Files</a></ul>
+            </li>
+        </div>
+
+        <div id="content">
+            <h1 id="contentTitle"> Yá'át'ééh! </h1>
+            <div class="items">
+                <div id="quote">
+                    <q>Welcome to the DigiPack!</q>
+                    <!-- <q>The more that you read, the more things you will know, the more that you learn, the more places
+                        you'll go.</q>
+                    <p>- Dr. Suess</p> -->
+                </div>
+                <div id="drivefiles" hidden> </div>
+                <div id="classdata" hidden> </div>
+                <div id="assignmentinfo" hidden> </div>
+                <div id="announcements" hidden> </div>
+                <div id="resultsdiv"></div>
+                <div id="gsearch" hidden> <input type="search" id="gs-input" aria-label="Make a new query"> <button
+                        id="gs-submit" onClick="">Search</button> <br>Past Searches:
+                    <div id="searchid"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="storage"></div>
+    <a href="#" class="yourlink"></a>
+
+    <script>
+
+        // create global variables for site url and id token
+        const digiurl = 'https://digipackweb.com:8000';
+        var id_token = document.getElementById('token').innerHTML;
+
+        // create urls for initializing gclass and gdrives
+        classInit = digiurl + '/gclass/' + id_token;
+        driveInit = digiurl + '/drive/' + id_token;
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('{% url "sw.js" %}', { scope: '/' }).then(function (reg) {
+                // registration worked
+                console.log('Registration succeeded. Scope is ' + reg.scope);
+            }).catch(function (error) {
+                // registration failed
+                console.log('Registration failed with ' + error);
+            });
+        }
+
+        // Check network status & get date/time
+        var ifConnected = window.navigator.onLine;
+        if (ifConnected) {
+            document.getElementById("networkStatus").innerHTML = "Online";
+            var currentdate = new Date();
+            var datetime = "Last Updated: "
+                + (currentdate.getMonth() + 1) + "/"
+                + currentdate.getDate() + "/"
+                + currentdate.getFullYear() + " @ "
+                + currentdate.getHours() + ":"
+                + currentdate.getMinutes() + ":"
+                + currentdate.getSeconds();
+            document.getElementById("lastUpdated").innerHTML = datetime;
+        } else {
+            document.getElementById("networkStatus").innerHTML = "Offline";
+        }
+        // Check again every 1 seconds & update date/time
+        setInterval(function () {
+            var ifConnected = window.navigator.onLine;
+            if (ifConnected) {
+                document.getElementById("networkStatus").innerHTML = "Online";
+                var currentdate = new Date();
+                var datetime = "Last Updated: "
+                    + (currentdate.getMonth() + 1) + "/"
+                    + currentdate.getDate() + "/"
+                    + currentdate.getFullYear() + " @ "
+                    + currentdate.getHours() + ":"
+                    + currentdate.getMinutes() + ":"
+                    + currentdate.getSeconds();
+                document.getElementById("lastUpdated").innerHTML = datetime;
+
+            } else {
+                document.getElementById("networkStatus").innerHTML = "Offline";
+            }
+
+        }, 1000);
+
+        
+
+        /**
+        * Function: getDueDate
+        * 
+        * Description: Takes a date JSON from the google class interpreter and returns a date string
+        */
+        function getDueDate(duedate) {
+            if (duedate != null) {
+                date = duedate.month + '/' + duedate.day + '/' + duedate.year;
+                return date;
+            }
+            return 'None';
+        }
+
+    </script>
+</body>
+
+</html>

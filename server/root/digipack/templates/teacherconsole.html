@@ -1,0 +1,601 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="{% static 'styles/mainpage.css' %}" rel="stylesheet">
+    <link rel="icon" href="{% static 'icons/favicon.png' %}" type="image/x-icon">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
+    </script>
+    {% load pwa %}
+    {% progressive_web_app_meta %}
+    <style>
+        .success{
+        background-color:hsl(120, 100%, 75%);
+        margin:20px;
+        padding:20px;}
+        
+        .pending{
+        background-color:rgb(255, 224, 84);
+        margin:20px;
+        padding:20px;
+        }
+        
+        .error{
+        background-color:rgb(255, 82, 82);
+        margin:20px;
+        padding:20px;
+        }
+        
+        #header{
+        color: white;
+        padding: 30px;
+        margin: 30px;
+        font-family: sans-serif;
+        padding: 10px;
+        font-size: 48px;
+        line-height: 100px;
+        
+        }
+    </style>
+</head>
+
+<body>
+    <p id='token' hidden>{{token}}</p>
+    <div class="header">
+        <a href="/"><img src="{% static 'icons/logo.png' %}" alt="Digipack Logo"></a>
+
+    <span id="header">Teacher Console</span>
+    </div>
+
+
+    <div class="container">
+        <div id="links">
+            <li>
+                <ul><a href="#" onClick="displayContent('createclass')">Create Classes</a></ul>
+                <ul><a href="#" onClick="displayContent('createassignments')">Create Assignments</a></ul>
+                <ul><a href="#" onClick="displayContent('enrollstudents')">Enroll Students</a></ul>
+            </li>
+        </div>
+
+        <div id="content">
+            <h1 id="contentTitle"> Welcome to the Teacher Console </h1>
+            <div class="items">
+                <div id="explanation">
+                    <p>The DigiPack Teacher Console enables you to make your Google Classroom compatible with the Digital Backpack. 
+                        Due to a limitation with Google Classroom, classes and assignments that are to be used with the Digital Backpack
+                        must be initialized through this webpage. Use the tabs on the left to initialize courses, initialize assignments,
+                        and enroll students from a roster. Once your classes and assignments are created, they can be managed through the default
+                        Google Classroom interface.</p>
+                </div>
+                <div id="createclass" hidden>
+                    <p>Use the below forum to create courses. Please specify a number of courses to be created.</p>
+                     <select name="numClasses" id="numClasses">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                    </select>
+                    
+                     <button type="createClasses" onclick="createClasses()">Create Classes</button> 
+                     <br>
+                     <div id="classSuccess" class="success" hidden><b>Success!</b> Your classes have been created. Please check your gmail inbox for an invitation to 
+                     accept the newly created classes. </div>
+                     <div id="classPending" class="pending" hidden><b>Please Wait.</b> Your classes are being created. Once complete, you will be informed here.</div>
+                     <div id="classError" class="error" hidden><b>Error.</b> Your classes were not created. Please try again later.</div>
+                </div>
+                
+                
+                <div id="createassignments" hidden>Use the below forum to create assignments for the specified class. Please select a class, an assignment type, and a
+                                                    number of assignments to be created.<br><br>
+                    <select name="numAssignments" id="numAssignments">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                    </select>
+                    
+                    <select name="assignmentType" id="assignmentType">
+                        <option value="ASSIGNMENT">Assignment</option>
+                        <option value="SHORT_ANSWER_QUESTION">Short Answer</option>
+                        <option value="MULTIPLE_CHOICE_QUESTION">Multiple Choice</option>
+                    </select>
+                    
+                    <select name="classSelect" id="classSelect">
+                    </select>
+                    <button type="createClasses" onclick="createAssignments()">Create Assignments</button>
+                    <br>
+                    
+                    <div id="assignmentSuccess" class="success" hidden><b>Success!</b> Your assignments have been created. The unpublished assignments can be configured through Google Classroom. </div>
+                     <div id="assignmentPending" class="pending" hidden><b>Please Wait.</b> Your assignments are being created. Once complete, you will be informed here.</div>
+                     <div id="assignmentError" class="error" hidden><b>Error.</b> Your assignments were not created. Please try again later.</div>
+                     
+
+                     <div id="getClassPending" class="pending" hidden><b>Please Wait.</b> Your Classes are being retrieved.</div>
+                     <div id="getClassError" class="error" hidden><b>Error.</b> Your classes could not be retrieved. Please try again later.</div>
+                </div>
+                
+                
+                <div id="enrollstudents" hidden>Use to below forum to upload a roster and automatically enroll the contained students into a selected class. Please indidate which 
+                                                class the student will be enrolled in, the column of student emails in the roster, and select the roster from your local files for upload.<br><br>
+                                    
+                                    
+                        <form id="enroll form" action="/enroll/" method="post" enctype="multipart/form-data">{% csrf_token %}            
+                            <select name="classSelectEnroll" id="classSelectEnroll">
+                            </select>
+                            <input type="file" id="roster" name="roster"> 
+                            <select name="colSelect" id="colSelect">
+                                <option value="">Student Email Column</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="D">D</option>
+                                <option value="E">E</option>
+                                <option value="F">F</option>
+                                <option value="G">G</option>
+                                <option value="H">H</option>
+                                <option value="I">I</option>
+                                <option value="J">J</option>
+                            </select>
+                            <input name="uploadIdTok" id="uploadIdTok" hidden>
+
+                            <button type="enrollStudents" onClick="enrollStudents()">Enroll Students</button>
+                        </form>
+                        
+                        
+                        
+                        <div id="getClassPendingEnroll" class="pending" hidden><b>Please Wait.</b> Your Classes are being retrieved.</div>
+                        <div id="getClassErrorEnroll" class="error" hidden><b>Error.</b> Your classes could not be retrieved. Please try again later.</div>
+                        
+                        <div id="enrollSuccess" class="success" hidden><b>Success!</b> Your students have been enrolled. They may need to accept an invitation in their email to fully join your class. </div>
+                        <div id="enrollPending" class="pending" hidden><b>Please Wait.</b> Your students are being enrolled in your class.</div>
+                        <div id="enrollError" class="error" hidden><b>Error.</b> Your students were not enrolled in your class. Please try again later.</div>
+                </div>
+            
+
+        </div>
+    </div>
+
+    
+    <script>
+    function createClasses() {
+        document.getElementById("classSuccess").hidden = true;
+        document.getElementById("classPending").hidden = false;
+        document.getElementById("classError").hidden = true;
+    
+        //get selected number of classes
+        var sel = document.getElementById('numClasses');
+        var num = sel.value
+        console.log(num)
+        
+        //get id_token
+        var id_token = document.getElementById('token').innerHTML;
+        console.log(id_token)
+        
+        try{
+            //make a post request
+            $.ajax({
+                type: 'POST',
+                url: 'https://digipackweb.com:8000/createclass/',
+
+                // Always include an `X-Requested-With` header in every AJAX request,
+                // to protect against CSRF attacks.
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                contentType: 'application/json; charset=utf-8',
+                dataType: "json",
+                success: function (result, status, jqXHR) {
+                    document.getElementById("classPending").hidden = true;
+                    document.getElementById("classSuccess").hidden = false;
+                    
+
+                },
+                error: function (result, status, jqXHR) {
+                    document.getElementById("classSuccess").hidden = true;
+                    document.getElementById("classPending").hidden = true;
+                    document.getElementById("classError").hidden = false;
+                },
+                processData: false,
+                data: JSON.stringify({ "numClasses": num, "id_token":id_token })
+            });
+        }
+        catch(err){
+        
+        }
+    }
+    
+    
+    
+     function getClasses() {
+        document.getElementById("getClassPending").hidden = false;
+        document.getElementById("getClassError").hidden = true;
+        
+        //get id_token
+        var id_token = document.getElementById('token').innerHTML;
+        console.log(id_token)
+        
+        try{
+            //make a post request
+            $.ajax({
+                type: 'POST',
+                url: 'https://digipackweb.com:8000/getclasses/',
+
+                // Always include an `X-Requested-With` header in every AJAX request,
+                // to protect against CSRF attacks.
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                contentType: 'application/json; charset=utf-8',
+                dataType: "json",
+                success: function (result, status, jqXHR) {
+                    document.getElementById("getClassPending").hidden = true;
+                    
+                    console.log(result);
+                    
+                    //create a dropdown menu
+                    let dropdown = document.getElementById('classSelect');
+                    
+                    //clear any extant options
+                    var length = dropdown.options.length;
+                    for (i = length-1; i >= 0; i--) {
+                        dropdown.options[i] = null;
+                    }
+                    
+                    let defaultOption = document.createElement('option');
+                    defaultOption.text = 'Select a Class';
+                    dropdown.add(defaultOption);
+                    dropdown.selectedIndex = 0;
+                    
+                    //populate dropdown menu
+                    //const courses = JSON.parse(result)
+                    const courses = result.courses
+                    let option;
+                    for(let i = 0; i < courses.length; i++) {
+                        if( courses[i].courseState != "DECLINED" && courses[i].courseState != "ARCHIVED")
+                        {
+                            console.log(courses[i].name)
+                            option = document.createElement('option');
+                            option.text = courses[i].name;
+                            option.value = courses[i].id;
+                            dropdown.add(option);
+                        }
+                    
+                    }
+                    
+
+                },
+                error: function (result, status, jqXHR) {
+                    document.getElementById("getClassPending").hidden = true;
+                    document.getElementById("getClassError").hidden = false;
+                },
+                processData: false,
+                data: JSON.stringify({ "id_token":id_token })
+            });
+        }
+        catch(err){
+            document.getElementById("getClassPending").hidden = true;
+            document.getElementById("getClassError").hidden = false;
+        }
+    }
+    
+    
+    function getClassesEnroll() {
+        document.getElementById("getClassPendingEnroll").hidden = false;
+        document.getElementById("getClassErrorEnroll").hidden = true;
+        
+        //get id_token
+        var id_token = document.getElementById('token').innerHTML;
+        console.log(id_token)
+        
+        try{
+            //make a post request
+            $.ajax({
+                type: 'POST',
+                url: 'https://digipackweb.com:8000/getclasses/',
+
+                // Always include an `X-Requested-With` header in every AJAX request,
+                // to protect against CSRF attacks.
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                contentType: 'application/json; charset=utf-8',
+                dataType: "json",
+                success: function (result, status, jqXHR) {
+                    document.getElementById("getClassPendingEnroll").hidden = true;
+                    
+                    console.log(result);
+                    
+                    //create a dropdown menu
+                    let dropdown = document.getElementById('classSelectEnroll');
+                    
+                    //clear any extant options
+                    var length = dropdown.options.length;
+                    for (i = length-1; i >= 0; i--) {
+                        dropdown.options[i] = null;
+                    }
+                    
+                    let defaultOption = document.createElement('option');
+                    defaultOption.text = 'Select a Class';
+                    dropdown.add(defaultOption);
+                    dropdown.selectedIndex = 0;
+                    
+                    //populate dropdown menu
+                    //const courses = JSON.parse(result)
+                    const courses = result.courses
+                    let option;
+                    for(let i = 0; i < courses.length; i++) {
+                        if( courses[i].courseState != "DECLINED" && courses[i].courseState != "ARCHIVED")
+                        {
+                            console.log(courses[i].name)
+                            option = document.createElement('option');
+                            option.text = courses[i].name;
+                            option.value = courses[i].id;
+                            dropdown.add(option);
+                        }
+                    
+                    }
+                    
+
+                },
+                error: function (result, status, jqXHR) {
+                    document.getElementById("getClassPendingEnroll").hidden = true;
+                    document.getElementById("getClassErrorEnroll").hidden = false;
+                },
+                processData: false,
+                data: JSON.stringify({ "id_token":id_token })
+            });
+        }
+        catch(err){
+            document.getElementById("getClassPendingEnroll").hidden = true;
+            document.getElementById("getClassErrorEnroll").hidden = false;
+        }
+    }
+    
+    
+    function createAssignments() {
+        document.getElementById("assignmentSuccess").hidden = true;
+        document.getElementById("assignmentPending").hidden = false;
+        document.getElementById("assignmentError").hidden = true;
+        document.getElementById("getClassPending").hidden = true;
+        document.getElementById("getClassError").hidden = true;
+    
+        //get selected number of assignments, course, assignmentType.
+        var numSel = document.getElementById('numAssignments');
+        var num = numSel.value;
+        console.log(num);
+        
+        var typeSelect = document.getElementById('assignmentType');
+        var assignmentType = typeSelect.value;
+        
+        var courseSel = document.getElementById('classSelect');
+        var courseId = courseSel.value;
+        console.log(courseId)
+        
+        //get id_token
+        var id_token = document.getElementById('token').innerHTML;
+        console.log(id_token)
+        
+        try{
+            //make a post request
+            $.ajax({
+                type: 'POST',
+                url: 'https://digipackweb.com:8000/createassignment/',
+
+                // Always include an `X-Requested-With` header in every AJAX request,
+                // to protect against CSRF attacks.
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                contentType: 'application/json; charset=utf-8',
+                dataType: "json",
+                success: function (result, status, jqXHR) {
+                    document.getElementById("assignmentPending").hidden = true;
+                    document.getElementById("assignmentSuccess").hidden = false;
+                    
+
+                },
+                error: function (result, status, jqXHR) {
+                    document.getElementById("assignmentSuccess").hidden = true;
+                    document.getElementById("assignmentPending").hidden = true;
+                    document.getElementById("assignmentError").hidden = false;
+                },
+                processData: false,
+                data: JSON.stringify({ "numAssignments": num, "id_token":id_token, "courseId": courseId, "assignmentType": assignmentType })
+            });
+        }
+        catch(err){
+        
+        }
+    }
+    
+    
+    
+     function enrollStudents() {
+        document.getElementById("enrollSuccess").hidden = true;
+        document.getElementById("enrollPending").hidden = false;
+        document.getElementById("enrollError").hidden = true;
+    
+        //retrieve forum data
+        var courseSel = document.getElementById('classSelectEnroll');
+        var courseId = courseSel.value;
+        console.log(courseId)
+        
+        //retrieve column for student emails
+        var colSel = document.getElementById('colSelect');
+        var column = colSel.value;
+        console.log(column)
+        
+        //get id_token
+        var id_token = document.getElementById('token').innerHTML;
+        
+        //retrieve selected spreadsheet
+        
+        try{
+            //make a post request
+            $.ajax({
+                type: 'POST',
+                url: 'https://digipackweb.com:8000/enrollstudents/',
+
+                // Always include an `X-Requested-With` header in every AJAX request,
+                // to protect against CSRF attacks.
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                contentType: 'application/json; charset=utf-8',
+                dataType: "json",
+                success: function (result, status, jqXHR) {
+                    document.getElementById("enrollPending").hidden = true;
+                    document.getElementById("enrollSuccess").hidden = false;
+                    
+
+                },
+                error: function (result, status, jqXHR) {
+                    document.getElementById("enrollSuccess").hidden = true;
+                    document.getElementById("enrollPending").hidden = true;
+                    document.getElementById("enrollError").hidden = false;
+                },
+                processData: false,
+                data: JSON.stringify({ "column": column, "id_token":id_token, "courseId": courseId})
+            });
+        }
+        catch(err){
+            document.getElementById("enrollSuccess").hidden = true;
+            document.getElementById("enrollPending").hidden = true;
+            document.getElementById("enrollError").hidden = false;
+        
+        }
+    }
+    
+    
+    /**
+         * Function: displayContent
+         * 
+         * Description: hides and unhides div elemets for different content tabs
+         */
+        function displayContent(tag) {
+            if (tag == 'createclass') {
+                document.getElementById("explanation").hidden = false;
+                document.getElementById("createclass").hidden = false;
+                document.getElementById("createassignments").hidden = true;
+                document.getElementById("classSuccess").hidden = true;
+                document.getElementById("contentTitle").innerHTML = "Create Classes";
+                document.getElementById("enrollstudents").hidden = true;
+
+
+            }
+            
+            if( tag == 'createassignments') {
+                document.getElementById("explanation").hidden = false;
+                document.getElementById("createclass").hidden = true;
+                document.getElementById("createassignments").hidden = false;
+                document.getElementById("classSuccess").hidden = true;
+                document.getElementById("contentTitle").innerHTML = "Create Assignments";
+                document.getElementById("assignmentSuccess").hidden = true;
+                document.getElementById("assignmentPending").hidden = true;
+                document.getElementById("assignmentError").hidden = true;
+                document.getElementById("getClassPending").hidden = true;
+                document.getElementById("getClassError").hidden = true;
+                document.getElementById("enrollstudents").hidden = true;
+                getClasses();
+
+            }
+            
+            if( tag == 'enrollstudents') {
+                document.getElementById("explanation").hidden = false;
+                document.getElementById("createclass").hidden = true;
+                document.getElementById("createassignments").hidden = true;
+                document.getElementById("classSuccess").hidden = true;
+                document.getElementById("contentTitle").innerHTML = "Enroll Students";
+                document.getElementById("enrollstudents").hidden = false;
+                document.getElementById("enrollSuccess").hidden = true;
+                document.getElementById("enrollPending").hidden = true;
+                document.getElementById("enrollError").hidden = true;
+                var idField = document.getElementById('uploadIdTok');
+                var id_token = document.getElementById('token').innerHTML;
+                console.log(id_token)
+                idField.value = id_token
+                getClassesEnroll();
+            }
+        }
+        
+        
+        function enrollStudents() {
+            document.getElementById("uploadIdTok").value = id_token;
+            document.getElementById("myForm").submit();
+        }
+    </script>
+    
+    
+    <script>
+        const digiurl = 'https://digipackweb.com:8000';
+        var id_token = document.getElementById('token').innerHTML;
+        
+        // create urls for initializing gclass and gdrives
+        classInit = digiurl + '/gclass/' + id_token;
+        driveInit = digiurl + '/drive/' + id_token;
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('{% url "sw.js" %}', { scope: '/' }).then(function (reg) {
+                // registration worked
+                console.log('Registration succeeded. Scope is ' + reg.scope);
+            }).catch(function (error) {
+                // registration failed
+                console.log('Registration failed with ' + error);
+            });
+        }
+
+        // Check network status & get date/time
+        var ifConnected = window.navigator.onLine;
+        if (ifConnected) {
+            document.getElementById("networkStatus").innerHTML = "Online";
+            var currentdate = new Date();
+            var datetime = "Last Updated: "
+                + (currentdate.getMonth() + 1) + "/"
+                + currentdate.getDate() + "/"
+                + currentdate.getFullYear() + " @ "
+                + currentdate.getHours() + ":"
+                + currentdate.getMinutes() + ":"
+                + currentdate.getSeconds();
+            document.getElementById("lastUpdated").innerHTML = datetime;
+        } else {
+            document.getElementById("networkStatus").innerHTML = "Offline";
+        }
+        // Check again every 1 seconds & update date/time
+        setInterval(function () {
+            var ifConnected = window.navigator.onLine;
+            if (ifConnected) {
+                document.getElementById("networkStatus").innerHTML = "Online";
+                var currentdate = new Date();
+                var datetime = "Last Updated: "
+                    + (currentdate.getMonth() + 1) + "/"
+                    + currentdate.getDate() + "/"
+                    + currentdate.getFullYear() + " @ "
+                    + currentdate.getHours() + ":"
+                    + currentdate.getMinutes() + ":"
+                    + currentdate.getSeconds();
+                document.getElementById("lastUpdated").innerHTML = datetime;
+
+            } else {
+                document.getElementById("networkStatus").innerHTML = "Offline";
+            }
+
+        }, 1000);
+    </script>
+</body>
+
+</html>

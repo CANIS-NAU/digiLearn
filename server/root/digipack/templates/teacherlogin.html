@@ -1,0 +1,225 @@
+
+<!-- The top of file index.html -->
+<html itemscope itemtype="http://schema.org/Article">
+<head>
+  <!-- BEGIN Pre-requisites -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
+  </script>
+  <script src="https://apis.google.com/js/client:platform.js?onload=start" async 
+defer>
+  </script>
+  <!-- END Pre-requisites -->
+        <style>
+            body {
+            background-color: #0066B2;
+            font-family: 'Ubuntu', sans-serif;
+        }
+
+        .main {
+            background-color: #FFFFFF;
+            width: 400px;
+            height: 400px;
+            margin: 7em auto;
+            border-radius: 1.5em;
+            box-shadow: 0px 11px 35px 2px rgba(0, 0, 0, 0.14);
+        }
+
+        .sign {
+            padding-top: 40px;
+            color: #CF4527;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: bold;
+            font-size: 23px;
+        }
+
+        .un {
+        width: 76%;
+        color: #002454;
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 1px;
+        background: rgba(136, 126, 126, 0.04);
+        padding: 10px 20px;
+        border: none;
+        border-radius: 20px;
+        outline: none;
+        box-sizing: border-box;
+        border: 2px solid rgba(0, 0, 0, 0.02);
+        margin-bottom: 50px;
+        margin-left: 46px;
+        text-align: center;
+        margin-bottom: 27px;
+        font-family: 'Ubuntu', sans-serif;
+        }
+
+        form.form1 {
+            padding-top: 40px;
+        }
+
+        .pass {
+                width: 76%;
+        color: rgb(38, 50, 56);
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 1px;
+        background: rgba(136, 126, 126, 0.04);
+        padding: 10px 20px;
+        border: none;
+        border-radius: 20px;
+        outline: none;
+        box-sizing: border-box;
+        border: 2px solid rgba(0, 0, 0, 0.02);
+        margin-bottom: 50px;
+        margin-left: 46px;
+        text-align: center;
+        margin-bottom: 27px;
+        font-family: 'Ubuntu', sans-serif;
+        }
+
+
+        .un:focus, .pass:focus {
+            border: 2px solid rgba(0, 0, 0, 0.18) !important;
+            
+        }
+
+        .submit {
+        cursor: pointer;
+            border-radius: 5em;
+            color: #fff;
+            background: linear-gradient(to right, #FAC01A, #FFDA0B);
+            border: 0;
+            padding-left: 40px;
+            padding-right: 40px;
+            padding-bottom: 10px;
+            padding-top: 10px;
+            font-family: 'Ubuntu', sans-serif;
+            margin-left: 35%;
+            font-size: 13px;
+            box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+        }
+
+        .forgot {
+            text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
+            color: #F68300;
+            padding-top: 15px;
+        }
+
+        a {
+            text-shadow: 0px 0px 3px rgba(117, 117, 117, 0.12);
+            color: #F68300;
+            text-decoration: none
+        }
+
+        @media (max-width: 600px) {
+            .main {
+                border-radius: 0px;
+            }
+        }
+        
+        #signInButton{
+            margin-top: 20%;
+            padding: 15px;
+            background: white;
+            color: #444;
+            width: 190px;
+            border-radius: 5px;
+            border: thin solid #888;
+            box-shadow: 1px 1px 1px grey;
+            white-space: nowrap;
+        }
+        
+        #signinFlex{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        #signInButton:hover {
+            cursor: pointer;
+        }
+        </style>
+
+    <!-- Continuing the <head> section -->
+  <script>
+    function start() {
+      gapi.load('auth2', function() {
+        auth2 = gapi.auth2.init({
+        client_id: '867834249770-gqs8vn9kq50u4o99im41eoa5odto9hfu.apps.googleusercontent.com',
+          // Scopes to request in addition to 'profile' and 'email'
+          //scope: 'additional_scope'
+        scope: 'https://www.googleapis.com/auth/classroom.courses https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/classroom.guardianlinks.me.readonly https://www.googleapis.com/auth/classroom.coursework.me https://www.googleapis.com/auth/classroom.announcements https://www.googleapis.com/auth/classroom.coursework.students https://www.googleapis.com/auth/classroom.rosters',
+        // redirect_uri: 'https://digipackweb.com:8000/'
+        });
+      });
+    }
+  </script>
+</head>
+    
+    <body>
+      <div class="main">
+        <p class="sign" align="center">Welcome to the DigiPack</p>
+        <br>
+        <div id="signInFlex">
+            <button id="signinButton" align="center">Sign in with Google</button>
+                <script>
+                $('#signinButton').click(function() {
+                    // signInCallback defined in step 6.
+                    auth2.grantOfflineAccess().then(signInCallback);
+                });
+                </script>
+        </div>
+      </div>
+        
+        
+    <!-- Callback method for the button -->
+        <script>
+        function signInCallback(authResult) {
+        if (authResult['code']) { //this the auth code for the server
+            console.log( authResult['code'])
+            // Hide the sign-in button now that the user is authorized
+            $('#signinButton').attr('style', 'display: none');
+            
+            //build the json containing the auth code
+            var obj = new Object();
+            obj.googleAccessToken = authResult['code'];
+            var authCodeString = JSON.stringify(obj);
+            const googleUser = gapi.auth2.getAuthInstance().currentUser.get();
+            const authData = googleUser.getAuthResponse( 1 );
+            token_data = JSON.stringify({'token': authData['id_token']});
+            console.log(token_data);
+
+            // Send the code to the server
+            $.ajax({
+            type: 'POST',
+            url: 'https://digipackweb.com:8000/teacherAuth/',
+            
+            // Always include an `X-Requested-With` header in every AJAX request,
+            // to protect against CSRF attacks.
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            contentType: 'application/json; charset=utf-8',
+            success: function(result) {
+                // Handle or verify the server response.
+				console.log("Proof: 6")
+                console.log(authData['id_token'])
+                console.log(authData['scope'])
+                console.log(result['token'])
+            },
+            
+            processData: false,
+            data: JSON.stringify({ authCodeString, token_data })
+            });
+
+        } else {
+            // There was an error.
+            console.log('There was an error')
+        }
+        }
+        </script>
+        <body>
+    
+    </html>
+    
+    
